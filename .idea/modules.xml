@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/dbl-algorithms.iml" filepath="$PROJECT_DIR$/dbl-algorithms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RectangePacking.iml" filepath="$PROJECT_DIR$/RectangePacking.iml" />
     </modules>
   </component>
 </project>
