@@ -1,5 +1,3 @@
-package dbl.input;
-
 import javafx.util.Pair;
 
 import java.awt.*;

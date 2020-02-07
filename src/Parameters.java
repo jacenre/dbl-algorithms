@@ -1,5 +1,3 @@
-package dbl.input;
-
 import java.awt.*;
 
 public class Parameters {
