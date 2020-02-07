@@ -22,12 +22,21 @@ abstract class AbstractPackingSolverTest {
      */
     @Timeout(30000)
     private void testSolver(AbstractSolver solver, Bin bin) {
+        // Log how long it took to solve
+        long startTime = System.nanoTime();
+
         int optimal = solver.optimal(bin.parameters);
+
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+
         double rate = (double) optimal /  (double) bin.optimal;
+
         // Test report
         System.out.println("Known optimal was :" + bin.optimal);
         System.out.println("Found optimal was :" + optimal);
         System.out.println("OPT rate of " + rate);
+        System.out.println("Solve took " + duration/1000000 + "ms");
     }
 
     /**
@@ -61,7 +70,6 @@ abstract class AbstractPackingSolverTest {
             parameters.heightVariant = "fixed";
             parameters.rotationVariant = false;
 
-            testSolver(solver, binGenerator.generate(parameters));
             assertTimeout(ofSeconds(30), () -> {
                 testSolver(solver, binGenerator.generate(parameters));
             } , "Solve attempt took longer than 30 seconds.");
