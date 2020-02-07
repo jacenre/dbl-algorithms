@@ -8,7 +8,7 @@ public class Main {
     /**
      * @throws IllegalArgumentException  if number of rectangles is not positive
      */
-    public static void main() throws IllegalArgumentException {
+    public static void main(String[] args) throws IllegalArgumentException {
         sc = new Scanner(System.in);
 
         // Getting the height variant
