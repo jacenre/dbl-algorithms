@@ -1,5 +1,7 @@
+import java.util.ArrayList;
+
 /**
- * Data type to store all the paramaters of the algorithm.
+ * Data type to store all the parameters of the algorithm.
  * @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1"> Problem description 2.1 Input Format</a>
  */
 public class Parameters {
@@ -23,5 +25,5 @@ public class Parameters {
     /**
      * Arraylist that stores all the rectangles.
      */
-    public Rectangle[] rectangles;
+    public ArrayList<Rectangle> rectangles;
 }
