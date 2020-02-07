@@ -1,6 +1,3 @@
-import java.util.Arrays;
-import java.util.Scanner;
-
 public class PackingSolver {
     /**
      * @throws IllegalArgumentException if number of rectangles is not positive
