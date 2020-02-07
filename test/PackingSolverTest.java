@@ -4,13 +4,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Main class for the test cases
+ *
+ * Extend this abstract class and add a concrete binGenerator and Solver to test them.
  */
-class PackingSolverTest {
+abstract class PackingSolverTest {
 
-    AbstractBinGenerator abstractBinGenerator;
+    // The bin generator being used for the test cases
+    private AbstractBinGenerator abstractBinGenerator;
 
-    private void testSolver(AbstractSolver solver, AbstractBinGenerator binGenerator) {
-        
+    private void testSolver(AbstractSolver solver, Parameters parameters) {
+        Bin bin = abstractBinGenerator.generate(parameters);
     }
 
 }

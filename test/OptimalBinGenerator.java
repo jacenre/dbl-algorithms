@@ -13,18 +13,15 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      * @return The bin to be packed
      */
     @Override
-    Bin generate(String heightVariant, boolean rotationVariant) {
+    Bin generate(Parameters parameters) {
+        //TODO find a way to parametrize the bound and add a seed
+
         // random grid size
         int randomHeight = new Random().nextInt(1000);
         int randomWidth = new Random().nextInt(1000);
 
         // optimal is the square grid size
         int optimal = randomHeight * randomWidth;
-
-        // generate the parameters
-        Parameters parameters = new Parameters();
-        parameters.heightVariant = heightVariant;
-        parameters.rotationVariant = rotationVariant;
 
         // Fixed height is the optimal height.
         parameters.height = randomHeight;
@@ -37,7 +34,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
 
     /**
      * Method used to generate rectangles based of optimal parameters.
-     * @param parameters The paramaters used in the bin
+     * @param parameters The parameters used in the bin
      * @return rectangles
      */
     private ArrayList<Rectangle> generateRectangles(Parameters parameters) {
@@ -54,7 +51,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      * @return The bin to be packed
      */
     @Override
-    Bin generate(int n, String heightVariant, boolean rotationVariant) {
+    Bin generate(int n, Parameters parameters) {
         return null;
     }
 }
