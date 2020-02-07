@@ -1,4 +1,3 @@
-//TODO Make an abstract solver and then abstract this solver
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
@@ -8,9 +7,8 @@ import org.junit.jupiter.api.Test;
  * Extend this abstract class and add a concrete binGenerator and Solver to test them.
  */
 abstract class AbstractPackingSolverTest {
-
-    // The bin generator being used for the test cases
-    abstract AbstractBinGenerator getGenerator();
+    // The solver to be used for the test cases
+    abstract AbstractSolver getSolver();
 
     /**
      * Basic testing structure,
@@ -19,8 +17,7 @@ abstract class AbstractPackingSolverTest {
      * @param solver Solver to be used during the testing.
      * @param parameters The (incomplete) parameters to be passed on the BinGenerator.
      */
-    private void testSolver(AbstractSolver solver, Parameters parameters) {
-        Bin bin = getGenerator().generate(parameters);
+    private void testSolver(AbstractSolver solver, Bin bin) {
         int optimal = solver.optimal(bin.parameters);
 
         // Test report
@@ -30,16 +27,20 @@ abstract class AbstractPackingSolverTest {
     }
 
     /**
-     * Basic test to see if the binGenerator is working
+     * Example structure of a test case using the OptimalBinGenerator
      */
     @Test
-    @Timeout(300000)
-    void testBinGenerator() {
+    @Timeout(30000)
+    private void exampleTestCase() {
+        AbstractSolver solver = getSolver();
+        OptimalBinGenerator binGenerator = new OptimalBinGenerator();
+
+        // Parameters to be used for the test.
         Parameters parameters = new Parameters();
-        parameters.heightVariant = (String) "free";
+        parameters.heightVariant = "free";
         parameters.rotationVariant = false;
 
-        System.out.println(getGenerator().generate(parameters));
+        testSolver(solver, binGenerator.generate(parameters));
     }
 
 }

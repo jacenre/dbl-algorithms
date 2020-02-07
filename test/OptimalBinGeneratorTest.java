@@ -4,16 +4,12 @@ import org.junit.jupiter.api.*;
 /**
  * Implementation of the abstract test file using the OptimalBinGenerator
  */
-public class OptimalPackingSolverTest extends AbstractPackingSolverTest{
+public class OptimalBinGeneratorTest {
 
     /**
      * Implement the BinGenerator using the OptimalBinGenerator
-     * @return OptimalBinGenerator
      */
-    @Override
-    AbstractBinGenerator getGenerator() {
-        return new OptimalBinGenerator();
-    }
+    private OptimalBinGenerator optimalBinGenerator = new OptimalBinGenerator();
 
     /**
      * Test to see if the rectangle generation works as expected.
@@ -25,7 +21,7 @@ public class OptimalPackingSolverTest extends AbstractPackingSolverTest{
         parameters.heightVariant = (String) "free";
         parameters.rotationVariant = false;
 
-        Bin bin = getGenerator().generate(parameters);
+        Bin bin = optimalBinGenerator.generate(parameters);
 
         int area = 0;
         for (Rectangle rectangle :
