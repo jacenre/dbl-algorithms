@@ -25,6 +25,8 @@ public class Rectangle extends java.awt.Rectangle {
      */
     public Rectangle(int width, int height) {
         super(width, height);
+
+        // Assign ID
         this.id = UUID.randomUUID().toString();
     }
 }

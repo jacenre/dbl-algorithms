@@ -1,4 +1,5 @@
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -41,17 +42,17 @@ public class UserInput {
         return rotationsVariant.startsWith("y");
     }
 
-    private Rectangle[] getRectangles() {
+    private ArrayList<Rectangle> getRectangles() {
         // Getting the rectangles
         int nRectangles = Integer.parseInt(readInputParameter());
         if (nRectangles <= 0) {
             throw new IllegalArgumentException("The number of rectangles must be positive.");
         }
         System.out.println("Getting " + nRectangles + " rectangles");
-        Rectangle[] rectangles = new Rectangle[nRectangles];
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
         for (int i = 0; i < nRectangles; i++) {
             int[] rec = Arrays.stream(sc.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
-            rectangles[i] = new Rectangle(rec[0], rec[1]);
+            rectangles.add(new Rectangle(rec[0], rec[1]));
         }
 
         for (Rectangle rec : rectangles) {
