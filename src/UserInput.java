@@ -1,27 +1,27 @@
-import javafx.util.Pair;
-
 import java.awt.*;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserInput {
     private Scanner sc;
-    public UserInput (InputStream is) {
+
+    public UserInput(InputStream is) {
         this.sc = new Scanner(is);
     }
 
     public Parameters getUserInput() {
         Parameters params = new Parameters();
-        Pair<String, Integer> height = getHeight();
-        params.heightVariant = height.getKey();
-        params.height = height.getValue();
+        List<Object> height = getHeight();
+        params.heightVariant = (String) height.get(0);
+        params.height = (Integer) height.get(1);
         params.rotationVariant = getRotation();
         params.rectangles = getRectangles();
         return params;
     }
 
-    private Pair<String, Integer> getHeight() {
+    private List<Object> getHeight() {
         // Getting the height variant
         String heightVariant = readInputParameter();
         Integer height = null;
@@ -32,7 +32,7 @@ public class UserInput {
         System.out.println();
         System.out.println("Height variant: " + heightVariant + (height != null ? " with height " + height : ""));
 
-        return new Pair<> (heightVariant, height);
+        return Arrays.asList(heightVariant, height);
     }
 
     private boolean getRotation() {
