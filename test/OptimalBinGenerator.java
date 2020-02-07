@@ -1,5 +1,3 @@
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,7 +11,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
 
     /**
      * Used to generate input.
-     * Works by creating a rectangle with a know size and then cutting it up in squares.
+     * Works by creating a rectangle with a known size and then cutting it up in squares.
      *
      * @return The bin to be packed
      */
@@ -51,11 +49,6 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
     private void recursiveRectangle(ArrayList<Rectangle> rectangles, int width, int height, boolean vert) {
         double cut = generator.nextDouble();
 
-        // Round to 2 decimals
-        BigDecimal bd = BigDecimal.valueOf(cut);
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
-        cut = bd.doubleValue();
-
         // Return if the recursion would give rise to rectangle smaller than the minimum, else cut and recurse.
         if (vert) {
             if (width * cut < MIN_RECT_SIZE || width * (1 - cut) < MIN_RECT_SIZE) {
@@ -73,17 +66,6 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
             recursiveRectangle(rectangles, width, newHeight, true);
             recursiveRectangle(rectangles, width, height - newHeight, true);
         }
-    }
-
-    /**
-     * Method used to generate rectangles based of optimal parameters.
-     * @param parameters The parameters used in the bin
-     * @return rectangles
-     */
-    private ArrayList<Rectangle> generateRectangles(Parameters parameters) {
-        ArrayList<Rectangle> rectangles = new ArrayList<>();
-
-        return rectangles;
     }
 
     /**

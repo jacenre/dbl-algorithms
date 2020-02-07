@@ -6,7 +6,7 @@ abstract class AbstractBinGenerator {
     /**
      * Used to generate input.
      * @param parameter The parameter used to describe the input.
-     * @return The bin to be packed
+     * @return The bin to be packed.
      */
     Bin generate(Parameters parameter) {
         return new Bin(new Parameters(), 0);
