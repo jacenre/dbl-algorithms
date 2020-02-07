@@ -9,6 +9,10 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
     private Random generator = new Random();
     private Long SEED = 10L;
 
+    OptimalBinGenerator() {
+        generator.setSeed(SEED);
+    }
+
     /**
      * Used to generate input.
      * Works by creating a rectangle with a known size and then cutting it up in squares.
@@ -18,10 +22,10 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
     @Override
     Bin generate(Parameters parameters) {
         //TODO find a way to parametrize the bound
-        generator.setSeed(SEED);
+
         // random grid size
-        int randomHeight = generator.nextInt(200);
-        int randomWidth =  generator.nextInt(100);
+        int randomHeight = generator.nextInt((int)Math.sqrt(Integer.MAX_VALUE));
+        int randomWidth =  generator.nextInt((int)Math.sqrt(Integer.MAX_VALUE));
         System.out.println("Generating grid with height = " + randomHeight + ", width = " + randomWidth);
         // optimal is the square grid size
         int optimal = randomHeight * randomWidth;

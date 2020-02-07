@@ -1,6 +1,9 @@
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Test;
 
+import static java.time.Duration.ofSeconds;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+
 /**
  * Main class for the test cases
  *
@@ -43,4 +46,26 @@ abstract class AbstractPackingSolverTest {
         testSolver(solver, binGenerator.generate(parameters));
     }
 
+    /**
+     * Automatic testing
+     */
+    @Test
+    void automatedTestCase() {
+        OptimalBinGenerator binGenerator = new OptimalBinGenerator();
+
+        for (int i = 0; i < 10; i++) {
+            AbstractSolver solver = getSolver();
+
+            // Parameters to be used for the test.
+            Parameters parameters = new Parameters();
+            parameters.heightVariant = "fixed";
+            parameters.rotationVariant = false;
+
+            testSolver(solver, binGenerator.generate(parameters));
+            assertTimeout(ofSeconds(30), () -> {
+                testSolver(solver, binGenerator.generate(parameters));
+            } , "Solve attempt took longer than 30 seconds.");
+
+        }
+    }
 }
