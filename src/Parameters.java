@@ -11,7 +11,7 @@ public class Parameters {
     public String heightVariant;
 
     /**
-     *  Describes the height of {@link Parameters#heightVariant} if {@code heightVarient.equals("fixed")}
+     * Describes the height of {@link Parameters#heightVariant} if {@code heightVarient.equals("fixed")}
      */
     public Integer height = null;
 
