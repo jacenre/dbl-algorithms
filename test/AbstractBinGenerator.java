@@ -1,5 +1,3 @@
-import java.util.stream.StreamSupport;
-
 /**
  * Abstract class for generator input test cases.
  */
