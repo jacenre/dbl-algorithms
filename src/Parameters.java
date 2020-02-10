@@ -8,12 +8,12 @@ public class Parameters {
 
     /**
      * Describes the variant that needs to be solved.
-     * Where varient \in {free, fixed}
+     * Where variant \in {free, fixed}
      */
     public String heightVariant;
 
     /**
-     * Describes the height of {@link Parameters#heightVariant} if {@code heightVarient.equals("fixed")}
+     * Describes the height of {@link Parameters#heightVariant} if {@code heightVariant.equals("fixed")}
      */
     public Integer height = null;
 

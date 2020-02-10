@@ -1,19 +1,19 @@
 import java.util.UUID;
 
 /**
- * Custom version of {@link java.awt.Rectangle} that allows for extra satalite data needed for the algorithm.
+ * Custom version of {@link java.awt.Rectangle} that allows for extra satellite data needed for the algorithm.
  */
 public class Rectangle extends java.awt.Rectangle {
 
     /**
      * {@code true} if rectangle is rotated.
      */
-    public boolean rotated = false;
+    private boolean rotated = false;
 
     /**
      * Unique id used for describing the order of the input. Needed to restore order when outputting.
      */
-    public String id;
+    private String id;
 
     /**
      * Construction method which also assigns a random unique id.
@@ -28,5 +28,25 @@ public class Rectangle extends java.awt.Rectangle {
 
         // Assign ID
         this.id = UUID.randomUUID().toString();
+    }
+
+    /** Get rotated property. */
+    public boolean isRotated() {
+        return rotated;
+    }
+
+    /** Get id. */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Command to rotate the rectangle.
+     * Allowed to be used in the strategy variants where rotation of the rectangle is used.
+     */
+    public void rotate() {
+        //noinspection SuspiciousNameCombination
+        this.setBounds(this.x, this.y, this.height, this.width);
+        this.rotated = !this.rotated;
     }
 }
