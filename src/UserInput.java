@@ -24,13 +24,13 @@ public class UserInput {
     private List<Object> getHeight() {
         // Getting the height variant
         String heightVariant = readInputParameter();
-        Integer height = null;
+        int height = Integer.MAX_VALUE;
         if (heightVariant.contains("fixed")) {
             height = Integer.parseInt(heightVariant.split(" ")[1]);
             heightVariant = heightVariant.split(" ")[0];
         }
-        System.out.println();
-        System.out.println("Height variant: " + heightVariant + (height != null ? " with height " + height : ""));
+//        System.out.println();
+//        System.out.println("Height variant: " + heightVariant + (height != Integer.MAX_VALUE ? " with height " + height : ""));
 
         return Arrays.asList(heightVariant, height);
     }
@@ -38,7 +38,7 @@ public class UserInput {
     private boolean getRotation() {
         // Getting the rotations variant
         String rotationsVariant = readInputParameter();
-        System.out.println("Rotations variant: " + rotationsVariant.startsWith("y"));
+//        System.out.println("Rotations variant: " + rotationsVariant.startsWith("y"));
         return rotationsVariant.startsWith("y");
     }
 
@@ -48,20 +48,20 @@ public class UserInput {
         if (nRectangles <= 0) {
             throw new IllegalArgumentException("The number of rectangles must be positive.");
         }
-        System.out.println("Getting " + nRectangles + " rectangles");
+//        System.out.println("Getting " + nRectangles + " rectangles");
         ArrayList<Rectangle> rectangles = new ArrayList<>();
         for (int i = 0; i < nRectangles; i++) {
-            int[] rec = Arrays.stream(sc.nextLine().split(" ")).mapToInt(Integer::parseInt).toArray();
+            int[] rec = Arrays.stream(sc.nextLine().trim().split(" ")).mapToInt(Integer::parseInt).toArray();
             rectangles.add(new Rectangle(rec[0], rec[1]));
         }
 
-        for (Rectangle rec : rectangles) {
-            System.out.println(" " + rec.getSize());
-        }
+//        for (Rectangle rec : rectangles) {
+//            System.out.println(" " + rec.getSize());
+//        }
         return rectangles;
     }
 
     private String readInputParameter() {
-        return this.sc.nextLine().split(":")[1].trim();
+        return this.sc.nextLine().trim().split(":")[1].trim();
     }
 }

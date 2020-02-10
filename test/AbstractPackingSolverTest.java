@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static java.time.Duration.ofSeconds;
@@ -25,7 +26,8 @@ abstract class AbstractPackingSolverTest {
         // Log how long it took to solve
         long startTime = System.nanoTime();
 
-        int optimal = solver.optimal(bin.parameters);
+        int[] sol = solver.optimal(bin.parameters);
+        int optimal = sol[0] * sol[1];
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
@@ -37,6 +39,7 @@ abstract class AbstractPackingSolverTest {
         System.out.println("Found optimal was :" + optimal);
         System.out.println("OPT rate of " + rate);
         System.out.println("Solve took " + duration/1000000 + "ms");
+        Assertions.assertTrue(rate >= 1);
     }
 
     /**
@@ -72,7 +75,7 @@ abstract class AbstractPackingSolverTest {
 
             assertTimeout(ofSeconds(30), () -> {
                 testSolver(solver, binGenerator.generate(parameters));
-            } , "Solve attempt took longer than 30 seconds.");
+            }, "Solve attempt took longer than 30 seconds.");
 
         }
     }

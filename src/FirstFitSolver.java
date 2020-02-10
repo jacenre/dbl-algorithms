@@ -1,6 +1,4 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * Solver algorithm using the First Fit Heuristic where height is fixed.
@@ -23,18 +21,11 @@ public class FirstFitSolver extends AbstractSolver {
      * @return Returns the optimal area found by this solver.
      */
     @Override
-    int optimal(Parameters parameters) {
-        int size = 0;
-
+    int[] optimal(Parameters parameters) {
         // Sort the array from large to small
-        parameters.rectangles.sort(new Comparator<Rectangle>() {
-            @Override
-            public int compare(Rectangle o1, Rectangle o2) {
-                return (o2.width) - (o1.width);
-            }
-        });
+        parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
-        // int[0] is the y of the bin, int[1] is the width.
+        // int[0] is the height of the bin, int[1] is the width, int[2] is x.
         ArrayList<int[]> bins = new ArrayList<>();
 
         for (Rectangle rectangle :
@@ -43,19 +34,21 @@ public class FirstFitSolver extends AbstractSolver {
             if (bins.size() == 0) {
                 rectangle.x = 0;
                 rectangle.y = 0;
-                bins.add(new int[]{rectangle.height, rectangle.width});
+                bins.add(new int[]{rectangle.height, rectangle.width, 0});
             } else {
-                // If the rectangle doesnt fit we create a new bin.
+                // If the rectangle doesn't fit we create a new bin.
                 if (!fitRectangle(bins, rectangle, parameters.height)) {
                     rectangle.x = bins.get(bins.size() - 1)[1];
                     rectangle.y = 0;
-                    bins.add(new int[]{rectangle.height, rectangle.x + rectangle.width});
+                    int[] lastBin = bins.get(bins.size() - 1);
+                    bins.add(new int[]{rectangle.height, rectangle.x + rectangle.width, 0, lastBin[1] + lastBin[2]});
                 }
             }
         }
 
         // Keeps track of the largest bin
         int largestHeight = 0;
+        int totalWidth = bins.get(bins.size()-1)[1];
 
         for (int[] bin :
                 bins) {
@@ -64,9 +57,10 @@ public class FirstFitSolver extends AbstractSolver {
             }
         }
 
-        size = largestHeight * bins.get(bins.size() - 1)[1];
+//        size = largestHeight * bins.get(bins.size() - 1)[1];
 
-        return size;
+        // Solution: int[0] is the height, int[1] is the width of the rectangle
+        return new int[]{largestHeight, totalWidth};
     }
 
     /**
@@ -77,7 +71,7 @@ public class FirstFitSolver extends AbstractSolver {
         for (int[] bin :
                 bins) {
             if (rectangle.height + bin[0] <= height) {
-                rectangle.x = bin[1];
+                rectangle.x = bin[2];
                 rectangle.y = bin[0];
 
                 bin[0] += rectangle.height;

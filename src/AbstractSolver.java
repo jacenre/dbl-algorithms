@@ -14,5 +14,22 @@ abstract class AbstractSolver {
      * @param parameters The parameters to be used by the solver.
      * @return Returns the optimal area found by this solver.
      */
-    abstract int optimal(Parameters parameters);
+    abstract int[] optimal(Parameters parameters);
 }
+
+//class Solution {
+//    /**
+//     * The area the solution takes up
+//     */
+//    public int area;
+//
+//    /**
+//     * The rectangles and their positions
+//     */
+//    public Rectangle[] rectangles;
+//
+//    public Solution(int area, Rectangle[] rectangles) {
+//        this.area = area;
+//        this.rectangles = rectangles;
+//    }
+//}

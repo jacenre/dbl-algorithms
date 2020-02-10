@@ -15,7 +15,7 @@ public class Parameters {
     /**
      * Describes the height of {@link Parameters#heightVariant} if {@code heightVariant.equals("fixed")}
      */
-    public Integer height = null;
+    public Integer height = Integer.MAX_VALUE;
 
     /**
      * True if rotation of rectangles is allowed.
