@@ -10,14 +10,15 @@ public class PackingSolver {
         AbstractSolver problemSolver = new FirstFitSolver();
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
         int[] solution = problemSolver.optimal(params);
+        Output.output(params, inputOrder);
         Output.outputVisual(params, inputOrder, solution);
     }
 
     static class Output {
         public static void output (Parameters params, String[] inputOrder) {
-            System.out.println("Height variant: " + params.heightVariant +
-                    (params.height != Integer.MAX_VALUE ? " with height " + params.height : ""));
-            System.out.println("Rotations variant: " + (params.rotationVariant ? "yes" : "no"));
+            System.out.println("container height: " + params.heightVariant +
+                    (params.height != Integer.MAX_VALUE ? " " + params.height : ""));
+            System.out.println("rotations allowed: " + (params.rotationVariant ? "yes" : "no"));
             System.out.println("number of rectangles: " + params.rectangles.size() );
             for (String rectID : inputOrder) {
                 Rectangle rect = params.rectangles.stream()

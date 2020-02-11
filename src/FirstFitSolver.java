@@ -41,7 +41,7 @@ public class FirstFitSolver extends AbstractSolver {
                     rectangle.x = bins.get(bins.size() - 1)[1];
                     rectangle.y = 0;
                     int[] lastBin = bins.get(bins.size() - 1);
-                    bins.add(new int[]{rectangle.height, rectangle.x + rectangle.width, 0, lastBin[1] + lastBin[2]});
+                    bins.add(new int[]{rectangle.height, rectangle.x + rectangle.width, lastBin[1] + lastBin[2]});
                 }
             }
         }
