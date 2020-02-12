@@ -69,7 +69,8 @@ abstract class AbstractPackingSolverTest {
     }
 
     private int TEST_COUNT = 10;
-    private List<AbstractBinGenerator> binGenerators = Arrays.asList(new OptimalBinGenerator());
+    private List<AbstractBinGenerator> binGenerators = Arrays.asList(new OptimalBinGenerator(),
+            new LargeOptimalBinGenerator());
 
     /**
      * Tests all the generators in binGenerators against the concrete solver

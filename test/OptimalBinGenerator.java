@@ -6,11 +6,19 @@ import java.util.Random;
  */
 public class OptimalBinGenerator extends AbstractBinGenerator {
 
-    private Random generator = new Random();
-    private Long SEED = 125L;
+    Random generator = new Random();
+    Long SEED = 125L;
 
     OptimalBinGenerator() {
         generator.setSeed(SEED);
+    }
+
+    int getHeight() {
+        return generator.nextInt((int) Math.sqrt(Integer.MAX_VALUE));
+    }
+
+    int getWidth() {
+        return generator.nextInt((int) Math.sqrt(Integer.MAX_VALUE));
     }
 
     /**
@@ -21,11 +29,10 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      */
     @Override
     Bin generate(Parameters parameters) {
-        //TODO find a way to parametrize the bound
-
         // random grid size
-        int randomHeight = generator.nextInt((int)Math.sqrt(Integer.MAX_VALUE));
-        int randomWidth =  generator.nextInt((int)Math.sqrt(Integer.MAX_VALUE));
+        int randomHeight = getHeight();
+        int randomWidth  = getWidth();
+
         System.out.println("Generating grid with height = " + randomHeight + ", width = " + randomWidth);
         // optimal is the square grid size
         int optimal = randomHeight * randomWidth;
@@ -40,8 +47,9 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
         return new Bin(parameters, optimal);
     }
 
-    // Used for the recursive rectangle generation
-    private static final int MIN_RECT_SIZE = 5;
+    public int getMinRectSize() {
+        return 5;
+    }
 
     /**
      * Recursively cut up the rectangle and add them to the array.
@@ -55,7 +63,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
 
         // Return if the recursion would give rise to rectangle smaller than the minimum, else cut and recurse.
         if (vert) {
-            if (width * cut < MIN_RECT_SIZE || width * (1 - cut) < MIN_RECT_SIZE) {
+            if (width * cut < getMinRectSize() || width * (1 - cut) < getMinRectSize()) {
                 rectangles.add(new Rectangle(width, height));
             } else {
                 // Used to make sure that the total width doesnt change due to rounding errors.
@@ -63,7 +71,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
                 recursiveRectangle(rectangles, newWidth, height, false);
                 recursiveRectangle(rectangles, width - newWidth, height, false);
             }
-        } else if (height * cut < MIN_RECT_SIZE || height * (1 - cut) < MIN_RECT_SIZE) {
+        } else if (height * cut < getMinRectSize() || height * (1 - cut) < getMinRectSize()) {
             rectangles.add(new Rectangle(width, height));
         } else {
             int newHeight = (int) (height * cut);
