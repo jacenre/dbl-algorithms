@@ -39,6 +39,10 @@ abstract class AbstractPackingSolverTest {
         System.out.println("Found optimal was :" + optimal);
         System.out.println("OPT rate of " + rate);
         System.out.println("Solve took " + duration/1000000 + "ms");
+
+        if (bin.parameters.heightVariant.equals("fixed")) {
+            Assertions.assertEquals(bin.parameters.height,sol[0]);
+        }
         Assertions.assertTrue(rate >= 1);
     }
 
@@ -86,17 +90,13 @@ abstract class AbstractPackingSolverTest {
     void momotorTestCase1() {
         OptimalBinGenerator binGenerator = new OptimalBinGenerator();
 
-        for (int i = 0; i < 10; i++) {
-            AbstractSolver solver = getSolver();
+        AbstractSolver solver = getSolver();
 
-            // Parameters to be used for the test.
-            Parameters parameters = new Parameters();
-            parameters.heightVariant = "fixed";
-            parameters.rotationVariant = false;
+        Parameters parameters = new Parameters();
+        parameters.heightVariant = "fixed";
+        parameters.rotationVariant = false;
 
-            assertTimeout(ofSeconds(30), () -> testSolver(solver, binGenerator.generate(parameters)),
-                    "Solve attempt took longer than 30 seconds.");
-
-        }
+        assertTimeout(ofSeconds(30), () -> testSolver(solver, binGenerator.generate(parameters)),
+                "Solve attempt took longer than 30 seconds.");
     }
 }
