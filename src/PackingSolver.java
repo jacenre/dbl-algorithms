@@ -11,7 +11,7 @@ public class PackingSolver {
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
         int[] solution = problemSolver.optimal(params);
         Output.output(params, inputOrder);
-        Output.outputVisual(params, inputOrder, solution);
+//        Output.outputVisual(params, inputOrder, solution);
     }
 
     static class Output {
@@ -24,6 +24,17 @@ public class PackingSolver {
                 Rectangle rect = params.rectangles.stream()
                         .filter(rectangle -> rectID.equals(rectangle.getId())).findAny().orElse(null);
                 assert (rect != null);
+                System.out.print(rect.width + " ");
+                System.out.println(rect.height);
+            }
+            System.out.println("placement of rectangles");
+            for (String rectID : inputOrder) {
+                Rectangle rect = params.rectangles.stream()
+                        .filter(rectangle -> rectID.equals(rectangle.getId())).findAny().orElse(null);
+                assert (rect != null);
+                if (params.rotationVariant) {
+                    System.out.print(rect.isRotated() ? "yes " : "no ");
+                }
                 System.out.print(rect.x + " ");
                 System.out.println(rect.y);
             }
