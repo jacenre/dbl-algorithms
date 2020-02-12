@@ -9,7 +9,7 @@ public class PackingSolver {
         Parameters params = ui.getUserInput();
         AbstractSolver problemSolver = new FirstFitSolver();
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
-        int[] solution = problemSolver.optimal(params);
+        Solution solution = problemSolver.solve(params);
         Output.output(params, inputOrder);
 //        Output.outputVisual(params, inputOrder, solution);
     }

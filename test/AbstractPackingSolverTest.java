@@ -26,8 +26,8 @@ abstract class AbstractPackingSolverTest {
         // Log how long it took to solve
         long startTime = System.nanoTime();
 
-        int[] sol = solver.optimal(bin.parameters);
-        int optimal = sol[0] * sol[1];
+        Solution sol = solver.optimal(bin.parameters);
+        int optimal = sol.getArea();
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
@@ -41,7 +41,7 @@ abstract class AbstractPackingSolverTest {
         System.out.println("Solve took " + duration/1000000 + "ms");
 
         if (bin.parameters.heightVariant.equals("fixed")) {
-            Assertions.assertEquals(bin.parameters.height,sol[0]);
+            Assertions.assertEquals(bin.parameters.height,sol.height);
         }
         Assertions.assertTrue(rate >= 1);
     }

@@ -4,15 +4,6 @@ import java.util.ArrayList;
  * Solver algorithm using the First Fit Heuristic where height is fixed.
  */
 public class FirstFitSolver extends AbstractSolver {
-    /**
-     * Solves for the given parameters
-     *
-     * @param parameters The parameters to be used by the solver.
-     */
-    @Override
-    void solve(Parameters parameters) {
-
-    }
 
     /**
      * Find the optimal value for the parameters without doing any other output.
@@ -21,7 +12,7 @@ public class FirstFitSolver extends AbstractSolver {
      * @return Returns the optimal area found by this solver.
      */
     @Override
-    int[] optimal(Parameters parameters) {
+    Solution optimal(Parameters parameters) {
         // Sort the array from large to small
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
@@ -64,7 +55,7 @@ public class FirstFitSolver extends AbstractSolver {
 //        size = totalHeight * bins.get(bins.size() - 1)[1];
 
         // Solution: int[0] is the height, int[1] is the width of the rectangle
-        return new int[]{totalHeight, totalWidth};
+        return new Solution(totalWidth, totalHeight, parameters);
     }
 
     /**

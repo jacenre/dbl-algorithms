@@ -34,7 +34,23 @@ public class Solution {
         this.width = width;
     }
 
+    /**
+     * Create a solution object without knowing the solution.
+     * @param parameters The parameters used for solving.
+     */
     public Solution(Parameters parameters) {
+        this.parameters = parameters;
+    }
+
+    /**
+     * Create a Solution object when you know the width and height of the solution.
+     * @param width The width of the solution.
+     * @param height The height of the solution.
+     * @param parameters The parameters used for solving.
+     */
+    public Solution(int width, int height, Parameters parameters) {
+        this.width = width;
+        this.height = height;
         this.parameters = parameters;
     }
 }
