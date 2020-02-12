@@ -7,7 +7,7 @@ import java.util.Random;
 public class OptimalBinGenerator extends AbstractBinGenerator {
 
     private Random generator = new Random();
-    private Long SEED = 10L;
+    private Long SEED = 125L;
 
     OptimalBinGenerator() {
         generator.setSeed(SEED);

@@ -50,10 +50,14 @@ public class FirstFitSolver extends AbstractSolver {
         int largestHeight = 0;
         int totalWidth = bins.get(bins.size()-1)[1];
 
-        for (int[] bin :
-                bins) {
-            if (bin[0] > largestHeight) {
-                largestHeight = bin[0];
+        if (parameters.heightVariant.equals("fixed")) {
+            largestHeight = parameters.height;
+        } else {
+            for (int[] bin :
+                    bins) {
+                if (bin[0] > largestHeight) {
+                    largestHeight = bin[0];
+                }
             }
         }
 
@@ -67,7 +71,7 @@ public class FirstFitSolver extends AbstractSolver {
      * Tries and fit the rectangle in one of the bins
      * @return {@code true} if it fits in any of the bins, else {@code false}
      */
-    boolean fitRectangle(ArrayList<int[]> bins, Rectangle rectangle, int height) {
+    private boolean fitRectangle(ArrayList<int[]> bins, Rectangle rectangle, int height) {
         for (int[] bin :
                 bins) {
             if (rectangle.height + bin[0] <= height) {
