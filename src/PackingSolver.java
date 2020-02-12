@@ -51,8 +51,8 @@ public class PackingSolver {
                 assert (rect != null);
                 for (int i = rect.y; i < rect.y + rect.getHeight(); i++) {
                     for (int j = rect.x; j < rect.x + rect.getWidth(); j++) {
-                        assert(solutionGrid[solution[0] - 1 - i][j].equals("-"));
-                        solutionGrid[solution[0] - 1 - i][j] = "*";
+                        assert(solutionGrid[i][j].equals("-"));
+                        solutionGrid[i][j] = "*";
                     }
                 }
             }
