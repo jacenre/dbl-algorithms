@@ -47,24 +47,24 @@ public class FirstFitSolver extends AbstractSolver {
         }
 
         // Keeps track of the largest bin
-        int largestHeight = 0;
+        int totalHeight = 0;
         int totalWidth = bins.get(bins.size()-1)[1];
 
         if (parameters.heightVariant.equals("fixed")) {
-            largestHeight = parameters.height;
+            totalHeight = parameters.height;
         } else {
             for (int[] bin :
                     bins) {
-                if (bin[0] > largestHeight) {
-                    largestHeight = bin[0];
+                if (bin[0] > totalHeight) {
+                    totalHeight = bin[0];
                 }
             }
         }
 
-//        size = largestHeight * bins.get(bins.size() - 1)[1];
+//        size = totalHeight * bins.get(bins.size() - 1)[1];
 
         // Solution: int[0] is the height, int[1] is the width of the rectangle
-        return new int[]{largestHeight, totalWidth};
+        return new int[]{totalHeight, totalWidth};
     }
 
     /**
