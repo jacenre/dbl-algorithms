@@ -19,7 +19,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         if (!parameters.heightVariant.equals("fixed")) {
             throw new IllegalArgumentException("TopLeftSolver only works when the height is fixed.");
         }
-        if (parameters.rectangles.size() > 10000) {
+        if (parameters.rectangles.size() > 2000) {
             return new Solution(Integer.MAX_VALUE, Integer.MAX_VALUE, parameters);
         }
         // Put the first rectangle in the top left corner
