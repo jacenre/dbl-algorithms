@@ -11,9 +11,21 @@ public class CompoundSolver extends AbstractSolver {
     private ArrayList<AbstractSolver> solvers = new ArrayList<>();
 
     /**
+     * Add a solver to the CompoundSolver
+     */
+    public void addSolver(AbstractSolver solver) {
+        this.solvers.add(solver);
+    }
+
+    /**
      * Solution object containing the best solution found.
      */
     private Solution bestSolution = null;
+
+    /**
+     * Solution object containing the best solution found.
+     */
+    private ArrayList<Rectangle> bestSolutionState = null;
 
     /**
      * Find the optimal value for the parameters without doing any other output.
@@ -23,18 +35,26 @@ public class CompoundSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) {
-        // Copy the parameters
-        Parameters parametersCopy = parameters;
-
         // Try and solve it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {
-            Solution solution = solver.solve(parametersCopy);
+            Solution solution = solver.solve(parameters);
             // If we found a better solution.
             if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
                 bestSolution = solution;
+                bestSolutionState = cloneRectangleState(parameters.rectangles);
             }
         }
+        parameters.rectangles = bestSolutionState;
         return bestSolution;
+    }
+
+    private static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
+        for (Rectangle rect:
+                rects) {
+            rectangles.add(new Rectangle(rect));
+        }
+        return rectangles;
     }
 }

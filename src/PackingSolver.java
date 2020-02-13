@@ -13,28 +13,15 @@ public class PackingSolver {
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
 
         // Different solutions
-        solutions.add(new FirstFitSolver().solve(params));
-        ArrayList<Rectangle> firstFitState = cloneRectangleState(params.rectangles);
+        CompoundSolver compoundSolver = new CompoundSolver();
+        compoundSolver.addSolver(new FirstFitSolver());
         if (params.heightVariant.equals("fixed")) {
-            solutions.add(new TopLeftSolver().solve(params));
+            compoundSolver.addSolver(new TopLeftSolver());
         }
-
-        if (solutions.size() > 1 && solutions.get(0).getArea() < solutions.get(1).getArea()) {
-            // FirstFitSolver found a better solution
-            params.rectangles = firstFitState;
-        }
+        compoundSolver.optimal(params);
 
         Output.output(params, inputOrder);
 //        Output.outputVisual(params, inputOrder, solution);
-    }
-
-    private static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
-        ArrayList<Rectangle> rectangles = new ArrayList<>();
-        for (Rectangle rect:
-             rects) {
-            rectangles.add(new Rectangle(rect));
-        }
-        return rectangles;
     }
 
     static class Output {
