@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 /**
  * Solver algorithm using the First Fit Heuristic where height is fixed.
+ * TODO Implement heightVariant and rotationVariant
  */
 public class FirstFitSolver extends AbstractSolver {
 
@@ -65,7 +66,7 @@ public class FirstFitSolver extends AbstractSolver {
     private boolean fitRectangle(ArrayList<int[]> bins, Rectangle rectangle, int height) {
         for (int[] bin :
                 bins) {
-            if (rectangle.height + bin[0] <= height) {
+            if (rectangle.height + bin[0] < height) {
                 rectangle.x = bin[2];
                 rectangle.y = bin[0];
 
