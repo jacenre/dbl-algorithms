@@ -81,7 +81,7 @@ abstract class AbstractPackingSolverTest {
      * @return All the dynamic generator you wish to run the algorithm on.
      */
     List<AbstractBinGenerator> getGenerators() {
-        return Arrays.asList(new OptimalBinGenerator(),
+        return Arrays.asList(new SmallOptimalBinGenerator(), new OptimalBinGenerator(),
                 new LargeOptimalBinGenerator());
     }
 
@@ -133,7 +133,7 @@ abstract class AbstractPackingSolverTest {
 
         double rate = (double) optimal / (double) bin.optimal;
 
-        if (hasOverlapping(bin.parameters.rectangles)) {
+        if (hasOverlapping(sol.parameters.rectangles)) {
             System.out.println("There are overlapping rectangles");
             return false;
         }
@@ -173,8 +173,8 @@ abstract class AbstractPackingSolverTest {
                     rectangles) {
                 if (!rectangle1.equals(rectangle2)) {
                     if (rectangle1.intersects(rectangle2)) {
-                        System.out.println(rectangle1);
-                        System.out.println(rectangle2);
+                        System.out.println(rectangle1.getId());
+                        System.out.println(rectangle2.getId());
                         return true;
                     }
                 }
@@ -188,7 +188,7 @@ abstract class AbstractPackingSolverTest {
      */
     @Test
     void momotorTestCase1() {
-        OptimalBinGenerator binGenerator = new OptimalBinGenerator();
+        OptimalBinGenerator binGenerator = new SmallOptimalBinGenerator();
 
         AbstractSolver solver = getSolver();
 
@@ -196,7 +196,8 @@ abstract class AbstractPackingSolverTest {
         parameters.heightVariant = "fixed";
         parameters.rotationVariant = false;
 
-        assertTimeout(ofSeconds(30), () -> testSolver(solver, binGenerator.generate(parameters)),
+        assertTimeout(ofSeconds(30), () -> isValidSolution(binGenerator.generate(parameters)),
                 "Solve attempt took longer than 30 seconds.");
+        System.out.println("end");
     }
 }
