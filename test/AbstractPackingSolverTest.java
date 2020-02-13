@@ -68,22 +68,35 @@ abstract class AbstractPackingSolverTest {
         testSolver(solver, binGenerator.generate(parameters));
     }
 
-    private int TEST_COUNT = 10;
-    private List<AbstractBinGenerator> binGenerators = Arrays.asList(new OptimalBinGenerator(),
-            new LargeOptimalBinGenerator());
+    /**
+     * Amount of test to run in the TestFactory
+     * @return default 10 test cases.
+     */
+    int getTestCount(){
+        return 10;
+    };
+
+    /**
+     * List of Bin Generators for which the dynamic test should run.
+     * @return All the dynamic generator you wish to run the algorithm on.
+     */
+    List<AbstractBinGenerator> getGenerators() {
+        return Arrays.asList(new OptimalBinGenerator(),
+                new LargeOptimalBinGenerator());
+    }
 
     /**
      * Tests all the generators in binGenerators against the concrete solver
      */
     @TestFactory
-    @DisplayName("Dynamic Test")
+    @DisplayName("Solver Test Factory")
     Stream<DynamicTest> dynamicSolverTests() {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         for (AbstractBinGenerator binGenerator :
-                binGenerators) {
+                getGenerators()) {
 
-            for (int i = 0; i < TEST_COUNT; i++) {
+            for (int i = 0; i < getTestCount(); i++) {
 
                 // TODO Make generators for each parameter combo.
                 Parameters parameters = new Parameters();
@@ -120,7 +133,13 @@ abstract class AbstractPackingSolverTest {
 
         double rate = (double) optimal / (double) bin.optimal;
 
+        if (hasOverlapping(bin.parameters.rectangles)) {
+            System.out.println("There are overlapping rectangles");
+            return false;
+        }
+
         // Test report
+        System.out.println("Amount of rectangles :" + bin.parameters.rectangles.size());
         System.out.println("Known optimal was :" + bin.optimal);
         System.out.println("Found optimal was :" + optimal);
         System.out.println("OPT rate of " + rate);
@@ -128,16 +147,40 @@ abstract class AbstractPackingSolverTest {
 
         // If solve took longer than 30 seconds
         if ((duration / 1000000) > 30000) {
+            System.out.println("Time limit reached");
             return false;
         }
 
         if (bin.parameters.heightVariant.equals("fixed")) {
             if (bin.parameters.height != sol.height) {
+                System.out.println("The height limit is not maintained");
                 return false;
             }
         }
 
         return rate >= 1;
+    }
+
+    /**
+     * Test to see if any of the rectangles in the list overlap.
+     * @return True if overlapping rectangles in list else false.
+     * TODO Improve runtime
+     */
+    boolean hasOverlapping(ArrayList<Rectangle> rectangles) {
+        for (Rectangle rectangle1 :
+                rectangles) {
+            for (Rectangle rectangle2 :
+                    rectangles) {
+                if (!rectangle1.equals(rectangle2)) {
+                    if (rectangle1.intersects(rectangle2)) {
+                        System.out.println(rectangle1);
+                        System.out.println(rectangle2);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
