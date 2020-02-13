@@ -18,7 +18,7 @@ public class TopLeftSolver extends AbstractSolver {
         if (!parameters.heightVariant.equals("fixed")) {
             throw new IllegalArgumentException("TopLeftSolver only works when the height is fixed.");
         }
-        if (parameters.rectangles.size() > 2000) {
+        if (parameters.rectangles.size() > 10000) {
             return new Solution(Integer.MAX_VALUE, Integer.MAX_VALUE, parameters);
         }
         // Put the first rectangle in the top left corner
@@ -40,15 +40,36 @@ public class TopLeftSolver extends AbstractSolver {
     private void move(Rectangle rect, List<Rectangle> rectangles) {
         if (!canMoveLeft(rect, rectangles) && !canMoveUp(rect, rectangles)) return;
         while (canMoveLeft(rect, rectangles)) {
-            rect.x = rect.x - 1;
+            moveLeft(rect, rectangles);
         }
         while (canMoveUp(rect, rectangles)) {
             rect.y = rect.y - 1;
             if (canMoveLeft(rect, rectangles)) {
-                break;
+                moveLeft(rect, rectangles);
             }
         }
-        move(rect, rectangles);
+    }
+
+    /**
+     * Instead of going step by step, this method looks at what rectangles are
+     * blocking it from going all the way to the left, and move to just the right side of them.
+     * This doesn't work for moveUp, because you always want to move left whenever you can.
+     */
+    private void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
+        rect.x = 0;
+        int minX = 0;
+        boolean intersects;
+        // Check intersection with all placed rectangles
+        do {
+            intersects = false;
+            for (Rectangle rectangle : rectangles) {
+                if (rect.intersects(rectangle)) {
+                    minX = Math.max(minX, rectangle.x + rectangle.width);
+                    intersects = true;
+                    rect.x = minX;
+                }
+            }
+        } while (intersects);
     }
 
     /** Check if the rectangle can move to its left */
