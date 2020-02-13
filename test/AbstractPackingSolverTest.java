@@ -1,5 +1,7 @@
 import org.junit.jupiter.api.*;
+import org.w3c.dom.css.Rect;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -139,6 +141,7 @@ abstract class AbstractPackingSolverTest {
 //        }
 
         // Test report
+        System.out.println("Solved by :" + sol.parameters.solvedBy);
         System.out.println("Amount of rectangles :" + bin.parameters.rectangles.size());
         System.out.println("Known optimal was :" + bin.optimal);
         System.out.println("Found optimal was :" + optimal);
@@ -198,6 +201,33 @@ abstract class AbstractPackingSolverTest {
 
         assertTimeout(ofSeconds(30), () -> isValidSolution(binGenerator.generate(parameters)),
                 "Solve attempt took longer than 30 seconds.");
-        System.out.println("end");
     }
+
+    /**
+     * Test case #3 from First Prototype
+     */
+    @Test
+    @DisplayName("First Prototype Run 3")
+    void run3() {
+        Parameters parameters = new Parameters();
+
+        parameters.heightVariant = "fixed";
+        parameters.height = 80;
+        parameters.rotationVariant = true;
+
+        parameters.rectangles = new ArrayList<>() {{
+            add(new Rectangle(41, 47));
+            add(new Rectangle(36, 20));
+            add(new Rectangle(2, 131));
+            add(new Rectangle(29, 40));
+            add(new Rectangle(27, 55));
+            add(new Rectangle(31, 132));
+        }};
+
+        Bin bin = new Bin(parameters, 17200);
+
+        assertTimeout(ofSeconds(30), () -> isValidSolution(bin),
+                "Solve attempt took longer than 30 seconds.");
+    }
+
 }

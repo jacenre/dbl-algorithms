@@ -42,6 +42,7 @@ public class CompoundSolver extends AbstractSolver {
             // If we found a better solution.
             if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
                 bestSolution = solution;
+                bestSolution.parameters.solvedBy = solver;
                 bestSolutionState = cloneRectangleState(parameters.rectangles);
             }
         }
