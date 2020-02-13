@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PackingSolver {
@@ -7,11 +8,33 @@ public class PackingSolver {
     public static void main(String[] args) throws IllegalArgumentException {
         UserInput ui = new UserInput(System.in);
         Parameters params = ui.getUserInput();
-        AbstractSolver problemSolver = new FirstFitSolver();
+        ArrayList<Solution> solutions = new ArrayList<>();
+        // Remember the order of the rectanges for the output
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
-        Solution solution = problemSolver.solve(params);
+
+        // Different solutions
+        solutions.add(new FirstFitSolver().solve(params));
+        ArrayList<Rectangle> firstFitState = cloneRectangleState(params.rectangles);
+        if (params.heightVariant.equals("fixed")) {
+            solutions.add(new TopLeftSolver().solve(params));
+        }
+
+        if (solutions.size() > 1 && solutions.get(0).getArea() < solutions.get(1).getArea()) {
+            // FirstFitSolver found a better solution
+            params.rectangles = firstFitState;
+        }
+
         Output.output(params, inputOrder);
 //        Output.outputVisual(params, inputOrder, solution);
+    }
+
+    private static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
+        for (Rectangle rect:
+             rects) {
+            rectangles.add(new Rectangle(rect));
+        }
+        return rectangles;
     }
 
     static class Output {

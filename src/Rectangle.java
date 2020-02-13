@@ -30,6 +30,13 @@ public class Rectangle extends java.awt.Rectangle {
         this.id = UUID.randomUUID().toString();
     }
 
+    public Rectangle(Rectangle rectangle) {
+        super(rectangle);
+
+        // Assign ID
+        this.id = rectangle.id != null ? rectangle.id : UUID.randomUUID().toString();
+    }
+
     /** Get rotated property. */
     public boolean isRotated() {
         return rotated;
