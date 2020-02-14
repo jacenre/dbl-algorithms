@@ -30,7 +30,7 @@ abstract class AbstractBinGenerator {
  */
 class Bin {
 
-    Bin(Parameters parameters, int optimal) {
+    Bin(Parameters parameters, Integer optimal) {
         this.parameters = parameters;
         this.optimal = optimal;
     }
@@ -43,5 +43,5 @@ class Bin {
     /**
      * If applicable, the optimal score of the bin
      */
-    int optimal;
+    Integer optimal;
 }
