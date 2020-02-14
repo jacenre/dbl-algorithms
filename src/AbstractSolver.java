@@ -42,7 +42,3 @@ abstract class AbstractSolver {
     abstract Solution optimal(Parameters parameters);
 }
 
-enum HeightSupport {
-    FIXED,
-    FREE
-}

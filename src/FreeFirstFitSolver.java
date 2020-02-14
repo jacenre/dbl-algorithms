@@ -26,7 +26,7 @@ public class FreeFirstFitSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) {
-        if (parameters.rectangles.size() > 10000) {
+        if (parameters.rectangles.size() > 5000) {
             throw new IllegalArgumentException();
         }
 
