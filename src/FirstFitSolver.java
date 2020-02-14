@@ -68,7 +68,7 @@ public class FirstFitSolver extends AbstractSolver {
 //        size = totalHeight * bins.get(bins.size() - 1)[1];
 
         // Solution: int[0] is the height, int[1] is the width of the rectangle
-        return new Solution(totalWidth, totalHeight, parameters);
+        return new Solution(totalWidth, totalHeight, parameters, this);
     }
 
     /**
@@ -78,7 +78,7 @@ public class FirstFitSolver extends AbstractSolver {
     private boolean fitRectangle(ArrayList<int[]> bins, Rectangle rectangle, int height) {
         for (int[] bin :
                 bins) {
-            if (rectangle.height + bin[0] < height) {
+            if (rectangle.height + bin[0] <= height) {
                 rectangle.x = bin[2];
                 rectangle.y = bin[0];
 

@@ -16,11 +16,7 @@ public class OptimalBinGeneratorTest {
      */
     @Test
     void testRectangleGeneration() {
-        Parameters parameters = new Parameters();
-        parameters.heightVariant = "free";
-        parameters.rotationVariant = false;
-
-        Bin bin = optimalBinGenerator.generate(parameters);
+        Bin bin = optimalBinGenerator.generate();
 
         int area = 0;
         for (Rectangle rectangle :

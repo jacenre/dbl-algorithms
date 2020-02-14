@@ -37,12 +37,22 @@ public class CompoundSolver extends AbstractSolver {
         // Try and solve it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {
-            Solution solution = solver.solve(parameters);
-            // If we found a better solution.
-            if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
-                bestSolution = solution;
-                bestSolution.parameters.solvedBy = solver;
-                bestSolutionState = cloneRectangleState(parameters.rectangles);
+            try {
+                Solution solution = solver.solve(parameters);
+
+                // continue if solution is invalid.
+//                if (solution.getRate() < 1) {
+//                    continue;
+//                }
+
+                // If we found a better solution.
+                if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
+                    bestSolution = solution;
+                    bestSolution.solvedBy = solver;
+                    bestSolutionState = cloneRectangleState(parameters.rectangles);
+                }
+            } catch (IllegalArgumentException e) {
+                // Ignore?
             }
         }
         parameters.rectangles = bestSolutionState;

@@ -13,12 +13,21 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
         generator.setSeed(SEED);
     }
 
-    int getHeight() {
-        return generator.nextInt((int) Math.sqrt(Integer.MAX_VALUE));
-    }
+    int getHeight() { return 2000 + generator.nextInt(1000);}
 
     int getWidth() {
-        return generator.nextInt((int) Math.sqrt(Integer.MAX_VALUE));
+        return 2000 + generator.nextInt(1000);
+    }
+
+    /**
+     * Default parameters for this binGenerator is free and non rotating.
+     * @return Free and non-rotating parameters
+     */
+    Parameters getParameters() {
+        Parameters parameters = new Parameters();
+        parameters.heightVariant = "free";
+        parameters.rotationVariant = false;
+        return parameters;
     }
 
     /**
@@ -28,7 +37,9 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      * @return The bin to be packed
      */
     @Override
-    Bin generate(Parameters parameters) {
+    Bin generate() {
+        Parameters parameters = getParameters();
+
         // random grid size
         int randomHeight = getHeight();
         int randomWidth  = getWidth();
@@ -87,7 +98,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      * @return The bin to be packed
      */
     @Override
-    Bin generate(int n, Parameters parameters) {
-        return null;
+    Bin generate(int n) {
+        return generate();
     }
 }
