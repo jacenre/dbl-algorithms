@@ -81,8 +81,8 @@ abstract class AbstractPackingSolverTest {
      * @return All the dynamic generator you wish to run the algorithm on.
      */
     List<AbstractBinGenerator> getGenerators() {
-        return Arrays.asList(new SmallOptimalBinGenerator(), new OptimalBinGenerator(),
-                new LargeOptimalBinGenerator());
+        return Arrays.asList(new FixedOptimalBinGenerator(), new OptimalBinGenerator(),
+                new RotatingOptimalBinGenerator(), new FixedOptimalBinGenerator());
     }
 
     /**
@@ -139,6 +139,7 @@ abstract class AbstractPackingSolverTest {
 //        }
 
         // Test report
+
         System.out.println(sol);
         System.out.println("Solve took " + duration / 1000000 + "ms");
 

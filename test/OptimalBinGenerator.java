@@ -13,12 +13,21 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
         generator.setSeed(SEED);
     }
 
-    int getHeight() {
-        return generator.nextInt((int) Math.sqrt(Integer.MAX_VALUE));
-    }
+    int getHeight() { return 2000 + generator.nextInt(1000);}
 
     int getWidth() {
-        return generator.nextInt((int) Math.sqrt(Integer.MAX_VALUE));
+        return 2000 + generator.nextInt(1000);
+    }
+
+    /**
+     * Default parameters for this binGenerator is free and non rotating.
+     * @return Free and non-rotating parameters
+     */
+    Parameters getParameters() {
+        Parameters parameters = new Parameters();
+        parameters.heightVariant = "free";
+        parameters.rotationVariant = false;
+        return parameters;
     }
 
     /**
@@ -29,14 +38,11 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      */
     @Override
     Bin generate() {
-        Parameters parameters = new Parameters();
+        Parameters parameters = getParameters();
 
         // random grid size
         int randomHeight = getHeight();
         int randomWidth  = getWidth();
-
-        parameters.heightVariant = "Fixed";
-        parameters.height = randomHeight;
 
         System.out.println("Generating grid with height = " + randomHeight + ", width = " + randomWidth);
         // optimal is the square grid size
