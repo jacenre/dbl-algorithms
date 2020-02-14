@@ -20,7 +20,7 @@ public class CompoundSolverTest extends AbstractPackingSolverTest {
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
         compoundSolver.addSolver(new TopLeftSolver());
-        compoundSolver.addSolver(new SimpleTopLeftSolver());
+//        compoundSolver.addSolver(new SimpleTopLeftSolver());
         return compoundSolver;
     }
 }

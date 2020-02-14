@@ -65,7 +65,7 @@ public class Solution {
     /**
      * Debugging information about which solver solved this.
      */
-    public AbstractSolver solvedBy;
+    public AbstractSolver solvedBy = null;
 
     /**
      * The sum of all rectangles which must always be as good or better than the found optimal.
@@ -96,7 +96,9 @@ public class Solution {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Solution found by ").append(solvedBy.getClass().getSimpleName()).append("\n \n");
+        if (solvedBy != null) {
+            stringBuilder.append("Solution found by ").append(solvedBy.getClass().getSimpleName()).append("\n \n");
+        }
         stringBuilder.append("Amount of rectangles ").append(this.parameters.rectangles.size()).append("\n");
         stringBuilder.append("Minimum area is ").append(this.getMinimumArea()).append("\n");
         stringBuilder.append("Found area is ").append(this.getArea()).append("\n");
