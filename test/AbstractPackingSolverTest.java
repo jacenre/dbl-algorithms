@@ -127,14 +127,14 @@ abstract class AbstractPackingSolverTest {
         AbstractSolver solver = getSolver();
 
         Solution sol = solver.optimal(bin.parameters);
-        int optimal = sol.getArea();
+//        int optimal = sol.getArea();
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
 
         Double rate = null;
         if (bin.optimal != null) {
-            rate = (double) optimal / (double) bin.optimal;
+            rate = sol.getRate();
         }
 
 //        if (hasOverlapping(sol.parameters.rectangles)) {
@@ -143,22 +143,18 @@ abstract class AbstractPackingSolverTest {
 //        }
 
         // Test report
-//        System.out.println("Solved by :" + sol.parameters.solvedBy);
-        System.out.println("Amount of rectangles :" + bin.parameters.rectangles.size());
-        System.out.println("Known optimal was :" + bin.optimal);
-        System.out.println("Found optimal was :" + optimal);
-        if (rate != null) System.out.println("OPT rate of " + rate);
+        System.out.println(sol);
         System.out.println("Solve took " + duration / 1000000 + "ms");
 
         // If solve took longer than 30 seconds
         if ((duration / 1000000) > 30000) {
-            System.out.println("Time limit reached");
+            System.err.println("Time limit reached");
             return false;
         }
 
         if (bin.parameters.heightVariant.equals("fixed")) {
             if (bin.parameters.height != sol.height) {
-                System.out.println("The height limit is not maintained");
+                System.err.println("The height limit is not maintained");
                 return false;
             }
         }
@@ -204,34 +200,6 @@ abstract class AbstractPackingSolverTest {
         assertTimeout(ofSeconds(30), () -> isValidSolution(binGenerator.generate(parameters)),
                 "Solve attempt took longer than 30 seconds.");
     }
-
-    /**
-     * Test case #3 from First Prototype
-     */
-    @Test
-    @DisplayName("First Prototype Run 3")
-    void run3() {
-        Parameters parameters = new Parameters();
-
-        parameters.heightVariant = "fixed";
-        parameters.height = 80;
-        parameters.rotationVariant = true;
-
-        parameters.rectangles = new ArrayList<>() {{
-            add(new Rectangle(41, 47));
-            add(new Rectangle(36, 20));
-            add(new Rectangle(2, 131));
-            add(new Rectangle(29, 40));
-            add(new Rectangle(27, 55));
-            add(new Rectangle(31, 132));
-        }};
-
-        Bin bin = new Bin(parameters, 17200);
-
-        assertTimeout(ofSeconds(30), () -> isValidSolution(bin),
-                "Solve attempt took longer than 30 seconds.");
-    }
-
 
     /**
      * All momotor test cases
