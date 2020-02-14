@@ -79,17 +79,19 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     /**
      * Move up until there is a possibility to move left.
      */
-    // TODO: Refactor to use the same logic as moveLeft, as this logic might be flawed
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
-        int prevY = rect.y;
         rect.y = 0;
-        Rectangle path = new Rectangle(rect.x, 0, rect.width, prevY);
-        for (Rectangle rectangle : rectangles) {
-            if (rectangle.intersects(path) &&
-                    rectangle.y + rectangle.height > rect.y + rect.height) {
-                rect.y = rectangle.y + rectangle.height;
+        boolean intersects;
+        // Check intersection with all placed rectangles
+        do {
+            intersects = false;
+            for (Rectangle rectangle : rectangles) {
+                if (rect.intersects(rectangle)) {
+                    intersects = true;
+                    rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
+                }
             }
-        }
+        } while (intersects);
     }
 
     /** Check if the rectangle can move to its left */
