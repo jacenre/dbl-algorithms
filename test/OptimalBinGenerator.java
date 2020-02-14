@@ -28,10 +28,15 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      * @return The bin to be packed
      */
     @Override
-    Bin generate(Parameters parameters) {
+    Bin generate() {
+        Parameters parameters = new Parameters();
+
         // random grid size
         int randomHeight = getHeight();
         int randomWidth  = getWidth();
+
+        parameters.heightVariant = "Fixed";
+        parameters.height = randomHeight;
 
         System.out.println("Generating grid with height = " + randomHeight + ", width = " + randomWidth);
         // optimal is the square grid size
@@ -87,7 +92,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      * @return The bin to be packed
      */
     @Override
-    Bin generate(int n, Parameters parameters) {
-        return null;
+    Bin generate(int n) {
+        return generate();
     }
 }

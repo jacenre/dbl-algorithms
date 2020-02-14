@@ -63,12 +63,9 @@ abstract class AbstractPackingSolverTest {
         AbstractSolver solver = getSolver();
         OptimalBinGenerator binGenerator = new OptimalBinGenerator();
 
-        // Parameters to be used for the test.
-        Parameters parameters = new Parameters();
-        parameters.heightVariant = "fixed";
-        parameters.rotationVariant = false;
+        Bin bin = binGenerator.generate();
 
-        testSolver(solver, binGenerator.generate(parameters));
+        testSolver(solver, bin);
     }
 
     /**
@@ -105,7 +102,7 @@ abstract class AbstractPackingSolverTest {
                 Parameters parameters = new Parameters();
                 parameters.heightVariant = "fixed";
                 parameters.rotationVariant = false;
-                Bin bin = binGenerator.generate(parameters);
+                Bin bin = binGenerator.generate();
                 DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
                         -> assertTrue(isValidSolution(bin)));
 
@@ -127,7 +124,6 @@ abstract class AbstractPackingSolverTest {
         AbstractSolver solver = getSolver();
 
         Solution sol = solver.optimal(bin.parameters);
-//        int optimal = sol.getArea();
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
@@ -182,23 +178,6 @@ abstract class AbstractPackingSolverTest {
             }
         }
         return false;
-    }
-
-    /**
-     * Momotor cases testing
-     */
-    @Test
-    void momotorTestCase1() {
-        OptimalBinGenerator binGenerator = new SmallOptimalBinGenerator();
-
-        AbstractSolver solver = getSolver();
-
-        Parameters parameters = new Parameters();
-        parameters.heightVariant = "fixed";
-        parameters.rotationVariant = false;
-
-        assertTimeout(ofSeconds(30), () -> isValidSolution(binGenerator.generate(parameters)),
-                "Solve attempt took longer than 30 seconds.");
     }
 
     /**

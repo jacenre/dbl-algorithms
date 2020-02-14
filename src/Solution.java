@@ -96,11 +96,11 @@ public class Solution {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Solution found by ").append(solvedBy.getClass().getSimpleName()).append("\n");
+        stringBuilder.append("Solution found by ").append(solvedBy.getClass().getSimpleName()).append("\n \n");
         stringBuilder.append("Amount of rectangles ").append(this.parameters.rectangles.size()).append("\n");
         stringBuilder.append("Minimum area is ").append(this.getMinimumArea()).append("\n");
         stringBuilder.append("Found area is ").append(this.getArea()).append("\n");
-        stringBuilder.append("OPT rate of ").append((double) this.getArea() / (double) this.getMinimumArea());
+        stringBuilder.append("OPT rate of ").append((double) this.getArea() / (double) this.getMinimumArea()).append("\n");
         return stringBuilder.toString();
     }
 }
