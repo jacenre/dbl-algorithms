@@ -113,7 +113,7 @@ public class ReverseFitSolver extends AbstractSolver {
         }
 
         while (canPushRectangleUp(firstRow, lastOnReverse)) {   // Push up the last rectangle in the reverse row
-            lastOnReverse.translate(0, 1);
+            lastOnReverse.translate(0, -1);
         }
 
         firstRow.add(lastOnReverse); // To make it easier to check if new rectangles intersect with others
@@ -129,11 +129,13 @@ public class ReverseFitSolver extends AbstractSolver {
     }
 
     void firstFit(ArrayList<Rectangle> remainingRectangles, int level, Parameters parameters, ArrayList<Rectangle> firstRow) {
+        System.out.println("level: " + level);
         while (!remainingRectangles.isEmpty()) {
             remainingRectangles.get(0).setLocation(level, parameters.height);
             while (canPushRectangleUp(firstRow, remainingRectangles.get(0))) { // Still sorted by width
-                remainingRectangles.get(0).translate(0, 1);
+                remainingRectangles.get(0).translate(0, -1);
             }
+            System.out.println("pushed far enough");
             if (remainingRectangles.get(0).y + remainingRectangles.get(0).height >= parameters.height) { //   TODO: SEE IF THIS SHOULD BE > OR >=
                 // it doesnt fit unfortunately, so we simply make a new level at the right of the fathest block to the right
                 int new_level = findNewLevel(firstRow); // Just search for ride side of most right block
@@ -157,14 +159,18 @@ public class ReverseFitSolver extends AbstractSolver {
     }
 
     boolean canPushRectangleUp(ArrayList<Rectangle> firstRow, Rectangle rectangleToPushUp) {
-        rectangleToPushUp.translate(0, 1);
+        rectangleToPushUp.translate(0, -1);
+        if (rectangleToPushUp.y <= 0) {
+            rectangleToPushUp.translate(0, 1);
+            return false;
+        }
         for (Rectangle rectangle : firstRow) {
-            if (rectangle.intersects(rectangleToPushUp) || rectangleToPushUp.y <= 0) {
-                rectangleToPushUp.translate(0, -1);
+            if (rectangleToPushUp.intersects(rectangle)) {
+                rectangleToPushUp.translate(0, 1);
                 return false;
             }
         }
-        rectangleToPushUp.translate(0, -1);
+        rectangleToPushUp.translate(0, 1);
         return true;
     }
 
