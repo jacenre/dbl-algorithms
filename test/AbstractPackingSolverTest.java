@@ -61,6 +61,7 @@ abstract class AbstractPackingSolverTest {
     @Test
     void exampleTestCase() {
         AbstractSolver solver = getSolver();
+        Assumptions.assumeTrue(solver.heightSupport.contains(HeightSupport.FIXED));
         OptimalBinGenerator binGenerator = new OptimalBinGenerator();
 
         // Parameters to be used for the test.

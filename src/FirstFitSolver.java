@@ -5,6 +5,7 @@ import java.util.ArrayList;
  * TODO Implement heightVariant and rotationVariant
  */
 public class FirstFitSolver extends AbstractSolver {
+    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED};
 
     /**
      * Find the optimal value for the parameters without doing any other output.
@@ -28,6 +29,7 @@ public class FirstFitSolver extends AbstractSolver {
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
         // int[0] is the height of the bin, int[1] is the width, int[2] is x.
+        // TODO: Rename bins into boxes, and create a box class
         ArrayList<int[]> bins = new ArrayList<>();
 
         for (Rectangle rectangle :

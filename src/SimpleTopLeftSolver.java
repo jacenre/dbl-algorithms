@@ -56,7 +56,6 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     /**
      * Instead of going step by step, this method looks at what rectangles are
      * blocking it from going all the way to the left, and move to just the right side of them.
-     * This doesn't work for moveUp, because you always want to move left whenever you can.
      */
     protected void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
         rect.x = 0;
@@ -76,6 +75,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     /**
      * Move up until there is a possibility to move left.
      */
+    // TODO: Refactor to use the same logic as moveLeft, as this logic might be flawed
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
         int prevY = rect.y;
         rect.y = 0;

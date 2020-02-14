@@ -23,11 +23,6 @@ public class CompoundSolver extends AbstractSolver {
     private Solution bestSolution = null;
 
     /**
-     * Solution object containing the best solution found.
-     */
-    private ArrayList<Rectangle> bestSolutionState = null;
-
-    /**
      * Find the optimal value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
@@ -35,6 +30,10 @@ public class CompoundSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) {
+        /**
+         * Solution object containing the best solution found.
+         */
+        ArrayList<Rectangle> bestSolutionState = cloneRectangleState(parameters.rectangles);
         // Try and solve it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {

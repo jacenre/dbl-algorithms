@@ -2,6 +2,7 @@
  * Abstract class for the solver
  */
 abstract class AbstractSolver {
+    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED, HeightSupport.FREE};
 
     /**
      * Solves for the given parameters
@@ -22,4 +23,9 @@ abstract class AbstractSolver {
      * @return Returns the associated {@link Solution} object
      */
     abstract Solution optimal(Parameters parameters);
+}
+
+enum HeightSupport {
+    FIXED,
+    FREE
 }
