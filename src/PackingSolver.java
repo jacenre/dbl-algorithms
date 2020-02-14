@@ -15,7 +15,7 @@ public class PackingSolver {
         // Different solutions
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
-        if (params.heightVariant.equals("fixed")) {
+        if (params.heightVariant == HeightSupport.FIXED) {
             compoundSolver.addSolver(new TopLeftSolver());
         }
         compoundSolver.optimal(params);

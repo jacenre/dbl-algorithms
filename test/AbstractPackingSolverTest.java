@@ -102,7 +102,7 @@ abstract class AbstractPackingSolverTest {
 
                 // TODO Make generators for each parameter combo.
                 Parameters parameters = new Parameters();
-                parameters.heightVariant = "fixed";
+                parameters.heightVariant = HeightSupport.FIXED;
                 parameters.rotationVariant = false;
                 Bin bin = binGenerator.generate();
                 DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
@@ -130,10 +130,8 @@ abstract class AbstractPackingSolverTest {
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
 
-        Double rate = null;
-        if (bin.optimal != null) {
-            rate = sol.getRate();
-        }
+        Double rate;
+        rate = sol.getRate();
 
 //        if (hasOverlapping(sol.parameters.rectangles)) {
 //            System.out.println("There are overlapping rectangles");
@@ -141,7 +139,6 @@ abstract class AbstractPackingSolverTest {
 //        }
 
         // Test report
-
         System.out.println(sol);
         System.out.println("Solve took " + duration / 1000000 + "ms");
 
@@ -151,14 +148,19 @@ abstract class AbstractPackingSolverTest {
             return false;
         }
 
-        if (bin.parameters.heightVariant.equals("fixed")) {
+        if (bin.parameters.heightVariant == HeightSupport.FIXED) {
             if (bin.parameters.height != sol.height) {
                 System.err.println("The height limit is not maintained");
                 return false;
             }
         }
 
-        return rate == null || rate >= 1;
+        if (rate < 1) {
+            System.err.println("Impossible result.");
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -202,9 +204,9 @@ abstract class AbstractPackingSolverTest {
             Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
             Bin bin = new Bin(params, null);
             AbstractSolver solver = this.getSolver();
-            if (params.heightVariant.equals("fixed") && !solver.getHeightSupport().contains(HeightSupport.FIXED)) {
+            if (!solver.getHeightSupport().contains(params.heightVariant)) {
                 continue;
-            } else if (params.heightVariant.equals("free") && !solver.getHeightSupport().contains(HeightSupport.FREE)) {
+            } else if (!solver.getHeightSupport().contains(params.heightVariant)) {
                 continue;
             }
             DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)) );

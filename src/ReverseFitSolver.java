@@ -14,14 +14,11 @@ public class ReverseFitSolver extends AbstractSolver {
      * Find the value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
-     * @pre {@code parameters.heightVariant.equals("fixed") }
+     * @pre {@code parameters.heightVariant == HeightVariant.FIXED }
      * @return Returns the optimal area found by this solver.
      */
     @Override
     Solution optimal(Parameters parameters) throws IllegalArgumentException {
-        if (!parameters.heightVariant.equals("fixed") || parameters.height <= 0)
-            throw new IllegalArgumentException("ReverseFitSolver only solves with fixed height.");
-
         // arrayList with rectangles in final position
         ArrayList<Rectangle> placedRectangles = new ArrayList<>();
 

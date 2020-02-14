@@ -10,7 +10,7 @@ public class Parameters {
      * Describes the variant that needs to be solved.
      * Where variant \in {free, fixed}
      */
-    public String heightVariant;
+    public HeightSupport heightVariant;
 
     /**
      * Describes the height of {@link Parameters#heightVariant} if {@code heightVariant.equals("fixed")}
