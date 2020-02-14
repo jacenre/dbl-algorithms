@@ -26,4 +26,10 @@ public class Parameters {
      * Arraylist that stores all the rectangles.
      */
     public ArrayList<Rectangle> rectangles;
+
+    /**
+     * Debugging information about which solver solved this.
+     */
+    public AbstractSolver solvedBy;
+
 }

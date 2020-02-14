@@ -13,7 +13,11 @@ public class Solution {
      * The area the solution takes up
      */
     public int getArea(){
-        return this.height * this.width;
+        try {
+            return Math.multiplyExact(this.height, this.width);
+        } catch (ArithmeticException e) {
+            return Integer.MAX_VALUE;
+        }
     };
 
     /**

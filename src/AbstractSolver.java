@@ -12,6 +12,7 @@ abstract class AbstractSolver {
         Solution solution = this.optimal(parameters);
 
         // report(solution);
+
         return solution;
     };
 

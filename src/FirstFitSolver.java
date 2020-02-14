@@ -14,6 +14,16 @@ public class FirstFitSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) {
+        // Greedy choice, rotate every rectangle such that it is wider than that it is high.
+        if (parameters.rotationVariant) {
+            for (Rectangle rectangle :
+                    parameters.rectangles) {
+                if (rectangle.height > rectangle.width) {
+                    rectangle.rotate();
+                }
+            }
+        }
+
         // Sort the array from large to small
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
