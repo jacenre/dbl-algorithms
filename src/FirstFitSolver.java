@@ -5,7 +5,8 @@ import java.util.ArrayList;
  * TODO Implement heightVariant and rotationVariant
  */
 public class FirstFitSolver extends AbstractSolver {
-    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED};
+
+    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED, HeightSupport.FREE};
 
     /**
      * Find the optimal value for the parameters without doing any other output.

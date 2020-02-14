@@ -1,7 +1,5 @@
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 
 /**
@@ -9,6 +7,11 @@ import java.util.Comparator;
  * See https://link.springer.com/chapter/10.1007/BFb0049416 for the algorithm
  */
 public class ReverseFitSolver extends AbstractSolver {
+
+    @Override
+    Set<HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(HeightSupport.FIXED));
+    }
 
     /**
      * Find the value for the parameters without doing any other output.
