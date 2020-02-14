@@ -201,16 +201,17 @@ abstract class AbstractPackingSolverTest {
         for (File file : files) {
             Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
             Bin bin = new Bin(params, null);
-            if (params.heightVariant.equals("fixed") && this.getSolver().heightSupport.contains(HeightSupport.FIXED)) {
+            AbstractSolver solver = this.getSolver();
+            if (params.heightVariant.equals("fixed") && !solver.getHeightSupport().contains(HeightSupport.FIXED)) {
                 continue;
-            } else if (this.getSolver().heightSupport.contains(HeightSupport.FREE)) {
+            } else if (params.heightVariant.equals("free") && !solver.getHeightSupport().contains(HeightSupport.FREE)) {
                 continue;
             }
             DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)) );
 
             dynamicTests.add(dynamicTest);
         }
-
+        System.out.println(dynamicTests.size());
         return dynamicTests.stream();
 
     }

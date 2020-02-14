@@ -6,7 +6,9 @@ import java.util.Set;
  * Abstract class for the solver
  */
 abstract class AbstractSolver {
-    public Set<HeightSupport> heightSupport = new HashSet<>(Arrays.asList(HeightSupport.FREE, HeightSupport.FIXED));
+    Set<HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(HeightSupport.FREE, HeightSupport.FIXED));
+    }
 
     /**
      * Solves for the given parameters

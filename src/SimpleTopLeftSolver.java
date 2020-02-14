@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Solver algorithm adapted from the BL-algorithm, where the height has to be fixed.
@@ -7,6 +6,11 @@ import java.util.List;
  */
 public class SimpleTopLeftSolver extends AbstractSolver {
     int binWidth = 0;
+
+    @Override
+    Set<HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(HeightSupport.FIXED));
+    }
 
     /**
      * Find the optimal value for the parameters without doing any other output.
