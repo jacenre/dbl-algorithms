@@ -1,5 +1,11 @@
 import org.junit.jupiter.api.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -74,7 +80,7 @@ abstract class AbstractPackingSolverTest {
      */
     int getTestCount(){
         return 10;
-    };
+    }
 
     /**
      * List of Bin Generators for which the dynamic test should run.
@@ -104,9 +110,7 @@ abstract class AbstractPackingSolverTest {
                 parameters.rotationVariant = false;
                 Bin bin = binGenerator.generate(parameters);
                 DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
-                        -> {
-                    assertTrue(isValidSolution(bin));
-                });
+                        -> assertTrue(isValidSolution(bin)));
 
                 dynamicTests.add(dynamicTest);
             }
@@ -131,7 +135,10 @@ abstract class AbstractPackingSolverTest {
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
 
-        double rate = (double) optimal / (double) bin.optimal;
+        Double rate = null;
+        if (bin.optimal != null) {
+            rate = (double) optimal / (double) bin.optimal;
+        }
 
 //        if (hasOverlapping(sol.parameters.rectangles)) {
 //            System.out.println("There are overlapping rectangles");
@@ -142,7 +149,7 @@ abstract class AbstractPackingSolverTest {
         System.out.println("Amount of rectangles :" + bin.parameters.rectangles.size());
         System.out.println("Known optimal was :" + bin.optimal);
         System.out.println("Found optimal was :" + optimal);
-        System.out.println("OPT rate of " + rate);
+        if (rate != null) System.out.println("OPT rate of " + rate);
         System.out.println("Solve took " + duration / 1000000 + "ms");
 
         // If solve took longer than 30 seconds
@@ -158,7 +165,7 @@ abstract class AbstractPackingSolverTest {
             }
         }
 
-        return rate >= 1;
+        return rate == null || rate >= 1;
     }
 
     /**
@@ -199,5 +206,34 @@ abstract class AbstractPackingSolverTest {
         assertTimeout(ofSeconds(30), () -> isValidSolution(binGenerator.generate(parameters)),
                 "Solve attempt took longer than 30 seconds.");
         System.out.println("end");
+    }
+
+
+    /**
+     * All momotor test cases
+     */
+    @TestFactory
+    @DisplayName("Momotor Test Cases")
+    Stream<DynamicTest> momotorTests() throws IOException {
+        List<DynamicTest> dynamicTests = new ArrayList<>();
+
+        // Get all files from the momotor folder
+        File folder = new File("./test/momotor/");
+        File[] files = folder.listFiles();
+        assert files != null;
+        files = Arrays.stream(files).filter(File::isFile).toArray(File[]::new);
+
+        // Add a test for each input
+        for (File file : files) {
+            Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+            Bin bin = new Bin(params, null);
+            DynamicTest dynamicTest = dynamicTest(file.getName(), ()
+                    -> assertTrue(isValidSolution(bin)));
+
+            dynamicTests.add(dynamicTest);
+        }
+
+        return dynamicTests.stream();
+
     }
 }

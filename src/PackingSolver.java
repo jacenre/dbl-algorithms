@@ -9,7 +9,7 @@ public class PackingSolver {
         UserInput ui = new UserInput(System.in);
         Parameters params = ui.getUserInput();
         ArrayList<Solution> solutions = new ArrayList<>();
-        // Remember the order of the rectanges for the output
+        // Remember the order of the rectangles for the output
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
 
         // Different solutions
@@ -25,6 +25,11 @@ public class PackingSolver {
     }
 
     static class Output {
+        public static void output (Parameters params) {
+            String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
+            output(params, inputOrder);
+        }
+
         public static void output (Parameters params, String[] inputOrder) {
             System.out.println("container height: " + params.heightVariant +
                     (params.height != Integer.MAX_VALUE ? " " + params.height : ""));
