@@ -16,7 +16,7 @@ public class FreeFirstFitSolver extends AbstractSolver {
 
     FirstFitSolver firstFitSolver = new FirstFitSolver();
 
-    Solution bestSolution;
+    Solution bestSolution = null;
 
     /**
      * Find the optimal value for the parameters without doing any other output.
@@ -38,16 +38,21 @@ public class FreeFirstFitSolver extends AbstractSolver {
 
         for (int height :
                 heights) {
-            parameters.height = height;
-            Solution newSolution = firstFitSolver.optimal(parameters);
+            Parameters newParameters = parameters.copy();
+            newParameters.height = height;
+
+            Solution newSolution = firstFitSolver.optimal(newParameters.copy());
+
+            if (bestSolution == null) {
+                bestSolution = newSolution.copy();
+            }
+
             if (newSolution.getArea() < bestSolution.getArea()) {
-                bestSolution.parameters = parameters;
-                bestSolution.setHeight(newSolution.height);
-                bestSolution.setWidth(newSolution.width);
+                bestSolution = newSolution.copy();
             }
         }
-
         bestSolution.parameters.heightVariant = HeightSupport.FREE;
+        bestSolution.solvedBy = this;
         return bestSolution;
     }
 
@@ -61,9 +66,6 @@ public class FreeFirstFitSolver extends AbstractSolver {
         // Set to fixed and give it to the first fit solver.
         parameters.heightVariant = HeightSupport.FIXED;
         Solution solution = firstFitSolver.solve(parameters);
-
-        // Create new best solution
-        bestSolution = new Solution(solution.width, solution.height, parameters, this);
 
         for (Rectangle rectangle :
                 solution.parameters.rectangles) {

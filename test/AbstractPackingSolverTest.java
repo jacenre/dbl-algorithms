@@ -133,10 +133,10 @@ abstract class AbstractPackingSolverTest {
         Double rate;
         rate = sol.getRate();
 
-//        if (hasOverlapping(sol.parameters.rectangles)) {
-//            System.out.println("There are overlapping rectangles");
-//            return false;
-//        }
+        if (hasOverlapping(sol.parameters.rectangles)) {
+            System.out.println("There are overlapping rectangles");
+            return false;
+        }
 
         // Test report
         System.out.println(sol);
@@ -149,7 +149,7 @@ abstract class AbstractPackingSolverTest {
         }
 
         if (bin.parameters.heightVariant == HeightSupport.FIXED) {
-            if (bin.parameters.height != sol.height) {
+            if (bin.parameters.height != sol.getHeight()) {
                 System.err.println("The height limit is not maintained");
                 return false;
             }
@@ -205,8 +205,6 @@ abstract class AbstractPackingSolverTest {
             Bin bin = new Bin(params, null);
             AbstractSolver solver = this.getSolver();
             if (!solver.getHeightSupport().contains(params.heightVariant)) {
-                continue;
-            } else if (!solver.getHeightSupport().contains(params.heightVariant)) {
                 continue;
             }
             DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)) );

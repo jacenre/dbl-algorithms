@@ -13,29 +13,36 @@ public class Solution {
      * The area the solution takes up
      */
     public int getArea() {
-        try {
-            return Math.multiplyExact(this.height, this.width);
-        } catch (ArithmeticException e) {
-            return Integer.MAX_VALUE;
-        }
+        return this.getWidth() * this.getHeight();
     }
 
     /**
      * Height of the total bin area
      */
-    public int height;
+    public int getHeight() {
+        // If height is fixed return the fix height
+        int maxHeight = 0;
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
+        for (Rectangle rectangle :
+                this.parameters.rectangles) {
+            if (rectangle.y + rectangle.height > maxHeight) maxHeight = rectangle.y + rectangle.height;
+        }
+
+        return maxHeight;
+    };
 
     /**
      * Width of the total bin area
      */
-    public int width;
+    public int getWidth() {
+        int maxWidth = 0;
 
-    public void setWidth(int width) {
-        this.width = width;
+        for (Rectangle rectangle :
+                this.parameters.rectangles) {
+            if (rectangle.x + rectangle.width > maxWidth) maxWidth = rectangle.x + rectangle.width;
+        }
+
+        return maxWidth;
     }
 
     /**
@@ -50,13 +57,9 @@ public class Solution {
     /**
      * Create a Solution object when you know the width and height of the solution.
      *
-     * @param width      The width of the solution.
-     * @param height     The height of the solution.
      * @param parameters The parameters used for solving.
      */
-    public Solution(int width, int height, Parameters parameters, AbstractSolver solvedBy) {
-        this.width = width;
-        this.height = height;
+    public Solution(Parameters parameters, AbstractSolver solvedBy) {
         this.parameters = parameters;
         this.solvedBy = solvedBy;
     }
@@ -101,5 +104,15 @@ public class Solution {
         stringBuilder.append("Found area is ").append(this.getArea()).append("\n");
         stringBuilder.append("OPT rate of ").append((double) this.getArea() / (double) this.getMinimumArea()).append("\n");
         return stringBuilder.toString();
+    }
+
+    /**
+     * Create a deep copy of this Solution object
+     * @return Deep copy solution object.
+     */
+    public Solution copy() {
+        Solution solution = new Solution(this.parameters.copy());
+        solution.solvedBy = this.solvedBy;
+        return solution;
     }
 }

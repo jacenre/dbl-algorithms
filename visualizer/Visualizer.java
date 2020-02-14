@@ -22,16 +22,20 @@ public class Visualizer extends PApplet {
         compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
         compoundSolver.addSolver(new TopLeftSolver());
+        compoundSolver.addSolver(new FreeFirstFitSolver());
         solution = compoundSolver.optimal(params);
 
-        if (solution.width > 1000 || solution.height > 1000) {
-            if (solution.width > solution.height) {
-                size(1000, (solution.height * 1000) / solution.width);
+        int width = solution.getWidth();
+        int height = solution.getHeight();
+        
+        if (width > 1000 || height > 1000) {
+            if (width > height) {
+                size(1000, (height * 1000) / width);
             } else {
-                size((solution.width * 1000) / solution.height, 1000);
+                size((width * 1000) / height, 1000);
             }
         } else {
-            size(solution.width, solution.height);
+            size(width, height);
         }
     }
 

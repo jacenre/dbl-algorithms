@@ -63,9 +63,8 @@ public class FirstFitSolver extends AbstractSolver {
         }
 
 //        size = totalHeight * bins.get(bins.size() - 1)[1];
-
-        // Solution: int[0] is the height, int[1] is the width of the rectangle
-        return new Solution(totalWidth, totalHeight, parameters, this);
+        
+        return new Solution(parameters, this);
     }
 
     /**
