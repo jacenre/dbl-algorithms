@@ -55,14 +55,10 @@ public class FirstFitSolver extends AbstractSolver {
         int totalHeight = 0;
         int totalWidth = bins.get(bins.size()-1)[1];
 
-        if (parameters.heightVariant == HeightSupport.FIXED) {
-            totalHeight = parameters.height;
-        } else {
-            for (int[] bin :
-                    bins) {
-                if (bin[0] > totalHeight) {
-                    totalHeight = bin[0];
-                }
+        for (int[] bin :
+                bins) {
+            if (bin[0] > totalHeight) {
+                totalHeight = bin[0];
             }
         }
 

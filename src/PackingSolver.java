@@ -78,5 +78,9 @@ public class PackingSolver {
                 }
             }
         }
+
+        public static void visualizerP3 (String[] args) {
+            Visualizer.main(args);
+        }
     }
 }
