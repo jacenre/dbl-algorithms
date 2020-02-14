@@ -1,8 +1,12 @@
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Abstract class for the solver
  */
 abstract class AbstractSolver {
-    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED, HeightSupport.FREE};
+    public Set<HeightSupport> heightSupport = new HashSet<>(Arrays.asList(HeightSupport.FREE, HeightSupport.FIXED));
 
     /**
      * Solves for the given parameters
@@ -23,7 +27,7 @@ abstract class AbstractSolver {
      * @return Returns the associated {@link Solution} object
      * @throws IllegalArgumentException If tasked with an incompatible parameter object for this solver.
      */
-    abstract Solution optimal(Parameters parameters) throws IllegalArgumentException;
+    abstract Solution optimal(Parameters parameters);
 }
 
 enum HeightSupport {

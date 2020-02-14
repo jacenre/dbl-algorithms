@@ -20,8 +20,6 @@ public class Solution {
         }
     }
 
-    ;
-
     /**
      * Height of the total bin area
      */
@@ -56,10 +54,11 @@ public class Solution {
      * @param height     The height of the solution.
      * @param parameters The parameters used for solving.
      */
-    public Solution(int width, int height, Parameters parameters) {
+    public Solution(int width, int height, Parameters parameters, AbstractSolver solvedBy) {
         this.width = width;
         this.height = height;
         this.parameters = parameters;
+        this.solvedBy = solvedBy;
     }
 
     /**

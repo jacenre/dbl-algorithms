@@ -91,7 +91,7 @@ public class ReverseFitSolver extends AbstractSolver {
         }
 
 
-        return new Solution(0, 0, parameters);
+        return new Solution(0, 0, parameters, this);
     }
 
 }
