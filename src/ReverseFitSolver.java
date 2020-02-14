@@ -10,6 +10,9 @@ public class ReverseFitSolver extends AbstractSolver {
     Solution optimal(Parameters parameters) {
         ArrayList<Rectangle> remainingRectangles = new ArrayList<>();
         for (Rectangle rectangle : parameters.rectangles) {
+            if (rectangle.width > parameters.height / 2) {
+                rectangle.rotate();
+            }
             remainingRectangles.add(rectangle);
         }
 
@@ -129,19 +132,16 @@ public class ReverseFitSolver extends AbstractSolver {
     }
 
     void firstFit(ArrayList<Rectangle> remainingRectangles, int level, Parameters parameters, ArrayList<Rectangle> firstRow) {
-        System.out.println("level: " + level);
         while (!remainingRectangles.isEmpty()) {
             remainingRectangles.get(0).setLocation(level, parameters.height);
             while (canPushRectangleUp(firstRow, remainingRectangles.get(0))) { // Still sorted by width
                 remainingRectangles.get(0).translate(0, -1);
             }
-            System.out.println("pushed far enough");
             if (remainingRectangles.get(0).y + remainingRectangles.get(0).height >= parameters.height) { //   TODO: SEE IF THIS SHOULD BE > OR >=
                 // it doesnt fit unfortunately, so we simply make a new level at the right of the fathest block to the right
                 int new_level = findNewLevel(firstRow); // Just search for ride side of most right block
                 firstFit(remainingRectangles, new_level, parameters, firstRow);
             } else { // rectangle fit in this last level, so we remove it from remaining rectangles but add to firstRow to look for collisions
-                System.out.println(remainingRectangles.get(0).x + " + " +  remainingRectangles.get(0).y);
                 firstRow.add(remainingRectangles.get(0));
                 remainingRectangles.remove(0);
             }
