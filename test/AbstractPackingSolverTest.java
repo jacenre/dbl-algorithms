@@ -133,14 +133,22 @@ abstract class AbstractPackingSolverTest {
         Double rate;
         rate = sol.getRate();
 
+        // Test report
+        System.out.println(sol);
+        System.out.println("Solve took " + duration / 1000000 + "ms");
+
         if (hasOverlapping(sol.parameters.rectangles)) {
             System.out.println("There are overlapping rectangles");
             return false;
         }
 
-        // Test report
-        System.out.println(sol);
-        System.out.println("Solve took " + duration / 1000000 + "ms");
+        for (Rectangle rectangle :
+                sol.parameters.rectangles) {
+            if (rectangle.x < 0 || rectangle.y < 0) {
+                System.out.println("Negative coordinates found");
+                return false;
+            }
+        }
 
         // If solve took longer than 30 seconds
         if ((duration / 1000000) > 30000) {

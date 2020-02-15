@@ -12,7 +12,7 @@ public class CompoundSolverTest extends AbstractPackingSolverTest {
 
     @Override
     List<AbstractBinGenerator> getGenerators() {
-        return new ArrayList<>();
+        return new ArrayList<>(Arrays.asList(new OptimalBinGenerator()));
     }
 
     @Override

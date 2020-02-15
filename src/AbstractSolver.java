@@ -23,6 +23,16 @@ abstract class AbstractSolver {
             throw new IllegalArgumentException("Unsupported height variant");
         }
 
+        // General rule, if rotating make sure that every rectangle fits.
+        if (parameters.rotationVariant) {
+            for (Rectangle rectangle :
+                    parameters.rectangles) {
+                if (rectangle.height > parameters.height) {
+                    rectangle.rotate();
+                }
+            }
+        }
+
         // Create a new solution for this solve.
         Solution solution = this.optimal(parameters);
 

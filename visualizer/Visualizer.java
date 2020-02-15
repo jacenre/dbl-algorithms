@@ -1,5 +1,7 @@
 import processing.core.PApplet;
 
+import java.util.Arrays;
+
 /**
  * Visualizer using the P3 library
  */
@@ -21,8 +23,9 @@ public class Visualizer extends PApplet {
         // Different solutions
         compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
-        compoundSolver.addSolver(new TopLeftSolver());
-        compoundSolver.addSolver(new FreeFirstFitSolver());
+//        compoundSolver.addSolver(new TopLeftSolver());
+//        compoundSolver.addSolver(new SimpleTopLeftSolver());
+//        compoundSolver.addSolver(new FreeFirstFitSolver());
         solution = compoundSolver.optimal(params);
 
         int width = solution.getWidth();
@@ -39,15 +42,27 @@ public class Visualizer extends PApplet {
         }
     }
 
+    public void drawParameters(Parameters parameters) {
+        for (Rectangle rectangle :
+                parameters.rectangles) {
+            rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+        }
+    }
+
     public void setup() {
         colorMode(HSB, 360, 100, 100);
     }
 
     public void draw() {
+        background(0,0,0);
         noLoop();
         for (Rectangle rectangle :
                 solution.parameters.rectangles) {
-            rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+            float x = map(rectangle.x, 0, solution.getWidth(), 0, width);
+            float y = map(rectangle.y, 0, solution.getHeight(), 0, height);
+            float rectw = map(rectangle.width, 0, solution.getWidth(), 0, width);
+            float recth = map(rectangle.height, 0, solution.getHeight(), 0, height);
+            rect(x, y, rectw, recth);
         }
     }
 }

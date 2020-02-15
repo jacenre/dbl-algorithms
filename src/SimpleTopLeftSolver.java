@@ -23,6 +23,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         if (parameters.rectangles.size() > 2000) {
             throw new IllegalArgumentException("To many rectangles");
         }
+
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;
         parameters.rectangles.get(0).y = 0;
@@ -36,6 +37,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
             move(rect, parameters.rectangles.subList(0, i));
             binWidth = Math.max(binWidth, rect.x + rect.width);
         }
+
         return new Solution(parameters, this);
     }
 
