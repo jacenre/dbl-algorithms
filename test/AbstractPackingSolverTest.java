@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -23,50 +24,51 @@ abstract class AbstractPackingSolverTest {
     // The solver to be used for the test cases
     abstract AbstractSolver getSolver();
 
-    /**
-     * Basic testing structure,
-     * The BinGenerator generates a input in the form of a Parameters object from the incomplete input.
-     * The parameters then get passed on the solver and checked against the associated optimum from the bin object.
-     *
-     * @param solver Solver to be used during the testing.
-     * @param bin    The bin containing the grid and the expected result.
-     */
-    private void testSolver(AbstractSolver solver, Bin bin) {
-        // Log how long it took to solve
-        long startTime = System.nanoTime();
+//    /**
+//     * Basic testing structure,
+//     * The BinGenerator generates a input in the form of a Parameters object from the incomplete input.
+//     * The parameters then get passed on the solver and checked against the associated optimum from the bin object.
+//     *
+//     * @param solver Solver to be used during the testing.
+//     * @param bin    The bin containing the grid and the expected result.
+//     */
+//    private void testSolver(AbstractSolver solver, Bin bin) {
+//        // Log how long it took to solve
+//        long startTime = System.nanoTime();
+//
+//        Solution sol = solver.optimal(bin.parameters);
+//        int optimal = sol.getArea();
+//
+//        long endTime = System.nanoTime();
+//        long duration = (endTime - startTime);
+//
+//        double rate = (double) optimal / (double) bin.optimal;
+//
+//        // Test report
+//        System.out.println("Known optimal was :" + bin.optimal);
+//        System.out.println("Found optimal was :" + optimal);
+//        System.out.println("OPT rate of " + rate);
+//        System.out.println("Solve took " + duration / 1000000 + "ms");
+//
+//        if (bin.parameters.heightVariant.equals("fixed")) {
+//            Assertions.assertEquals(bin.parameters.height, sol.height);
+//        }
+//        Assertions.assertTrue(rate >= 1);
+//    }
 
-        Solution sol = solver.optimal(bin.parameters);
-        int optimal = sol.getArea();
-
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime);
-
-        double rate = (double) optimal / (double) bin.optimal;
-
-        // Test report
-        System.out.println("Known optimal was :" + bin.optimal);
-        System.out.println("Found optimal was :" + optimal);
-        System.out.println("OPT rate of " + rate);
-        System.out.println("Solve took " + duration / 1000000 + "ms");
-
-        if (bin.parameters.heightVariant.equals("fixed")) {
-            Assertions.assertEquals(bin.parameters.height, sol.height);
-        }
-        Assertions.assertTrue(rate >= 1);
-    }
-
-    /**
-     * Example structure of a test case using the OptimalBinGenerator
-     */
-    @Test
-    void exampleTestCase() {
-        AbstractSolver solver = getSolver();
-        OptimalBinGenerator binGenerator = new OptimalBinGenerator();
-
-        Bin bin = binGenerator.generate();
-
-        testSolver(solver, bin);
-    }
+//    /**
+//     * Example structure of a test case using the OptimalBinGenerator
+//     */
+//    @Test
+//    void exampleTestCase() {
+//        AbstractSolver solver = getSolver();
+//        Assumptions.assumeTrue(solver.heightSupport.contains(HeightSupport.FIXED));
+//        OptimalBinGenerator binGenerator = new OptimalBinGenerator();
+//
+//        Bin bin = binGenerator.generate();
+//
+//        testSolver(solver, bin);
+//    }
 
     /**
      * Amount of test to run in the TestFactory
@@ -82,7 +84,7 @@ abstract class AbstractPackingSolverTest {
      */
     List<AbstractBinGenerator> getGenerators() {
         return Arrays.asList(new FixedOptimalBinGenerator(), new OptimalBinGenerator(),
-                new RotatingOptimalBinGenerator(), new FixedOptimalBinGenerator());
+                new RotatingOptimalBinGenerator(), new FixedRotatingOptimalBinGenerator());
     }
 
     /**
@@ -100,7 +102,7 @@ abstract class AbstractPackingSolverTest {
 
                 // TODO Make generators for each parameter combo.
                 Parameters parameters = new Parameters();
-                parameters.heightVariant = "fixed";
+                parameters.heightVariant = HeightSupport.FIXED;
                 parameters.rotationVariant = false;
                 Bin bin = binGenerator.generate();
                 DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
@@ -128,18 +130,15 @@ abstract class AbstractPackingSolverTest {
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
 
-        Double rate = null;
-        if (bin.optimal != null) {
-            rate = sol.getRate();
+        Double rate;
+        rate = sol.getRate();
+
+        if (hasOverlapping(sol.parameters.rectangles)) {
+            System.out.println("There are overlapping rectangles");
+            return false;
         }
 
-//        if (hasOverlapping(sol.parameters.rectangles)) {
-//            System.out.println("There are overlapping rectangles");
-//            return false;
-//        }
-
         // Test report
-
         System.out.println(sol);
         System.out.println("Solve took " + duration / 1000000 + "ms");
 
@@ -149,14 +148,19 @@ abstract class AbstractPackingSolverTest {
             return false;
         }
 
-        if (bin.parameters.heightVariant.equals("fixed")) {
-            if (bin.parameters.height != sol.height) {
+        if (bin.parameters.heightVariant == HeightSupport.FIXED) {
+            if (bin.parameters.height != sol.getHeight()) {
                 System.err.println("The height limit is not maintained");
                 return false;
             }
         }
 
-        return rate == null || rate >= 1;
+        if (rate < 1) {
+            System.err.println("Impossible result.");
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -199,12 +203,15 @@ abstract class AbstractPackingSolverTest {
         for (File file : files) {
             Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
             Bin bin = new Bin(params, null);
-            DynamicTest dynamicTest = dynamicTest(file.getName(), ()
-                    -> assertTrue(isValidSolution(bin)));
+            AbstractSolver solver = this.getSolver();
+            if (!solver.getHeightSupport().contains(params.heightVariant)) {
+                continue;
+            }
+            DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)) );
 
             dynamicTests.add(dynamicTest);
         }
-
+        System.out.println(dynamicTests.size());
         return dynamicTests.stream();
 
     }

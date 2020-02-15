@@ -1,3 +1,4 @@
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
 /**
@@ -23,11 +24,6 @@ public class CompoundSolver extends AbstractSolver {
     private Solution bestSolution = null;
 
     /**
-     * Solution object containing the best solution found.
-     */
-    private ArrayList<Rectangle> bestSolutionState = null;
-
-    /**
      * Find the optimal value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
@@ -35,12 +31,19 @@ public class CompoundSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) {
+        /**
+         * Solution object containing the best solution found.
+         */
+        ArrayList<Rectangle> bestSolutionState = cloneRectangleState(parameters.rectangles);
+
+        Parameters initialParameters = parameters.copy();
+
         // Try and solve it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {
             try {
-                Solution solution = solver.solve(parameters);
-
+                Solution solution = solver.solve(initialParameters.copy());
+                System.out.println(solver.getClass().getSimpleName() + " found solution " + solution.getArea());
                 // continue if solution is invalid.
 //                if (solution.getRate() < 1) {
 //                    continue;
@@ -48,8 +51,7 @@ public class CompoundSolver extends AbstractSolver {
 
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
-                    bestSolution = solution;
-                    bestSolution.solvedBy = solver;
+                    bestSolution = solution.copy();
                     bestSolutionState = cloneRectangleState(parameters.rectangles);
                 }
             } catch (IllegalArgumentException e) {
@@ -60,7 +62,7 @@ public class CompoundSolver extends AbstractSolver {
         return bestSolution;
     }
 
-    private static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
+    public static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
         ArrayList<Rectangle> rectangles = new ArrayList<>();
         for (Rectangle rect:
                 rects) {

@@ -15,6 +15,8 @@ public class Rectangle extends java.awt.Rectangle {
      */
     private String id;
 
+    // TODO: add a hasBeenPlaced boolean to be used in solvers
+
     /**
      * Construction method which also assigns a random unique id.
      *

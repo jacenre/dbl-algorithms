@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Solver algorithm adapted from the BL-algorithm, where the height has to be fixed.
@@ -7,6 +6,11 @@ import java.util.List;
  */
 public class SimpleTopLeftSolver extends AbstractSolver {
     int binWidth = 0;
+
+    @Override
+    Set<HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(HeightSupport.FIXED));
+    }
 
     /**
      * Find the optimal value for the parameters without doing any other output.
@@ -16,11 +20,8 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) throws IllegalArgumentException {
-        if (!parameters.heightVariant.equals("fixed")) {
-            throw new IllegalArgumentException("TopLeftSolver only works when the height is fixed.");
-        }
         if (parameters.rectangles.size() > 2000) {
-            return new Solution(Integer.MAX_VALUE, Integer.MAX_VALUE, parameters);
+            throw new IllegalArgumentException("To many rectangles");
         }
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;
@@ -35,7 +36,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
             move(rect, parameters.rectangles.subList(0, i));
             binWidth = Math.max(binWidth, rect.x + rect.width);
         }
-        return new Solution(binWidth, parameters.height, parameters);
+        return new Solution(parameters, this);
     }
 
     protected void move(Rectangle rect, List<Rectangle> rectangles) {
@@ -56,7 +57,6 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     /**
      * Instead of going step by step, this method looks at what rectangles are
      * blocking it from going all the way to the left, and move to just the right side of them.
-     * This doesn't work for moveUp, because you always want to move left whenever you can.
      */
     protected void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
         rect.x = 0;
@@ -77,15 +77,18 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      * Move up until there is a possibility to move left.
      */
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
-        int prevY = rect.y;
         rect.y = 0;
-        Rectangle path = new Rectangle(rect.x, 0, rect.width, prevY);
-        for (Rectangle rectangle : rectangles) {
-            if (rectangle.intersects(path) &&
-                    rectangle.y + rectangle.height > rect.y + rect.height) {
-                rect.y = rectangle.y + rectangle.height;
+        boolean intersects;
+        // Check intersection with all placed rectangles
+        do {
+            intersects = false;
+            for (Rectangle rectangle : rectangles) {
+                if (rect.intersects(rectangle)) {
+                    intersects = true;
+                    rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
+                }
             }
-        }
+        } while (intersects);
     }
 
     /** Check if the rectangle can move to its left */

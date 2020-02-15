@@ -1,7 +1,5 @@
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 
 /**
@@ -10,18 +8,20 @@ import java.util.Comparator;
  */
 public class ReverseFitSolver extends AbstractSolver {
 
+    @Override
+    Set<HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(HeightSupport.FIXED));
+    }
+
     /**
      * Find the value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
-     * @pre {@code parameters.heightVariant.equals("fixed") }
+     * @pre {@code parameters.heightVariant == HeightVariant.FIXED }
      * @return Returns the optimal area found by this solver.
      */
     @Override
     Solution optimal(Parameters parameters) throws IllegalArgumentException {
-        if (!parameters.heightVariant.equals("fixed") || parameters.height <= 0)
-            throw new IllegalArgumentException("ReverseFitSolver only solves with fixed height.");
-
         // arrayList with rectangles in final position
         ArrayList<Rectangle> placedRectangles = new ArrayList<>();
 
@@ -91,7 +91,7 @@ public class ReverseFitSolver extends AbstractSolver {
         }
 
 
-        return new Solution(0, 0, parameters);
+        return new Solution(parameters, this);
     }
 
 }

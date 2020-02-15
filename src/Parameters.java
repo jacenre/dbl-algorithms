@@ -10,7 +10,7 @@ public class Parameters {
      * Describes the variant that needs to be solved.
      * Where variant \in {free, fixed}
      */
-    public String heightVariant;
+    public HeightSupport heightVariant;
 
     /**
      * Describes the height of {@link Parameters#heightVariant} if {@code heightVariant.equals("fixed")}
@@ -26,4 +26,17 @@ public class Parameters {
      * Arraylist that stores all the rectangles.
      */
     public ArrayList<Rectangle> rectangles;
+
+    /**
+     * Creates a deep copy of this parameter object.
+     * @return Deep copy of parameters.
+     */
+    public Parameters copy() {
+        Parameters parameters = new Parameters();
+        parameters.heightVariant = this.heightVariant;
+        parameters.height = this.height;
+        parameters.rotationVariant = this.rotationVariant;
+        parameters.rectangles = CompoundSolver.cloneRectangleState(rectangles);
+        return parameters;
+    }
 }

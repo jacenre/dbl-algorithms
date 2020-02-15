@@ -14,7 +14,13 @@ public class UserInput {
     public Parameters getUserInput() {
         Parameters params = new Parameters();
         List<Object> height = getHeight();
-        params.heightVariant = (String) height.get(0);
+
+        if (height.get(0).equals("free")) {
+            params.heightVariant = HeightSupport.FREE;
+        } else {
+            params.heightVariant = HeightSupport.FIXED;
+        }
+
         params.height = (Integer) height.get(1);
         params.rotationVariant = getRotation();
         params.rectangles = getRectangles();

@@ -6,6 +6,8 @@ import java.util.ArrayList;
  */
 public class FirstFitSolver extends AbstractSolver {
 
+    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED, HeightSupport.FREE};
+
     /**
      * Find the optimal value for the parameters without doing any other output.
      *
@@ -28,6 +30,7 @@ public class FirstFitSolver extends AbstractSolver {
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
         // int[0] is the height of the bin, int[1] is the width, int[2] is x.
+        // TODO: Rename bins into boxes, and create a box class
         ArrayList<int[]> bins = new ArrayList<>();
 
         for (Rectangle rectangle :
@@ -52,21 +55,16 @@ public class FirstFitSolver extends AbstractSolver {
         int totalHeight = 0;
         int totalWidth = bins.get(bins.size()-1)[1];
 
-        if (parameters.heightVariant.equals("fixed")) {
-            totalHeight = parameters.height;
-        } else {
-            for (int[] bin :
-                    bins) {
-                if (bin[0] > totalHeight) {
-                    totalHeight = bin[0];
-                }
+        for (int[] bin :
+                bins) {
+            if (bin[0] > totalHeight) {
+                totalHeight = bin[0];
             }
         }
 
 //        size = totalHeight * bins.get(bins.size() - 1)[1];
-
-        // Solution: int[0] is the height, int[1] is the width of the rectangle
-        return new Solution(totalWidth, totalHeight, parameters);
+        
+        return new Solution(parameters, this);
     }
 
     /**
