@@ -99,7 +99,7 @@ public class ReverseFitSolver extends AbstractSolver {
         // Move all the rectangles from the right row to the left until any of them touch
         int moved = 0; // equivalent to e_1 in paper
         while (getTouchingLine(firstRow, reverseRow).length == 0) { // not touching
-            moved++; // IMPORTANT CHANGE
+            moved++;
             for (Rectangle rectangle : reverseRow) {
                 rectangle.translate(-1, 0);
             }
@@ -110,8 +110,6 @@ public class ReverseFitSolver extends AbstractSolver {
         for (Rectangle rectangle : reverseRow) {
             rectangle.translate(1, 0);
         }
-
-
 
         int w_1 = x_0 + w_max + d_1 - moved;   // As in the paper
 
@@ -131,34 +129,31 @@ public class ReverseFitSolver extends AbstractSolver {
             reverseRow.remove(lastOnReverse); // Because we want to drop everything except this one
             int H_2 = 0; // as in the paper
             while (getTouchingLine(firstRow, reverseRow).length == 0) { // not touching
-                H_2++; // IMPORTANT CHANGE
+                H_2++;
                 for (Rectangle rectangle : reverseRow) {
                     rectangle.translate(-1, 0);
                 }
             }
-            // revert so not touching anymore
+            // revert last translation so not touching anymore
             H_2--;
             for (Rectangle rectangle : reverseRow) {
                 rectangle.translate(1, 0);
             }
 
-
             int x_third_level = lastButOneOnReverse.x + lastButOneOnReverse.width;
-            if (H_2 == lastOnReverse.width) {
+            if (H_2 <= lastOnReverse.width) { // what had to be done when H_2 < lastOnReverse.width was not in the paper but Wikipedia said the same as when equal
                 // Push up the last rectangle in the reverse row
                 while (canPushRectangleUp(firstRow, lastOnReverse)) {
                     lastOnReverse.translate(0, -1);
                 }
                 // revert last translation
                 lastOnReverse.translate(0, 1);
-            } else if (H_2 > lastOnReverse.height) {
+            } else { // (H_2 > lastOnReverse.width) {
                 lastOnReverse.setLocation(x_third_level, lastOnReverse.y);
                 while (canPushRectangleUp(firstRow, lastOnReverse)) {
                     lastOnReverse.translate(0, -1);
                     lastOnReverse.translate(0, 1);
                 }
-            } else {
-                throw new AssertionError("H_2 cannot be smaller");
             }
 
             nextLevel = x_third_level;
