@@ -51,19 +51,6 @@ public class FirstFitSolver extends AbstractSolver {
             }
         }
 
-        // Keeps track of the largest bin
-        int totalHeight = 0;
-        int totalWidth = bins.get(bins.size()-1)[1];
-
-        for (int[] bin :
-                bins) {
-            if (bin[0] > totalHeight) {
-                totalHeight = bin[0];
-            }
-        }
-
-//        size = totalHeight * bins.get(bins.size() - 1)[1];
-        
         return new Solution(parameters, this);
     }
 

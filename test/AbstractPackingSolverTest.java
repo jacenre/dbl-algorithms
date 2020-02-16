@@ -157,7 +157,7 @@ abstract class AbstractPackingSolverTest {
         }
 
         if (bin.parameters.heightVariant == HeightSupport.FIXED) {
-            if (bin.parameters.height != sol.getHeight()) {
+            if (sol.getHeight() > bin.parameters.height) {
                 System.err.println("The height limit is not maintained");
                 return false;
             }

@@ -10,6 +10,8 @@ public class Visualizer extends PApplet {
     static Parameters params;
     static CompoundSolver compoundSolver;
 
+    static int WINDOW_SIZE = 1500;
+
     Solution solution;
 
     public static void main(String[] args) {
@@ -21,24 +23,22 @@ public class Visualizer extends PApplet {
         params = ui.getUserInput();
 
         // Different solutions
-        compoundSolver = new CompoundSolver();
-        compoundSolver.addSolver(new FirstFitSolver());
-//        compoundSolver.addSolver(new TopLeftSolver());
-//        compoundSolver.addSolver(new SimpleTopLeftSolver());
+//        compoundSolver = new CompoundSolver();
+        FirstFitSolver firstFitSolver = new FirstFitSolver();
+        TopLeftSolver topLeftSolver = new TopLeftSolver();
 //        compoundSolver.addSolver(new FreeFirstFitSolver());
-        solution = compoundSolver.optimal(params);
+        solution = firstFitSolver.optimal(params);
+//        solution = topLeftSolver.optimal(solution.parameters);
+
+        System.out.println(solution.getArea());
 
         int width = solution.getWidth();
         int height = solution.getHeight();
-        
-        if (width > 1000 || height > 1000) {
-            if (width > height) {
-                size(1000, (height * 1000) / width);
-            } else {
-                size((width * 1000) / height, 1000);
-            }
+
+        if (width > height) {
+            size(WINDOW_SIZE, (height * WINDOW_SIZE) / width);
         } else {
-            size(width, height);
+            size((width * WINDOW_SIZE) / height, WINDOW_SIZE);
         }
     }
 
