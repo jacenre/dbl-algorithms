@@ -12,8 +12,7 @@ public class FirstFitSolver extends AbstractSolver {
      * @param parameters The parameters to be used by the solver.
      * @return Returns the optimal area found by this solver.
      */
-    @Override
-    Solution optimal(Parameters parameters) {
+    Solution solveFixedHeight(Parameters parameters) {
         // Sort the array from large to small
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 

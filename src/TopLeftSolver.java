@@ -13,8 +13,7 @@ public class TopLeftSolver extends AbstractSolver {
      * @param parameters The parameters to be used by the solver.
      * @return Returns the associated {@link Solution} object
      */
-    @Override
-    Solution optimal(Parameters parameters) throws IllegalArgumentException {
+    Solution solveFixedHeight(Parameters parameters) throws IllegalArgumentException {
 //        if (!parameters.heightVariant.equals("fixed")) {
 //            throw new IllegalArgumentException("TopLeftSolver only works when the height is fixed.");
 //        }

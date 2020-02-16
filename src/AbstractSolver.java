@@ -20,16 +20,11 @@ abstract class AbstractSolver {
     }
 
     /**
-     * Solves for the given parameters
+     * Find the optimal value for the parameters without doing any other output.
      * @param parameters The parameters to be used by the solver.
+     * @return Returns the associated {@link Solution} object
      */
-    Solution solveFixedHeight(Parameters parameters){
-        // Create a new solution for this solve.
-        Solution solution = this.optimal(parameters);
-
-        // report(solution);
-        return solution;
-    };
+    abstract Solution solveFixedHeight(Parameters parameters);
 
     /**
      * Tries different fixed heights. Starts with a maximum height, then halfs it and checks if it is smaller.
@@ -72,13 +67,6 @@ abstract class AbstractSolver {
         }
         return rectangles;
     }
-
-    /**
-     * Find the optimal value for the parameters without doing any other output.
-     * @param parameters The parameters to be used by the solver.
-     * @return Returns the associated {@link Solution} object
-     */
-    abstract Solution optimal(Parameters parameters);
 
 
 }
