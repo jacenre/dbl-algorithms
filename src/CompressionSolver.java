@@ -1,4 +1,7 @@
-public class ExpSolver extends AbstractSolver {
+/**
+ * First runs FFT and then TLS to 'compress' the first result.
+ */
+public class CompressionSolver extends AbstractSolver {
     /**
      * Find the optimal value for the parameters without doing any other output.
      *
@@ -13,6 +16,6 @@ public class ExpSolver extends AbstractSolver {
         Solution solution = firstFitSolver.solve(parameters);
         solution = topLeftSolver.solve(solution.parameters);
 
-        return solution;
+        return new Solution(solution.parameters, this);
     }
 }

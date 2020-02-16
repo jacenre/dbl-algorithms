@@ -6,12 +6,12 @@ import java.util.List;
 /**
  * Testing class using {@link TopLeftSolver}
  */
-@DisplayName("Top-Left Solver")
-public class ExpSolverTest extends AbstractPackingSolverTest {
+@DisplayName("Compression Solver")
+public class CompressionSolverTest extends AbstractPackingSolverTest {
 
     @Override
     AbstractSolver getSolver() {
-        return new ExpSolver();
+        return new CompressionSolver();
     }
 
     @Override
