@@ -47,7 +47,7 @@ abstract class AbstractPackingSolverTest {
         System.out.println("Solve took " + duration / 1000000 + "ms");
 
         if (bin.parameters.heightVariant.equals("fixed")) {
-            Assertions.assertEquals(bin.parameters.height, sol.height);
+            Assertions.assertEquals((int)bin.parameters.height, (int)sol.height);
         }
         Assertions.assertTrue(rate >= 1);
     }
@@ -73,7 +73,7 @@ abstract class AbstractPackingSolverTest {
      * @return default 10 test cases.
      */
     int getTestCount(){
-        return 10;
+        return 2;
     };
 
     /**
@@ -98,17 +98,21 @@ abstract class AbstractPackingSolverTest {
 
             for (int i = 0; i < getTestCount(); i++) {
 
-                // TODO Make generators for each parameter combo.
-                Parameters parameters = new Parameters();
-                parameters.heightVariant = "fixed";
-                parameters.rotationVariant = false;
-                Bin bin = binGenerator.generate(parameters);
-                DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
-                        -> {
-                    assertTrue(isValidSolution(bin));
-                });
+                for (String heightVariant : new String[] {"fixed", "free"}) {
+                    for (boolean rotationVariant : new boolean[] {true, false}) {
 
-                dynamicTests.add(dynamicTest);
+                        Parameters parameters = new Parameters();
+                        parameters.heightVariant = heightVariant;
+                        parameters.rotationVariant = rotationVariant;
+                        Bin bin = binGenerator.generate(parameters);
+                        DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
+                                -> {
+                            assertTrue(isValidSolution(bin));
+                        });
+
+                        dynamicTests.add(dynamicTest);
+                    }
+                }
             }
         }
         return dynamicTests.stream();
@@ -125,9 +129,10 @@ abstract class AbstractPackingSolverTest {
 
         AbstractSolver solver = getSolver();
 
-        Solution sol = solver.optimal(bin.parameters);
+        Solution sol = solver.solve(bin.parameters);
         int optimal = sol.getArea();
 
+        System.out.println(sol.width + " * " + sol.height + " = " + sol.width * sol.height + " ratio " + ((double)(sol.width * sol.height))/Integer.MAX_VALUE);
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
 
@@ -139,9 +144,11 @@ abstract class AbstractPackingSolverTest {
 //        }
 
         // Test report
-        System.out.println("Amount of rectangles :" + bin.parameters.rectangles.size());
-        System.out.println("Known optimal was :" + bin.optimal);
-        System.out.println("Found optimal was :" + optimal);
+        System.out.println("HeightVariant : " + bin.parameters.heightVariant);
+        System.out.println("RotationsAllowed : " + (bin.parameters.rotationVariant ? "true" : "false"));
+        System.out.println("Amount of rectangles : " + bin.parameters.rectangles.size());
+        System.out.println("Known optimal was : " + bin.optimal);
+        System.out.println("Found optimal was : " + optimal);
         System.out.println("OPT rate of " + rate);
         System.out.println("Solve took " + duration / 1000000 + "ms");
 

@@ -15,9 +15,9 @@ public class PackingSolver {
         // Different solutions
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
-        if (params.heightVariant.equals("fixed")) {
-            compoundSolver.addSolver(new TopLeftSolver());
-        }
+        compoundSolver.addSolver(new TopLeftSolver());
+        compoundSolver.addSolver(new ReverseFitSolver());
+
         compoundSolver.optimal(params);
 
         Output.output(params, inputOrder);
@@ -27,7 +27,7 @@ public class PackingSolver {
     static class Output {
         public static void output (Parameters params, String[] inputOrder) {
             System.out.println("container height: " + params.heightVariant +
-                    (params.height != Integer.MAX_VALUE ? " " + params.height : ""));
+                    (params.heightVariant.equals("fixed") ? " " + params.height : ""));
             System.out.println("rotations allowed: " + (params.rotationVariant ? "yes" : "no"));
             System.out.println("number of rectangles: " + params.rectangles.size() );
             for (String rectID : inputOrder) {

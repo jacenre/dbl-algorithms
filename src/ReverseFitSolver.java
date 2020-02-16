@@ -18,7 +18,7 @@ public class ReverseFitSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) throws IllegalArgumentException {
-        if (!parameters.heightVariant.equals("fixed") || parameters.height <= 0)
+        if (parameters.height <= 0)
             throw new IllegalArgumentException();
 
         /* Commented out the rotating for now, first of all this should only happen if parameters.rotationVariant and
@@ -47,6 +47,11 @@ public class ReverseFitSolver extends AbstractSolver {
             } else {
                 remainingRectangles.add(rectangle);
             }
+        }
+
+        // With low parameters.height, sometimes we are done here already
+        if (remainingRectangles.isEmpty()) {
+            return new Solution(x_0, parameters.height, parameters);
         }
 
         // STEP 2 #####
