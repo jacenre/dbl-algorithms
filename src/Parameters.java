@@ -10,7 +10,7 @@ public class Parameters {
      * Describes the variant that needs to be solved.
      * Where variant \in {free, fixed}
      */
-    public HeightSupport heightVariant;
+    public Util.HeightSupport heightVariant;
 
     /**
      * Describes the height of {@link Parameters#heightVariant} if {@code heightVariant.equals("fixed")}
@@ -36,7 +36,7 @@ public class Parameters {
         parameters.heightVariant = this.heightVariant;
         parameters.height = this.height;
         parameters.rotationVariant = this.rotationVariant;
-        parameters.rectangles = CompoundSolver.cloneRectangleState(rectangles);
+        parameters.rectangles = Util.cloneRectangleState(rectangles);
         return parameters;
     }
 }

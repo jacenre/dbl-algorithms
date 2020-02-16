@@ -6,7 +6,8 @@ import java.util.ArrayList;
  */
 public class FirstFitSolver extends AbstractSolver {
 
-    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED, HeightSupport.FREE};
+    public Util.HeightSupport[] heightSupport = new Util.HeightSupport[]{
+            Util.HeightSupport.FIXED, Util.HeightSupport.FREE};
 
     /**
      * Find the optimal value for the parameters without doing any other output.

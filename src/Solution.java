@@ -20,7 +20,7 @@ public class Solution {
      * Height of the total bin area
      */
     public int getHeight() {
-        if (parameters.heightVariant == HeightSupport.FIXED) {
+        if (parameters.heightVariant == Util.HeightSupport.FIXED) {
             return parameters.height;
         }
 

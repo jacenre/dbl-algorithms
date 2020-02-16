@@ -102,7 +102,7 @@ abstract class AbstractPackingSolverTest {
 
                 // TODO Make generators for each parameter combo.
                 Parameters parameters = new Parameters();
-                parameters.heightVariant = HeightSupport.FIXED;
+                parameters.heightVariant = Util.HeightSupport.FIXED;
                 parameters.rotationVariant = false;
                 Bin bin = binGenerator.generate();
                 DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
@@ -156,7 +156,7 @@ abstract class AbstractPackingSolverTest {
             return false;
         }
 
-        if (bin.parameters.heightVariant == HeightSupport.FIXED) {
+        if (bin.parameters.heightVariant == Util.HeightSupport.FIXED) {
             if (sol.getHeight() > bin.parameters.height) {
                 System.err.println("The height limit is not maintained");
                 return false;

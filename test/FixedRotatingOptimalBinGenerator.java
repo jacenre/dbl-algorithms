@@ -6,7 +6,7 @@ public class FixedRotatingOptimalBinGenerator extends OptimalBinGenerator {
     @Override
     Parameters getParameters() {
         Parameters parameters = new Parameters();
-        parameters.heightVariant = HeightSupport.FIXED;
+        parameters.heightVariant = Util.HeightSupport.FIXED;
         parameters.rotationVariant = true;
         return parameters;
     }

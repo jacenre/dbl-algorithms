@@ -8,8 +8,8 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     int binWidth = 0;
 
     @Override
-    Set<HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(HeightSupport.FIXED));
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
     /**

@@ -7,8 +7,8 @@ import java.util.Set;
  */
 abstract class AbstractSolver {
 
-    Set<HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(HeightSupport.FREE, HeightSupport.FIXED));
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE, Util.HeightSupport.FIXED));
     }
 
     /**

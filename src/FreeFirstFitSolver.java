@@ -7,8 +7,8 @@ import java.util.*;
 public class FreeFirstFitSolver extends AbstractSolver {
 
     @Override
-    Set<HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(HeightSupport.FREE));
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE));
     }
 
     // ArrayList to binary search on.
@@ -34,7 +34,7 @@ public class FreeFirstFitSolver extends AbstractSolver {
         heights = getHeights(parameters);
 
         // Set the heightVariant for the first fit solver
-        parameters.heightVariant = HeightSupport.FIXED;
+        parameters.heightVariant = Util.HeightSupport.FIXED;
 
         for (int height :
                 heights) {
@@ -51,20 +51,20 @@ public class FreeFirstFitSolver extends AbstractSolver {
                 bestSolution = newSolution.copy();
             }
         }
-        bestSolution.parameters.heightVariant = HeightSupport.FREE;
+        bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
         bestSolution.solvedBy = this;
         return bestSolution;
     }
 
     /**
      * Creates an ArrayList of all the y's of the first fit solver without height limit.
-     * @param parameter The parameters used for the solve
+     * @param parameters The parameters used for the solve
      * @return ArrayList containing all the y's.
      */
     ArrayList<Integer> getHeights(Parameters parameters) {
         ArrayList<Integer> heights = new ArrayList<>();
         // Set to fixed and give it to the first fit solver.
-        parameters.heightVariant = HeightSupport.FIXED;
+        parameters.heightVariant = Util.HeightSupport.FIXED;
         Solution solution = firstFitSolver.solve(parameters);
 
         for (Rectangle rectangle :

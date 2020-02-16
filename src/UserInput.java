@@ -16,9 +16,9 @@ public class UserInput {
         List<Object> height = getHeight();
 
         if (height.get(0).equals("free")) {
-            params.heightVariant = HeightSupport.FREE;
+            params.heightVariant = Util.HeightSupport.FREE;
         } else {
-            params.heightVariant = HeightSupport.FIXED;
+            params.heightVariant = Util.HeightSupport.FIXED;
         }
 
         params.height = (Integer) height.get(1);

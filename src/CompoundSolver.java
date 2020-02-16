@@ -50,13 +50,4 @@ public class CompoundSolver extends AbstractSolver {
         }
         return bestSolution;
     }
-
-    public static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
-        ArrayList<Rectangle> rectangles = new ArrayList<>();
-        for (Rectangle rect:
-                rects) {
-            rectangles.add(new Rectangle(rect));
-        }
-        return rectangles;
-    }
 }
