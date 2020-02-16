@@ -2,6 +2,9 @@
 .idea/*
 out/
 
+# Deployment script
+.selenium/
+
 # Compiled class file
 *.class
 
