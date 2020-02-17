@@ -25,7 +25,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      */
     Parameters getParameters() {
         Parameters parameters = new Parameters();
-        parameters.heightVariant = HeightSupport.FREE;
+        parameters.heightVariant = Util.HeightSupport.FREE;
         parameters.rotationVariant = false;
         return parameters;
     }

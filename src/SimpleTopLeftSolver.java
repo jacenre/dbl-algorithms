@@ -8,8 +8,8 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     int binWidth = 0;
 
     @Override
-    Set<HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(HeightSupport.FIXED));
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
     /**
@@ -23,19 +23,24 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         if (parameters.rectangles.size() > 2000) {
             throw new IllegalArgumentException("To many rectangles");
         }
+
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;
         parameters.rectangles.get(0).y = 0;
+        parameters.rectangles.get(0).place(true);
         binWidth = parameters.rectangles.get(0).width;
 
         for (int i = 1; i < parameters.rectangles.size(); i++) {
+            Util.animate(parameters, this);
             // Put the rectangle in the bottom right corner
             Rectangle rect = parameters.rectangles.get(i);
+            rect.place(true);
             rect.x = binWidth;
             rect.y = parameters.height - rect.height;
             move(rect, parameters.rectangles.subList(0, i));
             binWidth = Math.max(binWidth, rect.x + rect.width);
         }
+
         return new Solution(parameters, this);
     }
 
@@ -45,11 +50,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         }
         while (canMoveLeft(rect, rectangles)) {
             moveLeft(rect, rectangles);
+            Util.animate();
         }
         while (canMoveUp(rect, rectangles)) {
             moveUp(rect, rectangles);
+            Util.animate();
             if (canMoveLeft(rect, rectangles)) {
                 moveLeft(rect, rectangles);
+                Util.animate();
             }
         }
     }

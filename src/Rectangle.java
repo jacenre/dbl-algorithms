@@ -1,3 +1,5 @@
+import org.w3c.dom.css.Rect;
+
 import java.util.UUID;
 
 /**
@@ -34,7 +36,8 @@ public class Rectangle extends java.awt.Rectangle {
 
     public Rectangle(Rectangle rectangle) {
         super(rectangle);
-
+        this.x = rectangle.x;
+        this.y = rectangle.y;
         // Assign ID
         this.id = rectangle.id != null ? rectangle.id : UUID.randomUUID().toString();
     }
@@ -54,6 +57,16 @@ public class Rectangle extends java.awt.Rectangle {
     /** Get id. */
     public String getId() {
         return id;
+    }
+
+    private boolean placed = false;
+
+    public boolean isPlaced() {
+        return placed;
+    }
+
+    public void place(boolean placed) {
+        this.placed = placed;
     }
 
     /**

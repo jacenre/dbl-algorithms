@@ -20,6 +20,10 @@ public class Solution {
      * Height of the total bin area
      */
     public int getHeight() {
+        if (parameters.heightVariant == Util.HeightSupport.FIXED) {
+            return parameters.height;
+        }
+
         // If height is fixed return the fix height
         int maxHeight = 0;
 

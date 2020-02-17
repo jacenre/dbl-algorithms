@@ -9,8 +9,8 @@ import java.util.*;
 public class ReverseFitSolver extends AbstractSolver {
 
     @Override
-    Set<HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(HeightSupport.FIXED));
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
     /**

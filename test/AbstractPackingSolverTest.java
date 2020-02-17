@@ -102,7 +102,7 @@ abstract class AbstractPackingSolverTest {
 
                 // TODO Make generators for each parameter combo.
                 Parameters parameters = new Parameters();
-                parameters.heightVariant = HeightSupport.FIXED;
+                parameters.heightVariant = Util.HeightSupport.FIXED;
                 parameters.rotationVariant = false;
                 Bin bin = binGenerator.generate();
                 DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
@@ -133,14 +133,22 @@ abstract class AbstractPackingSolverTest {
         Double rate;
         rate = sol.getRate();
 
+        // Test report
+        System.out.println(sol);
+        System.out.println("Solve took " + duration / 1000000 + "ms");
+
         if (hasOverlapping(sol.parameters.rectangles)) {
             System.out.println("There are overlapping rectangles");
             return false;
         }
 
-        // Test report
-        System.out.println(sol);
-        System.out.println("Solve took " + duration / 1000000 + "ms");
+        for (Rectangle rectangle :
+                sol.parameters.rectangles) {
+            if (rectangle.x < 0 || rectangle.y < 0) {
+                System.out.println("Negative coordinates found");
+                return false;
+            }
+        }
 
         // If solve took longer than 30 seconds
         if ((duration / 1000000) > 30000) {
@@ -148,8 +156,8 @@ abstract class AbstractPackingSolverTest {
             return false;
         }
 
-        if (bin.parameters.heightVariant == HeightSupport.FIXED) {
-            if (bin.parameters.height != sol.getHeight()) {
+        if (bin.parameters.heightVariant == Util.HeightSupport.FIXED) {
+            if (sol.getHeight() > bin.parameters.height) {
                 System.err.println("The height limit is not maintained");
                 return false;
             }
@@ -191,6 +199,7 @@ abstract class AbstractPackingSolverTest {
     @TestFactory
     @DisplayName("Momotor Test Cases")
     Stream<DynamicTest> momotorTests() throws IOException {
+        Animator.main(new String[]{});
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         // Get all files from the momotor folder

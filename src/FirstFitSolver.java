@@ -6,7 +6,8 @@ import java.util.ArrayList;
  */
 public class FirstFitSolver extends AbstractSolver {
 
-    public HeightSupport[] heightSupport = new HeightSupport[]{HeightSupport.FIXED, HeightSupport.FREE};
+    public Util.HeightSupport[] heightSupport = new Util.HeightSupport[]{
+            Util.HeightSupport.FIXED, Util.HeightSupport.FREE};
 
     /**
      * Find the optimal value for the parameters without doing any other output.
@@ -29,59 +30,83 @@ public class FirstFitSolver extends AbstractSolver {
         // Sort the array from large to small
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
-        // int[0] is the height of the bin, int[1] is the width, int[2] is x.
-        // TODO: Rename bins into boxes, and create a box class
-        ArrayList<int[]> bins = new ArrayList<>();
+        ArrayList<Box> boxes = new ArrayList<>();
 
         for (Rectangle rectangle :
                 parameters.rectangles) {
+            Util.animate(parameters, this);
             // First rectangle always fits
-            if (bins.size() == 0) {
+            if (boxes.size() == 0) {
                 rectangle.x = 0;
                 rectangle.y = 0;
-                bins.add(new int[]{rectangle.height, rectangle.width, 0});
+
+                Box newBox = new Box(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+                newBox.add(rectangle);
+
+                boxes.add(newBox);
             } else {
                 // If the rectangle doesn't fit we create a new bin.
-                if (!fitRectangle(bins, rectangle, parameters.height)) {
-                    rectangle.x = bins.get(bins.size() - 1)[1];
-                    rectangle.y = 0;
-                    int[] lastBin = bins.get(bins.size() - 1);
-                    bins.add(new int[]{rectangle.height, rectangle.x + rectangle.width, lastBin[1]});
+                if (!fitRectangle(boxes, rectangle, parameters.height)) {
+                    Box latest = boxes.get(boxes.size() - 1);
+                    rectangle.x = latest.x + latest.width;
+                    rectangle.y = latest.y;
+
+                    Box newBox = new Box(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+                    newBox.add(rectangle);
+
+                    boxes.add(newBox);
                 }
             }
+            rectangle.place(true);
         }
 
-        // Keeps track of the largest bin
-        int totalHeight = 0;
-        int totalWidth = bins.get(bins.size()-1)[1];
-
-        for (int[] bin :
-                bins) {
-            if (bin[0] > totalHeight) {
-                totalHeight = bin[0];
-            }
-        }
-
-//        size = totalHeight * bins.get(bins.size() - 1)[1];
-        
         return new Solution(parameters, this);
     }
 
     /**
      * Tries and fit the rectangle in one of the bins
+     *
      * @return {@code true} if it fits in any of the bins, else {@code false}
      */
-    private boolean fitRectangle(ArrayList<int[]> bins, Rectangle rectangle, int height) {
-        for (int[] bin :
-                bins) {
-            if (rectangle.height + bin[0] <= height) {
-                rectangle.x = bin[2];
-                rectangle.y = bin[0];
-
-                bin[0] += rectangle.height;
+    private boolean fitRectangle(ArrayList<Box> boxes, Rectangle rectangle, int height) {
+        for (Box box :
+                boxes) {
+            if (rectangle.height + box.height + box.y <= height) {
+                rectangle.x = box.x;
+                rectangle.y = box.y + box.height;
+                box.add(rectangle);
                 return true;
             }
         }
         return false;
     }
+
+    private class Box {
+
+        // All the Rectangles in this box.
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
+
+        // Top left coordinates of the box.
+        int x;
+        int y;
+
+        // Size of the Box.
+        int width;
+        int height;
+
+        Box(int x, int y, int width, int height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+
+        public void add(Rectangle rect) {
+            rectangles.add(rect);
+            this.height = (rect.y + rect.height > this.y + this.height) ? rect.y + rect.height - this.y : this.height;
+            this.width = (rect.x + rect.width > this.x + this.width) ? rect.x + rect.width - this.x : this.width;
+        }
+
+    }
+
 }

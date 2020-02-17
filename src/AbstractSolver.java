@@ -7,8 +7,8 @@ import java.util.Set;
  */
 abstract class AbstractSolver {
 
-    Set<HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(HeightSupport.FREE, HeightSupport.FIXED));
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE, Util.HeightSupport.FIXED));
     }
 
     /**
@@ -21,6 +21,16 @@ abstract class AbstractSolver {
     Solution solve(Parameters parameters) throws IllegalArgumentException {
         if (!getHeightSupport().contains(parameters.heightVariant)) {
             throw new IllegalArgumentException("Unsupported height variant");
+        }
+
+        // General rule, if rotating make sure that every rectangle fits.
+        if (parameters.rotationVariant) {
+            for (Rectangle rectangle :
+                    parameters.rectangles) {
+                if (rectangle.height > parameters.height) {
+                    rectangle.rotate();
+                }
+            }
         }
 
         // Create a new solution for this solve.

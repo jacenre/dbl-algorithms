@@ -16,10 +16,11 @@ public class PackingSolver {
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
         compoundSolver.addSolver(new TopLeftSolver());
+        compoundSolver.addSolver(new CompressionSolver());
         compoundSolver.addSolver(new FreeFirstFitSolver());
-        compoundSolver.optimal(params);
+        Solution solution = compoundSolver.optimal(params);
 
-        Output.output(params, inputOrder);
+        Output.output(solution.parameters, inputOrder);
 //        Output.outputVisual(params, inputOrder, solution);
     }
 

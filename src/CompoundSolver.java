@@ -1,3 +1,5 @@
+import org.w3c.dom.css.Rect;
+
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
@@ -31,11 +33,6 @@ public class CompoundSolver extends AbstractSolver {
      */
     @Override
     Solution optimal(Parameters parameters) {
-        /**
-         * Solution object containing the best solution found.
-         */
-        ArrayList<Rectangle> bestSolutionState = cloneRectangleState(parameters.rectangles);
-
         Parameters initialParameters = parameters.copy();
 
         // Try and solve it using all the solvers in the array
@@ -43,31 +40,14 @@ public class CompoundSolver extends AbstractSolver {
                 solvers) {
             try {
                 Solution solution = solver.solve(initialParameters.copy());
-                System.out.println(solver.getClass().getSimpleName() + " found solution " + solution.getArea());
-                // continue if solution is invalid.
-//                if (solution.getRate() < 1) {
-//                    continue;
-//                }
-
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
                     bestSolution = solution.copy();
-                    bestSolutionState = cloneRectangleState(parameters.rectangles);
                 }
             } catch (IllegalArgumentException e) {
                 // Ignore?
             }
         }
-        parameters.rectangles = bestSolutionState;
         return bestSolution;
-    }
-
-    public static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
-        ArrayList<Rectangle> rectangles = new ArrayList<>();
-        for (Rectangle rect:
-                rects) {
-            rectangles.add(new Rectangle(rect));
-        }
-        return rectangles;
     }
 }
