@@ -104,7 +104,7 @@ abstract class AbstractPackingSolverTest {
                 Parameters parameters = new Parameters();
                 parameters.heightVariant = Util.HeightSupport.FIXED;
                 parameters.rotationVariant = false;
-                Bin bin = binGenerator.generate();
+                Bin bin = binGenerator.generate(1000);
                 DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
                         -> assertTrue(isValidSolution(bin)));
 
@@ -199,7 +199,6 @@ abstract class AbstractPackingSolverTest {
     @TestFactory
     @DisplayName("Momotor Test Cases")
     Stream<DynamicTest> momotorTests() throws IOException {
-        Animator.main(new String[]{});
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         // Get all files from the momotor folder

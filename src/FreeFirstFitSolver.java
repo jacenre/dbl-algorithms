@@ -1,3 +1,5 @@
+import org.w3c.dom.css.Rect;
+
 import java.lang.reflect.Parameter;
 import java.util.*;
 
@@ -30,8 +32,8 @@ public class FreeFirstFitSolver extends AbstractSolver {
             throw new IllegalArgumentException();
         }
 
-        // Get all the possible heights
         heights = getHeights(parameters);
+        Util.animate(parameters, this);
 
         // Set the heightVariant for the first fit solver
         parameters.heightVariant = Util.HeightSupport.FIXED;
@@ -42,11 +44,11 @@ public class FreeFirstFitSolver extends AbstractSolver {
             newParameters.height = height;
 
             Solution newSolution = firstFitSolver.optimal(newParameters.copy());
+            Util.animate(newSolution.parameters, this);
 
             if (bestSolution == null) {
                 bestSolution = newSolution.copy();
             }
-
             if (newSolution.getArea() < bestSolution.getArea()) {
                 bestSolution = newSolution.copy();
             }
@@ -67,9 +69,10 @@ public class FreeFirstFitSolver extends AbstractSolver {
         parameters.heightVariant = Util.HeightSupport.FIXED;
         Solution solution = firstFitSolver.solve(parameters);
 
-        for (Rectangle rectangle :
-                solution.parameters.rectangles) {
-            heights.add(rectangle.y + rectangle.height);
+        Rectangle last = solution.parameters.rectangles.get(solution.parameters.rectangles.size() - 1);
+
+        for (int i = 0; i < last.height + last.y; i++) {
+            heights.add(i);
         }
 
         return heights;

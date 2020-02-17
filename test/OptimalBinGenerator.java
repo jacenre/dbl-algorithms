@@ -19,6 +19,9 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
         return 2000 + generator.nextInt(1000);
     }
 
+    int rectangleCount = 0;
+    int maxRectangles = 10000;
+
     /**
      * Default parameters for this binGenerator is free and non rotating.
      * @return Free and non-rotating parameters
@@ -39,6 +42,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
     @Override
     Bin generate() {
         Parameters parameters = getParameters();
+        rectangleCount = 0;
 
         // random grid size
         int randomHeight = getHeight();
@@ -70,12 +74,16 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      * @param vert True if we are cutting the rectangle vertically, false if horizontal
      */
     private void recursiveRectangle(ArrayList<Rectangle> rectangles, int width, int height, boolean vert) {
+        if (rectangleCount >= maxRectangles) {
+            return;
+        }
         double cut = generator.nextDouble();
 
         // Return if the recursion would give rise to rectangle smaller than the minimum, else cut and recurse.
         if (vert) {
             if (width * cut < getMinRectSize() || width * (1 - cut) < getMinRectSize()) {
                 rectangles.add(new Rectangle(width, height));
+                rectangleCount++;
             } else {
                 // Used to make sure that the total width doesnt change due to rounding errors.
                 int newWidth = (int) (width * cut);
@@ -84,6 +92,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
             }
         } else if (height * cut < getMinRectSize() || height * (1 - cut) < getMinRectSize()) {
             rectangles.add(new Rectangle(width, height));
+            rectangleCount++;
         } else {
             int newHeight = (int) (height * cut);
             recursiveRectangle(rectangles, width, newHeight, true);
@@ -99,6 +108,7 @@ public class OptimalBinGenerator extends AbstractBinGenerator {
      */
     @Override
     Bin generate(int n) {
+        maxRectangles = n;
         return generate();
     }
 }
