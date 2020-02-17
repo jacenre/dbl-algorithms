@@ -199,6 +199,7 @@ abstract class AbstractPackingSolverTest {
     @TestFactory
     @DisplayName("Momotor Test Cases")
     Stream<DynamicTest> momotorTests() throws IOException {
+        Animator.main(new String[]{});
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         // Get all files from the momotor folder

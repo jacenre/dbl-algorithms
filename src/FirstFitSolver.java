@@ -34,6 +34,10 @@ public class FirstFitSolver extends AbstractSolver {
 
         for (Rectangle rectangle :
                 parameters.rectangles) {
+            if (Animator.animator != null) {
+                Animator.animator.draw();
+                Animator.animator.drawParameter(parameters, this);
+            }
             // First rectangle always fits
             if (boxes.size() == 0) {
                 rectangle.x = 0;
@@ -56,6 +60,7 @@ public class FirstFitSolver extends AbstractSolver {
                     boxes.add(newBox);
                 }
             }
+            rectangle.place(true);
         }
 
         return new Solution(parameters, this);

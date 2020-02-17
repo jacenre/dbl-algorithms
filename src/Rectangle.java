@@ -59,6 +59,16 @@ public class Rectangle extends java.awt.Rectangle {
         return id;
     }
 
+    private boolean placed = false;
+
+    public boolean isPlaced() {
+        return placed;
+    }
+
+    public void place(boolean placed) {
+        this.placed = placed;
+    }
+
     /**
      * Command to rotate the rectangle.
      * Allowed to be used in the strategy variants where rotation of the rectangle is used.
