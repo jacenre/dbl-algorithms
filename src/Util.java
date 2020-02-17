@@ -15,7 +15,7 @@ public class Util {
     }
 
     /**
-     * Creates a deep copy of a {@link Rectangle} ArrayList with the same {@link Rectangle#id} for each rectangle.
+     * Creates a deep copy of a {@link Rectangle} ArrayList with the same {@link Rectangle#getId()} for each rectangle.
      * @param rects Input array to copy
      * @return A deep copy ArrayList.
      */
@@ -26,6 +26,29 @@ public class Util {
             rectangles.add(new Rectangle(rect));
         }
         return rectangles;
+    }
+
+    /**
+     * Used for animating the current parameters.
+     * @param parameters Parameters to animate.
+     * @param solver Solver that called the animation.
+     * TODO COMMENT OUT BEFORE HANDING IN.
+     */
+    public static void animate(Parameters parameters, AbstractSolver solver) {
+        if (Animator.animator == null) {
+            Animator.main(new String[]{});
+        } else {
+            Animator.animator.draw();
+            Animator.animator.drawParameter(parameters, solver);
+        }
+    }
+
+    public static void animate() {
+        if (Animator.animator == null) {
+            Animator.main(new String[]{});
+        } else {
+            Animator.animator.draw();
+        }
     }
 
 }

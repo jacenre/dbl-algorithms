@@ -27,11 +27,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;
         parameters.rectangles.get(0).y = 0;
+        parameters.rectangles.get(0).place(true);
         binWidth = parameters.rectangles.get(0).width;
 
         for (int i = 1; i < parameters.rectangles.size(); i++) {
+            Util.animate(parameters, this);
             // Put the rectangle in the bottom right corner
             Rectangle rect = parameters.rectangles.get(i);
+            rect.place(true);
             rect.x = binWidth;
             rect.y = parameters.height - rect.height;
             move(rect, parameters.rectangles.subList(0, i));
@@ -47,11 +50,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         }
         while (canMoveLeft(rect, rectangles)) {
             moveLeft(rect, rectangles);
+            Util.animate();
         }
         while (canMoveUp(rect, rectangles)) {
             moveUp(rect, rectangles);
+            Util.animate();
             if (canMoveLeft(rect, rectangles)) {
                 moveLeft(rect, rectangles);
+                Util.animate();
             }
         }
     }
