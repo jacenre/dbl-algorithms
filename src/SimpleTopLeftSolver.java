@@ -88,18 +88,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      * Move up until there is a possibility to move left.
      */
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
+        Rectangle path = new Rectangle(rect.x, 0, rect.width, rect.y);
         rect.y = 0;
-        boolean intersects;
-        // Check intersection with all placed rectangles
-        do {
-            intersects = false;
-            for (Rectangle rectangle : rectangles) {
-                if (rect.intersects(rectangle)) {
-                    intersects = true;
-                    rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
-                }
+        for (Rectangle rectangle : rectangles) {
+            if (rectangle.getId().equals(rect.getId())) break;
+            if (path.intersects(rectangle)) {
+                rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
             }
-        } while (intersects);
+        }
     }
 
     /** Check if the rectangle can move to its left */
