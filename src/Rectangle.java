@@ -1,5 +1,3 @@
-import org.w3c.dom.css.Rect;
-
 import java.util.UUID;
 
 /**
@@ -18,6 +16,15 @@ public class Rectangle extends java.awt.Rectangle {
     private String id;
 
     // TODO: add a hasBeenPlaced boolean to be used in solvers
+    private boolean placed = false;
+
+    public boolean isPlaced() {
+        return placed;
+    }
+
+    public void place(boolean placed) {
+        this.placed = placed;
+    }
 
     /**
      * Construction method which also assigns a random unique id.
@@ -59,16 +66,6 @@ public class Rectangle extends java.awt.Rectangle {
         return id;
     }
 
-    private boolean placed = false;
-
-    public boolean isPlaced() {
-        return placed;
-    }
-
-    public void place(boolean placed) {
-        this.placed = placed;
-    }
-
     /**
      * Command to rotate the rectangle.
      * Allowed to be used in the strategy variants where rotation of the rectangle is used.
@@ -77,5 +74,16 @@ public class Rectangle extends java.awt.Rectangle {
         //noinspection SuspiciousNameCombination
         this.setBounds(this.x, this.y, this.height, this.width);
         this.rotated = !this.rotated;
+    }
+
+    /**
+     * Returns a deep copy of this Rectangle object.
+     *
+     * @return a deep copy of this Rectangle.
+     */
+    public Rectangle copy() {
+        Rectangle rectangle = new Rectangle(this);
+        rectangle.rotated = this.rotated;
+        return rectangle;
     }
 }

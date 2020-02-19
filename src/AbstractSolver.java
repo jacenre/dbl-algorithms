@@ -1,72 +1,87 @@
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Abstract class for the solver
+ * Abstract Solver class
+ * <p>
+ * The main class that will be used for solving the Bin Packing problem.<br>
+ * The intention is that the PackingSolver will call {@link #solve(Parameters)} on a concrete solver.<br>
+ * To implement a {@code Solver} it suffices to implement the hook method {@link #optimal(Parameters)}.<br>
+ * </p>
+ * <p>
+ * To specify what type of Bin Packing problems the {@code Solver} can handle use {@link Util.HeightSupport}.<br>
+ * Throw an {@code IllegalArgumentException} if the given {@code Parameters} violate the {@code Solver} preconditions.<br>
+ * </p>
  */
-abstract class AbstractSolver {
-
+public abstract class AbstractSolver {
 
     /**
-     * Solution object containing the best solution found.
+     * Gets all the supported height variants.
+     * <p>
+     * By default both {@code FREE} and {@code FIXED} are enabled.
+     * 
+     * @return a {@code Set} containing all the supported height variants.
+     * @see Util.HeightSupport
+     * </p>
      */
-    private ArrayList<Rectangle> bestSolutionState = null;
-
-    Solution solve(Parameters parameters) {
-        if (parameters.heightVariant.equals("fixed")) {
-            return this.solveFixedHeight(parameters);
-        } else { // heightVariant == "free"
-            return this.solveFreeHeight(parameters);
-        }
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE, Util.HeightSupport.FIXED));
     }
 
     /**
-     * Find the optimal value for the parameters without doing any other output.
-     * @param parameters The parameters to be used by the solver.
-     * @return Returns the associated {@link Solution} object
+     * Returns a {@code Solution} for the given {@code Parameters}
+     * <p>
+     * Contains the template code for most solvers. By default it will rotate any rectangle
+     * that are to high to fit in a fixed box, if applicable. It will also check if the {@code Parameter }
+     * heightVariant and the supported height variants of this {@code Solver} match.
+     * </p>
+     *
+     * @param parameters the parameters for which to solve
+     * @return a {@code Solution} object containing the results
+     * @throws IllegalArgumentException if the Solver cannot solve the given parameters
      */
-    abstract Solution solveFixedHeight(Parameters parameters);
+    public Solution solve(Parameters parameters) throws IllegalArgumentException {
+        if (!getHeightSupport().contains(parameters.heightVariant)) {
+            throw new IllegalArgumentException("Unsupported height variant");
+        }
 
-    /**
-     * Tries different fixed heights. Starts with a maximum height, then halfs it and checks if it is smaller.
-     *  /TODO find a good algorithm for this optimization problem
-     * @param parameters
-     * @return optimalSolution
-     */
-    Solution solveFreeHeight(Parameters parameters) {
-        int height = 0; // The absolute max height that it could have
-        for (Rectangle rectangle : parameters.rectangles) {
-            if (rectangle.width > rectangle.height) {
-                height += rectangle.width;
-            } else {
-                height += rectangle.height;
+        // General rule, if rotating make sure that every rectangle fits.
+        if (parameters.rotationVariant) {
+            for (Rectangle rectangle :
+                    parameters.rectangles) {
+                if (rectangle.height > parameters.height) {
+                    rectangle.rotate();
+                }
             }
         }
 
-        height = Math.min(height, 46340); // Otherwise integer overflow, 46340 = sqrt(Integer.MAX_VALUE)
-        parameters.height = height;
-        Solution bestSolution = null;
-        Solution solution = solveFixedHeight(parameters);
+        // Create a new solution for this solve.
+        Solution solution = this.optimal(parameters);
 
-        while((bestSolution == null || solution.getArea() < bestSolution.getArea())) {
-            bestSolution = solution;
-            bestSolutionState = cloneRectangleState(parameters.rectangles);
-            height /= 2;
-            parameters.height = height;
-            solution = solveFixedHeight(parameters);
-        }
+        // report(solution);
 
-        parameters.rectangles = bestSolutionState;
-        return bestSolution;
+        return solution;
     }
 
-    private static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
-        ArrayList<Rectangle> rectangles = new ArrayList<>();
-        for (Rectangle rect:
-                rects) {
-            rectangles.add(new Rectangle(rect));
-        }
-        return rectangles;
-    }
-
-
+    /**
+     * Hook method for implementing a {@code Solver}.
+     * <p>
+     * The intention is that the PackingSolver calls {@link #solve(Parameters)} which will in turn call this function.
+     * The reasoning is that the solve function can contain all the Template code needed for the setup and the solve
+     * itself.
+     * </p>
+     * <p>
+     * To solve for a {@code Parameters} object you have to set all the x and y coordinates for all the rectangles in
+     * {@link Parameters#rectangles} in such a way that there is no overlap. The {@code Parameters} object in the
+     * final {@code Solution} object should be the same or deep copied over via {@link Parameters#copy()}.
+     * As of now the {@code PackingSolver} does not ensure that a given {@code Solution} is valid and thus this
+     * responsibility lies in the hand of the programming implementing the {@code optimal} function.
+     * </p>
+     *
+     * @param parameters the {@code Parameters} to be used by the solver
+     * @return the associated {@link Solution} object containing the results
+     */
+    abstract Solution optimal(Parameters parameters);
 }
+

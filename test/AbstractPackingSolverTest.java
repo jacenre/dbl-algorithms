@@ -201,7 +201,11 @@ abstract class AbstractPackingSolverTest {
     Stream<DynamicTest> momotorTests() throws IOException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        String[] paths = new String[]{"./test/momotor/prototype-1","./test/momotor/prototype-2"};
+        ArrayList<String> paths = new ArrayList<String>();
+
+        paths.add("./test/momotor/prototype-1");
+        paths.add("./test/momotor/prototype-2");
+
         for (String path : paths) {
             // Get all files from the momotor folder
             File folder = new File(path);

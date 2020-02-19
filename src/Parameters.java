@@ -79,7 +79,7 @@ public class Parameters {
         toString.append("\n");
         toString.append("number of rectangles: ").append(this.rectangles.size()).append("\n");
         for (Rectangle rectangle : rectangles) {
-            toString.append(rectangle.width).append(" ").append(rectangle.height).append("\n");
+            toString.append(rectangle.width).append(" ").append(rectangle.height).append(" ");
         }
         return toString.toString();
     }

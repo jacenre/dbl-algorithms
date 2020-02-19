@@ -45,11 +45,18 @@ public class FirstFitSolver extends AbstractSolver {
 
                 boxes.add(newBox);
             } else {
-                // If the rectangle doesn't fit we create a new bin.
+                // If the rectangle doesn't fit we create a new box.
                 if (!fitRectangle(boxes, rectangle, parameters.height)) {
-                    Box latest = boxes.get(boxes.size() - 1);
-                    rectangle.x = latest.x + latest.width;
-                    rectangle.y = latest.y;
+
+                    int maxX = 0;
+                    for (Box box : boxes) {
+                        if (box.y == 0) {
+                            maxX = (box.x + box.width > maxX) ? box.x + box.width : maxX;
+                        }
+                    }
+
+                    rectangle.x = maxX;
+                    rectangle.y = 0;
 
                     Box newBox = new Box(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
                     newBox.add(rectangle);
@@ -71,10 +78,19 @@ public class FirstFitSolver extends AbstractSolver {
     private boolean fitRectangle(ArrayList<Box> boxes, Rectangle rectangle, int height) {
         for (Box box :
                 boxes) {
-            if (rectangle.height + box.height + box.y <= height) {
+            if (rectangle.height + box.height + box.y <= height && rectangle.width <= box.width) {
                 rectangle.x = box.x;
                 rectangle.y = box.y + box.height;
                 box.add(rectangle);
+
+                if (box.rectangles.size() > 1) {
+                    Rectangle previousRect = box.rectangles.get(box.rectangles.size() - 2);
+                    int boundX = previousRect.width - rectangle.width;
+
+                    Box recursiveBox = new Box(rectangle.x + rectangle.width, rectangle.y, boundX, 0);
+                    boxes.add(recursiveBox);
+                }
+
                 return true;
             }
         }

@@ -28,11 +28,17 @@ public class Viz extends PApplet {
         solvers.add(new FirstFitSolver());
         solvers.add(new TopLeftSolver());
         solvers.add(new CompressionSolver());
+        solvers.add(new SimpleTopLeftSolver());
+        solvers.add(new FreeFirstFitSolver());
 
         for (AbstractSolver solver :
                 solvers) {
-            Solution solution = solver.solve(params.copy());
-            viewports.add(new Viewport(solution));
+            try {
+                Solution solution = solver.solve(params.copy());
+                viewports.add(new Viewport(solution));
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
         }
 
         activeView = viewports.get(0);

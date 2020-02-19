@@ -13,12 +13,12 @@ public class TopLeftSolver extends AbstractSolver {
      * @param parameters The parameters to be used by the solver.
      * @return Returns the associated {@link Solution} object
      */
-    Solution solveFixedHeight(Parameters parameters) throws IllegalArgumentException {
-//        if (!parameters.heightVariant.equals("fixed")) {
-//            throw new IllegalArgumentException("TopLeftSolver only works when the height is fixed.");
-//        }
+    Solution optimal(Parameters parameters) throws IllegalArgumentException {
+        if (!parameters.heightVariant.equals("fixed")) {
+            throw new IllegalArgumentException("TopLeftSolver only works when the height is fixed.");
+        }
         if (parameters.rectangles.size() > 2000) {
-            return new Solution(Integer.MAX_VALUE, Integer.MAX_VALUE, parameters);
+            throw new IllegalArgumentException("Too many rectangles");
         }
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;

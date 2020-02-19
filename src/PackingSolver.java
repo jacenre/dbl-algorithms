@@ -42,8 +42,13 @@ public class PackingSolver {
                 Rectangle rect = params.rectangles.stream()
                         .filter(rectangle -> rectID.equals(rectangle.getId())).findAny().orElse(null);
                 assert (rect != null);
-                System.out.print(rect.width + " ");
-                System.out.println(rect.height);
+                if (!rect.isRotated()) {
+                    System.out.print(rect.width + " ");
+                    System.out.println(rect.height);
+                } else {
+                    System.out.print(rect.height + " ");
+                    System.out.println(rect.width);
+                }
             }
             System.out.println("placement of rectangles");
             for (String rectID : inputOrder) {

@@ -1,10 +1,10 @@
-import org.w3c.dom.css.Rect;
-
-import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Binary search on the fixed results of First Fit solver
+ * Fixed height version of the FirstFitSolver.
  */
 public class FreeFirstFitSolver extends AbstractSolver {
 
@@ -44,6 +44,7 @@ public class FreeFirstFitSolver extends AbstractSolver {
             newParameters.height = height;
 
             Solution newSolution = firstFitSolver.optimal(newParameters.copy());
+
             Util.animate(newSolution.parameters, this);
 
             if (bestSolution == null) {
@@ -65,13 +66,16 @@ public class FreeFirstFitSolver extends AbstractSolver {
      */
     ArrayList<Integer> getHeights(Parameters parameters) {
         ArrayList<Integer> heights = new ArrayList<>();
-        // Set to fixed and give it to the first fit solver.
-        parameters.heightVariant = Util.HeightSupport.FIXED;
-        Solution solution = firstFitSolver.solve(parameters);
 
-        Rectangle last = solution.parameters.rectangles.get(solution.parameters.rectangles.size() - 1);
+        int minHeight = 0;
+        int maxHeight = 0;
 
-        for (int i = 0; i < last.height + last.y; i++) {
+        for (Rectangle rectangle : parameters.rectangles) {
+            maxHeight += rectangle.height;
+            minHeight = (rectangle.height > minHeight) ? rectangle.height : minHeight;
+        }
+
+        for (int i = minHeight; i <= maxHeight; i++) {
             heights.add(i);
         }
 
