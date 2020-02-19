@@ -43,7 +43,8 @@ public abstract class AbstractSolver {
      */
     public Solution solve(Parameters parameters) throws IllegalArgumentException {
         if (!getHeightSupport().contains(parameters.heightVariant)) {
-            throw new IllegalArgumentException("Unsupported height variant");
+            throw new IllegalArgumentException(this.getClass().getSimpleName() +
+                    " does not support " + parameters.heightVariant);
         }
 
         // General rule, if rotating make sure that every rectangle fits.
