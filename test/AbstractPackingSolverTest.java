@@ -201,24 +201,28 @@ abstract class AbstractPackingSolverTest {
     Stream<DynamicTest> momotorTests() throws IOException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        // Get all files from the momotor folder
-        File folder = new File("./test/momotor/");
-        File[] files = folder.listFiles();
-        assert files != null;
-        files = Arrays.stream(files).filter(File::isFile).toArray(File[]::new);
+        String[] paths = new String[]{"./test/momotor/prototype-1","./test/momotor/prototype-2"};
+        for (String path : paths) {
+            // Get all files from the momotor folder
+            File folder = new File(path);
+            File[] files = folder.listFiles();
+            assert files != null;
+            files = Arrays.stream(files).filter(File::isFile).toArray(File[]::new);
 
-        // Add a test for each input
-        for (File file : files) {
-            Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
-            Bin bin = new Bin(params, null);
-            AbstractSolver solver = this.getSolver();
-            if (!solver.getHeightSupport().contains(params.heightVariant)) {
-                continue;
+            // Add a test for each input
+            for (File file : files) {
+                Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+                Bin bin = new Bin(params, null);
+                AbstractSolver solver = this.getSolver();
+                if (!solver.getHeightSupport().contains(params.heightVariant)) {
+                    continue;
+                }
+                DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)) );
+
+                dynamicTests.add(dynamicTest);
             }
-            DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)) );
-
-            dynamicTests.add(dynamicTest);
         }
+
         System.out.println(dynamicTests.size());
         return dynamicTests.stream();
 
