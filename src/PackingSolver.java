@@ -9,30 +9,25 @@ public class PackingSolver {
         UserInput ui = new UserInput(System.in);
         Parameters params = ui.getUserInput();
         ArrayList<Solution> solutions = new ArrayList<>();
-        // Remember the order of the rectangles for the output
+        // Remember the order of the rectanges for the output
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
 
         // Different solutions
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
         compoundSolver.addSolver(new TopLeftSolver());
-        compoundSolver.addSolver(new CompressionSolver());
-        compoundSolver.addSolver(new FreeFirstFitSolver());
-        Solution solution = compoundSolver.optimal(params);
+        compoundSolver.addSolver(new ReverseFitSolver());
 
-        Output.output(solution.parameters, inputOrder);
+        compoundSolver.optimal(params);
+
+        Output.output(params, inputOrder);
 //        Output.outputVisual(params, inputOrder, solution);
     }
 
     static class Output {
-        public static void output (Parameters params) {
-            String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
-            output(params, inputOrder);
-        }
-
         public static void output (Parameters params, String[] inputOrder) {
             System.out.println("container height: " + params.heightVariant +
-                    (params.height != Integer.MAX_VALUE ? " " + params.height : ""));
+                    (params.heightVariant.equals("fixed") ? " " + params.height : ""));
             System.out.println("rotations allowed: " + (params.rotationVariant ? "yes" : "no"));
             System.out.println("number of rectangles: " + params.rectangles.size() );
             for (String rectID : inputOrder) {
@@ -78,6 +73,5 @@ public class PackingSolver {
                 }
             }
         }
-
     }
 }
