@@ -14,3 +14,24 @@ A group project for the DBL Algorithms course at Eindhoven University of Technol
 | | Might or might not have a fixed height. |
 | Strip | Box with a fixed height. |
 | Bin  | Stores the Parameters and additional satellite data to serve a test case. |
+
+# Example inputs
+    container height: fixed 22
+    rotations allowed: yes
+    number of rectangles: 6
+    12 8
+    10 9
+    8 12
+    16 3
+    4 16
+    10 6
+    
+    container height: free
+    rotations allowed: no
+    number of rectangles: 6
+    12 8
+    10 9
+    8 12
+    16 3
+    4 16
+    10 6
