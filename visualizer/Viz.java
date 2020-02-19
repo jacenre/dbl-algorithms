@@ -129,8 +129,7 @@ public class Viz extends PApplet {
             fill(0,0,100,100);
             for (Rectangle rectangle :
                     solution.parameters.rectangles) {
-                fill(map(rectangle.x, 0, solution.getWidth(), 0, 360),
-                        map(rectangle.y, 0, solution.getHeight(), 50, 100),100);
+                fill((rectangle.width*rectangle.height*10)%360, (rectangle.width*rectangle.height*10)%360,100);
                 float x = map(rectangle.x, 0, solution.getWidth(), 0, drawWidth);
                 float y = map(rectangle.y, 0, solution.getHeight(), 0, drawHeight);
                 float rectw = map(rectangle.width, 0, solution.getWidth(), 0, drawWidth);
