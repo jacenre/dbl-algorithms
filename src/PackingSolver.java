@@ -8,7 +8,7 @@ public class PackingSolver {
     public static void main(String[] args) throws IllegalArgumentException {
         UserInput ui = new UserInput(System.in);
         Parameters params = ui.getUserInput();
-        ArrayList<Solution> solutions = new ArrayList<>();
+
         // Remember the order of the rectangles for the output
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
 
@@ -31,8 +31,11 @@ public class PackingSolver {
         }
 
         public static void output (Parameters params, String[] inputOrder) {
-            System.out.println("container height: " + params.heightVariant +
-                    (params.height != Integer.MAX_VALUE ? " " + params.height : ""));
+            if (params.heightVariant == Util.HeightSupport.FREE) {
+                System.out.println("container height: free");
+            } else {
+                System.out.println("container height: fixed " + params.height);
+            }
             System.out.println("rotations allowed: " + (params.rotationVariant ? "yes" : "no"));
             System.out.println("number of rectangles: " + params.rectangles.size() );
             for (String rectID : inputOrder) {

@@ -1,35 +1,51 @@
 import java.util.ArrayList;
 
 /**
- * Data type to store all the parameters of the algorithm.
+ * Data type to store all the parameters of the problem.
+ *
  * @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1"> Problem description 2.1 Input Format</a>
  */
 public class Parameters {
 
     /**
+     * The height variant of the parameter.
+     * <p>
      * Describes the variant that needs to be solved.
-     * Where variant \in {free, fixed}
+     * Where variant {@code \in {free, fixed}}
+     * </p>
+     *
+     * @see Util.HeightSupport
      */
     public Util.HeightSupport heightVariant;
 
     /**
-     * Describes the height of {@link Parameters#heightVariant} if {@code heightVariant.equals("fixed")}
+     * The height of the {@link #heightVariant}.
+     * <p>
+     *     If the input has {@code heightVariant == Util.HeightSupport.FIXED} then this will represent the maximum
+     *     height of the solution.
+     * </p>
      */
     public Integer height = 0;
 
     /**
-     * True if rotation of rectangles is allowed.
+     * The rotation variant of the Parameter.
+     * <p>
+     *     if {@code this == true} then rotation is enabled.
+     * </p>
      */
     public boolean rotationVariant;
 
     /**
-     * Arraylist that stores all the rectangles.
+     * The ArrayList containing all the rectangles.
+     *
+     * @see Rectangle
      */
     public ArrayList<Rectangle> rectangles;
 
     /**
-     * Creates a deep copy of this parameter object.
-     * @return Deep copy of parameters.
+     * Returns a deep copy of this parameter object.
+     *
+     * @return a deep copy of parameters.
      */
     public Parameters copy() {
         Parameters parameters = new Parameters();
@@ -38,5 +54,33 @@ public class Parameters {
         parameters.rotationVariant = this.rotationVariant;
         parameters.rectangles = Util.cloneRectangleState(rectangles);
         return parameters;
+    }
+
+    /**
+     * Prints this {@code Solution} object as a string, containing debug information.
+     *
+     * @return a string representation of this object
+     */
+    @Override
+    public String toString() {
+        StringBuilder toString = new StringBuilder();
+        if (this.heightVariant == Util.HeightSupport.FIXED) {
+            toString.append("container height: fixed ").append(this.height);
+        } else {
+            toString.append("container height: free");
+        }
+        toString.append("\n");
+        toString.append("rotations allowed: ");
+        if (this.rotationVariant) {
+            toString.append("yes");
+        } else {
+            toString.append("no");
+        }
+        toString.append("\n");
+        toString.append("number of rectangles: ").append(this.rectangles.size()).append("\n");
+        for (Rectangle rectangle : rectangles) {
+            toString.append(rectangle.width).append(" ").append(rectangle.height).append("\n");
+        }
+        return toString.toString();
     }
 }
