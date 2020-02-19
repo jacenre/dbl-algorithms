@@ -21,7 +21,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     @Override
     Solution optimal(Parameters parameters) throws IllegalArgumentException {
         if (parameters.rectangles.size() > 2000) {
-            throw new IllegalArgumentException("To many rectangles");
+            throw new IllegalArgumentException("Too many rectangles");
         }
 
         // Put the first rectangle in the top left corner
@@ -36,6 +36,9 @@ public class SimpleTopLeftSolver extends AbstractSolver {
             Rectangle rect = parameters.rectangles.get(i);
             rect.place(true);
             rect.x = binWidth;
+            if (rect.height > parameters.height) {
+                rect.rotate();
+            }
             rect.y = parameters.height - rect.height;
             move(rect, parameters.rectangles.subList(0, i));
             binWidth = Math.max(binWidth, rect.x + rect.width);
@@ -85,18 +88,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      * Move up until there is a possibility to move left.
      */
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
+        Rectangle path = new Rectangle(rect.x, 0, rect.width, rect.y);
         rect.y = 0;
-        boolean intersects;
-        // Check intersection with all placed rectangles
-        do {
-            intersects = false;
-            for (Rectangle rectangle : rectangles) {
-                if (rect.intersects(rectangle)) {
-                    intersects = true;
-                    rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
-                }
+        for (Rectangle rectangle : rectangles) {
+            if (rectangle.getId().equals(rect.getId())) break;
+            if (path.intersects(rectangle)) {
+                rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
             }
-        } while (intersects);
+        }
     }
 
     /** Check if the rectangle can move to its left */

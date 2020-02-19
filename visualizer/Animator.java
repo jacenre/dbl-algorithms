@@ -11,6 +11,13 @@ public class Animator extends PApplet {
 
     static Animator animator = null;
 
+    public static Animator getInstance() {
+        if (animator == null) {
+            Animator.main(new String[]{});
+        }
+        return animator;
+    }
+
     Viewport activeView;
     ArrayList<Viewport> viewports = new ArrayList<>();
     int active = 0;
@@ -26,12 +33,12 @@ public class Animator extends PApplet {
     }
 
     public void settings() {
+        animator = this;
         size(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     public void setup() {
         colorMode(HSB, 360, 100, 100);
-        animator = this;
     }
 
     public void drawParameter(Parameters parameters, AbstractSolver solver) {
@@ -40,6 +47,7 @@ public class Animator extends PApplet {
         } else {
             activeView.solution.parameters = parameters;
         }
+        activeView.setScale();
     }
 
     /**
@@ -140,28 +148,23 @@ public class Animator extends PApplet {
         oldY = mouseY;
     }
 
-    public void mouseDragged() {
-        // If you click on the strip, move it
-        if (activeView.boundingBox.contains(new Point(mouseX, mouseY))) {
-            activeView.setX(activeView.x - oldX + mouseX);
-            activeView.setY(activeView.y - oldY + mouseY);
-        }
-        oldX = mouseX;
-        oldY = mouseY;
-    }
-
     int TEXT_X = 50;
     int TEXT_Y = 50;
 
     public void draw() {
-        animator = this;
-        background(0, 0, 100);
-        if (activeView != null) {
-            fill(0, 0, 0);
-            text(activeView.solution.solvedBy.getClass().getSimpleName(), TEXT_X, TEXT_Y);
-            text("Size = " + activeView.solution.getArea(), TEXT_X, TEXT_Y + 15);
-            activeView.draw();
+        try {
+            if (Animator.getInstance() != null) {
+                background(0,0,100);
+                if (activeView != null) {
+                    fill(0, 0, 0);
+                    text(activeView.solution.solvedBy.getClass().getSimpleName(), TEXT_X, TEXT_Y);
+                    text("Size = " + activeView.solution.getArea(), TEXT_X, TEXT_Y + 15);
+                    activeView.draw();
+                }
+                delay(100);
+            }
+        } catch (Exception e) {
+            // ignore
         }
-        delay(500);
     }
 }

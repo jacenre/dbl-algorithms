@@ -1,30 +1,38 @@
 /**
- * Intent: the solution object should contain all the information about the input and output
- * in such a way that only a solution object is needed to verify its correctness
+ * Solution object encapsulating the results of solving a {@link Parameters} object.
+ * <p>
+ * The Solution object was made to make a clear distinction between the {@code Parameters} representing a solved
+ * and an unsolved situation. In case of an unsolved situation there is little use to asking for the Area, thus
+ * these function have been added to the {@code Solution} object to make the use cases clear in a natural way.
+ * </p>
  */
 public class Solution {
 
     /**
-     * The parameters that were used during solving.
+     * The parameters of the {@code Solution}.
      */
     public Parameters parameters;
 
     /**
-     * The area the solution takes up
+     * Returns the area, or score, of the {@code Solution} as an {@code Integer}.
+     *
+     * @return the Area of the {@code Solution}.
      */
     public int getArea() {
         return this.getWidth() * this.getHeight();
     }
 
     /**
-     * Height of the total bin area
+     * Returns the height of the {@code Solution} as an {@code Integer}.
+     *
+     * @return the height of the {@code Solution}.
      */
     public int getHeight() {
+        // If height is fixed return the fix height
         if (parameters.heightVariant == Util.HeightSupport.FIXED) {
             return parameters.height;
         }
 
-        // If height is fixed return the fix height
         int maxHeight = 0;
 
         for (Rectangle rectangle :
@@ -33,10 +41,12 @@ public class Solution {
         }
 
         return maxHeight;
-    };
+    }
 
     /**
-     * Width of the total bin area
+     * Returns the width of the {@code Solution} as an {@code Integer}.
+     *
+     * @return the width of the {@code Solution}.
      */
     public int getWidth() {
         int maxWidth = 0;
@@ -50,18 +60,19 @@ public class Solution {
     }
 
     /**
-     * Create a solution object without knowing the solution.
+     * Constructs a new {@code Solution} whose {@link #solvedBy} is unknown.
      *
-     * @param parameters The parameters used for solving.
+     * @param parameters the {@code Parameters} used for solving
      */
     public Solution(Parameters parameters) {
         this.parameters = parameters;
     }
 
     /**
-     * Create a Solution object when you know the width and height of the solution.
+     * Constructs a new {@code Solution} whose {@link #solvedBy} is known.
      *
-     * @param parameters The parameters used for solving.
+     * @param parameters the {@code Parameters} used for solving
+     * @param solvedBy the {@link AbstractSolver} that created this solution
      */
     public Solution(Parameters parameters, AbstractSolver solvedBy) {
         this.parameters = parameters;
@@ -69,14 +80,18 @@ public class Solution {
     }
 
     /**
-     * Debugging information about which solver solved this.
+     * The {@link AbstractSolver} that created this solution.
      */
     public AbstractSolver solvedBy = null;
 
     /**
-     * The sum of all rectangles which must always be as good or better than the found optimal.
+     * Returns the sum of all {@code Rectangles} in {@link #parameters}.
+     * <p>
+     *     If we find that {@link #getArea()} is less than the sum of all rectangles it must mean that there is an
+     *     overlap and the solution is invalid.
+     * </p>
      *
-     * @return The minimum area representing the sum of all rectangles.
+     * @return the sum of the area of all rectangles
      */
     public int getMinimumArea() {
         int minimumArea = 0;
@@ -88,16 +103,18 @@ public class Solution {
     }
 
     /**
-     * Returns the rate of the solution
-     * @return solution / minimum
+     * Returns the OPT rate of the solution.
+     *
+     * @return a double representing the found area divided by the minimum area
      */
     public double getRate() {
         return (double) this.getArea() / (double) this.getMinimumArea();
     }
 
     /**
-     * For debugging information in test cases.
-     * @return String representation of this object.
+     * Prints this {@code Solution} object as a string, containing debug information.
+     *
+     * @return a string representation of this object
      */
     @Override
     public String toString() {
@@ -113,8 +130,9 @@ public class Solution {
     }
 
     /**
-     * Create a deep copy of this Solution object
-     * @return Deep copy solution object.
+     * Returns a deep copy of this {@code Solution} object.
+     *
+     * @return a {@code Solution} object which is a deep copy of {@code this}
      */
     public Solution copy() {
         Solution solution = new Solution(this.parameters.copy());
