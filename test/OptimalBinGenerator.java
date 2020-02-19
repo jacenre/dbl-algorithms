@@ -1,15 +1,16 @@
 import java.util.ArrayList;
 import java.util.Random;
 
+
 /**
  * Class that generates optimal test cases to be used as input for tests.
  */
 public class OptimalBinGenerator extends AbstractBinGenerator {
 
-    Random generator = new Random();
-    Long SEED = 125L;
+    private Random generator = new Random();
 
     OptimalBinGenerator() {
+        long SEED = 125L;
         generator.setSeed(SEED);
     }
 

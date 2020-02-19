@@ -79,7 +79,7 @@ abstract class AbstractPackingSolverTest {
     }
 
     /**
-     * List of Bin Generators for which the dynamic test should run.
+     * List of BinGenerators.Bin Generators for which the dynamic test should run.
      * @return All the dynamic generator you wish to run the algorithm on.
      */
     List<AbstractBinGenerator> getGenerators() {

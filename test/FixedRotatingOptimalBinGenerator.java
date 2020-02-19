@@ -1,5 +1,5 @@
 /**
- * Implementation of the Optimal Bin Generator with rotating enabled.
+ * Implementation of the Optimal BinGenerators.Bin Generator with rotating enabled.
  */
 public class FixedRotatingOptimalBinGenerator extends OptimalBinGenerator {
 

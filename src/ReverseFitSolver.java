@@ -60,13 +60,14 @@ public class ReverseFitSolver extends AbstractSolver {
 
         // put rectangles from top to bottom after placeX until it is too high to fit, then go to the right
         int heightStackedSmallRectangles = 0;
-        for (Rectangle rectangle : smallHeightRectangles) {
+        for (Iterator<Rectangle> iterator = smallHeightRectangles.iterator(); iterator.hasNext(); ) {
+            Rectangle rectangle = iterator.next();
             if (heightStackedSmallRectangles + rectangle.getHeight() > parameters.height) {
                 break;
             }
             rectangle.setLocation(placeX, heightStackedSmallRectangles);
             placedRectangles.add(rectangle);
-            smallHeightRectangles.remove(rectangle);
+            iterator.remove();
             // update heigthtStackedSmallRectangles;
             heightStackedSmallRectangles += rectangle.height;
         }

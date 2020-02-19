@@ -38,6 +38,7 @@ public class Animator extends PApplet {
     }
 
     public void setup() {
+        frameRate(100);
         colorMode(HSB, 360, 100, 100);
     }
 

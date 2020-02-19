@@ -23,7 +23,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         if (parameters.rectangles.size() > 2000) {
             throw new IllegalArgumentException("Too many rectangles");
         }
-
+        Util.animate(parameters, this);
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;
         parameters.rectangles.get(0).y = 0;
@@ -31,10 +31,10 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         binWidth = parameters.rectangles.get(0).width;
 
         for (int i = 1; i < parameters.rectangles.size(); i++) {
-            Util.animate(parameters, this);
             // Put the rectangle in the bottom right corner
             Rectangle rect = parameters.rectangles.get(i);
             rect.place(true);
+            Util.animate();
             rect.x = binWidth;
             if (rect.height > parameters.height) {
                 rect.rotate();
@@ -53,14 +53,11 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         }
         while (canMoveLeft(rect, rectangles)) {
             moveLeft(rect, rectangles);
-            Util.animate();
         }
         while (canMoveUp(rect, rectangles)) {
             moveUp(rect, rectangles);
-            Util.animate();
             if (canMoveLeft(rect, rectangles)) {
                 moveLeft(rect, rectangles);
-                Util.animate();
             }
         }
     }

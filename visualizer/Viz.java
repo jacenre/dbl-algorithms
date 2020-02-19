@@ -1,10 +1,7 @@
-import com.sun.source.tree.TryTree;
 import processing.core.PApplet;
 
 import java.awt.*;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Random;
 
 @SuppressWarnings("Duplicates")
 public class Viz extends PApplet {
