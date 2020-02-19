@@ -23,6 +23,6 @@ public class OptimalBinGeneratorTest {
                 bin.parameters.rectangles) {
             area += (rectangle.width * rectangle.height);
         }
-        Assertions.assertEquals(bin.optimal, area);
+        Assertions.assertEquals((int)bin.optimal, area);
     }
 }
