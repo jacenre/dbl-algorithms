@@ -4,7 +4,7 @@ import java.util.List;
 /**
  * Solver algorithm adapted from the BL-algorithm, where the height has to be fixed.
  */
-public class TopLeftSolver extends AbstractSolver {
+public class TopLeftSolver extends SimpleTopLeftSolver {
     int binWidth = 0;
 
     /**
@@ -33,47 +33,11 @@ public class TopLeftSolver extends AbstractSolver {
         return new Solution(parameters, this);
     }
 
-    private void move(Rectangle rect, List<Rectangle> rectangles) {
-        if (!canMoveLeft(rect, rectangles) && !canMoveUp(rect, rectangles)) return;
-        while (canMoveLeft(rect, rectangles)) {
-            rect.x = rect.x - 1;
-        }
-        while (canMoveUp(rect, rectangles)) {
-            rect.y = rect.y - 1;
-            if (canMoveLeft(rect, rectangles)) {
-                break;
-            }
-        }
-        move(rect, rectangles);
-    }
-
-    /** Check if the rectangle can move to its left */
-    private boolean canMoveLeft(Rectangle rect, List<Rectangle> rectangles) {
-        if (rect.x <= 0) return false;
-        rect.x = rect.x - 1;
-        // Check intersection with all placed rectangles
-        for (Rectangle rectangle : rectangles) {
-            if (rect.intersects(rectangle)) {
-                rect.x = rect.x + 1;
-                return false;
-            }
-        }
-        rect.x = rect.x + 1;
-        return true;
-    }
-
-    /** Check if the rectangle can move up */
-    private boolean canMoveUp(Rectangle rect, List<Rectangle> rectangles) {
-        if (rect.y <= 0) return false;
-        rect.y = rect.y - 1;
-        // Check intersection with all placed rectangles
-        for (Rectangle rectangle : rectangles) {
-            if (rect.intersects(rectangle)) {
-                rect.y = rect.y + 1;
-                return false;
-            }
-        }
-        rect.y = rect.y + 1;
-        return true;
+    /**
+     * Move up until there is a possibility to move left.
+     */
+    @Override
+    protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
+        rect.y--;
     }
 }
