@@ -38,7 +38,7 @@ public class Viz extends PApplet {
                 Solution solution = solver.solve(params.copy());
                 viewports.add(new Viewport(solution));
             } catch (IllegalArgumentException e) {
-                // ignore
+                System.out.println(e);
             }
         }
 

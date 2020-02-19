@@ -50,7 +50,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
         // With low parameters.height, sometimes we are done here already
         if (remainingRectangles.isEmpty()) {
-            return new Solution(parameters);
+            return new Solution(parameters, this);
         }
 
         // STEP 2 #####
@@ -75,7 +75,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
         // Either we are done because all the rectangles have been placed, or we need to start with the reverse fit
         if (remainingRectangles.isEmpty()) {
-            return new Solution(parameters);
+            return new Solution(parameters, this);
         }
 
         // STEP 4 #####
@@ -119,7 +119,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
         // Either no rectangles anymore or reverse row reached far enough
         if (remainingRectangles.isEmpty()) {
-            return new Solution(parameters);
+            return new Solution(parameters, this);
         }
 
         // FROM HERE HARD
@@ -171,7 +171,7 @@ public class ReverseFitSolver extends AbstractSolver {
         assert (remainingRectangles.size() == 0);
         int finalWidth = findNewLevel(firstRow);
 
-        return new Solution(parameters);
+        return new Solution(parameters, this);
     }
 
     void firstFit(ArrayList<Rectangle> remainingRectangles, int level, Parameters parameters, ArrayList<Rectangle> firstRow) {
