@@ -14,9 +14,6 @@ public class TopLeftSolver extends AbstractSolver {
      * @return Returns the associated {@link Solution} object
      */
     Solution optimal(Parameters parameters) throws IllegalArgumentException {
-        if (!parameters.heightVariant.equals("fixed")) {
-            throw new IllegalArgumentException("TopLeftSolver only works when the height is fixed.");
-        }
         if (parameters.rectangles.size() > 2000) {
             throw new IllegalArgumentException("Too many rectangles");
         }
