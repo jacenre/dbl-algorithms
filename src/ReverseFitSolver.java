@@ -17,9 +17,10 @@ public class ReverseFitSolver extends AbstractSolver {
      * @return Solution object
      */
     Solution optimal(Parameters parameters) throws IllegalArgumentException {
-        if (parameters.height <= 0)
+        if (parameters.rectangles.size() > 5000) {
             throw new IllegalArgumentException();
-
+        }
+        Util.animate(parameters, this);
         /* Commented out the rotating for now, first of all this should only happen if parameters.rotationVariant and
          * this does not seem very helpful anyway
         ArrayList<Rectangle> remainingRectangles = new ArrayList<>();
@@ -39,7 +40,9 @@ public class ReverseFitSolver extends AbstractSolver {
         int x_0 = 0; // Keeps track of where to place the blocks in the while loop
         // Stack all the rectangles that have height > parameters.height/2 next to each other
         for (Rectangle rectangle : parameters.rectangles) {
+            Util.animate();
             if (rectangle.height > parameters.height / 2) {
+                rectangle.place(true);
                 rectangle.setLocation(x_0, 0);
                 firstLargeRectangles.add(rectangle);
                 x_0 += rectangle.width;
@@ -64,6 +67,8 @@ public class ReverseFitSolver extends AbstractSolver {
         // STEP 3 #####
         // Filling in first row
         for (Rectangle rectangle : remainingRectangles) {
+            Util.animate();
+            rectangle.place(true);
             if (rectangle.height + y_0 > parameters.height) {
                 break;
             }
@@ -84,6 +89,7 @@ public class ReverseFitSolver extends AbstractSolver {
         ArrayList<Rectangle> reverseRow = new ArrayList<>();
         int y_0_reverse = parameters.height;
         for (Rectangle rectangle : remainingRectangles) {
+            Util.animate();
             if (y_0_reverse < parameters.height / 2)
                 break;  // If the reverse row is this far up, stop
             if (rectangle.height + y_0 < parameters.height) {    // Smaller rectangles might still fit in the first row
@@ -112,6 +118,8 @@ public class ReverseFitSolver extends AbstractSolver {
         // revert last translation
         moved--;
         for (Rectangle rectangle : reverseRow) {
+            Util.animate();
+            rectangle.place(true);
             rectangle.translate(1, 0);
         }
 
@@ -170,7 +178,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
         assert (remainingRectangles.size() == 0);
         int finalWidth = findNewLevel(firstRow);
-
+        Util.animate();
         return new Solution(parameters, this);
     }
 

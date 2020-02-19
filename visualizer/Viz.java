@@ -16,6 +16,8 @@ public class Viz extends PApplet {
 
     static boolean USER_INPUT;
 
+    int range = 0;
+
     public static void main(String[] args) {
         PApplet.main("Viz");
     }
@@ -31,6 +33,8 @@ public class Viz extends PApplet {
         solvers.add(new ReverseFitSolver());
         solvers.add(new SimpleTopLeftSolver());
         solvers.add(new FreeFirstFitSolver());
+
+        range = (int) Math.random() * 180;
 
         for (AbstractSolver solver :
                 solvers) {
@@ -95,6 +99,7 @@ public class Viz extends PApplet {
             setScale();
         }
 
+
         void setScale() {
             // update sizes
             this.solutionHeight = this.solution.getHeight();
@@ -114,29 +119,42 @@ public class Viz extends PApplet {
             boundingBox = new Rectangle(this.x, this.y, drawWidth, drawHeight);
         }
 
+        int smallest = Integer.MAX_VALUE;
+        int largest = 0;
+
         Viewport(Parameters parameters) {
+            for (Rectangle rectangle : parameters.rectangles) {
+                smallest = (smallest > rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : smallest;
+                largest = (largest < rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : largest;
+            }
             // Wrap the parameters in a solution object.
             this.solution = new Solution(parameters);
             setScale();
         }
 
         Viewport(Solution solution) {
+            for (Rectangle rectangle : solution.parameters.rectangles) {
+                smallest = (smallest > rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : smallest;
+                largest = (largest < rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : largest;
+            }
             this.solution = solution;
             setScale();
         }
 
         void draw() {
-            fill(0,0,100,100);
+            fill(0, 0, 100, 100);
             for (Rectangle rectangle :
                     solution.parameters.rectangles) {
-                fill((rectangle.width*rectangle.height*10)%360, (rectangle.width*rectangle.height*10)%360,100);
+                float hue = map((float)Math.log(rectangle.width * rectangle.height),
+                        (float)Math.log(activeView.smallest), (float)Math.log(activeView.largest), range, range + 180);
+                fill(hue, 100, 100);
                 float x = map(rectangle.x, 0, solution.getWidth(), 0, drawWidth);
                 float y = map(rectangle.y, 0, solution.getHeight(), 0, drawHeight);
                 float rectw = map(rectangle.width, 0, solution.getWidth(), 0, drawWidth);
                 float recth = map(rectangle.height, 0, solution.getHeight(), 0, drawHeight);
                 rect(x + this.x, y + this.y, rectw, recth);
             }
-            stroke(0,0,0);
+            stroke(0, 0, 0);
             fill(0, 0, 0, 0);
             rect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
         }
@@ -183,11 +201,11 @@ public class Viz extends PApplet {
     int TEXT_Y = 50;
 
     public void draw() {
-        background(0,0,100);
+        background(0, 0, 100);
         if (activeView != null) {
-            fill(0,0,0);
-            text(activeView.solution.solvedBy.getClass().getSimpleName(),TEXT_X,TEXT_Y);
-            text("Size = " + activeView.solution.getArea(), TEXT_X,TEXT_Y + 15);
+            fill(0, 0, 0);
+            text(activeView.solution.solvedBy.getClass().getSimpleName(), TEXT_X, TEXT_Y);
+            text("Size = " + activeView.solution.getArea(), TEXT_X, TEXT_Y + 15);
             activeView.draw();
         }
     }

@@ -11,10 +11,10 @@ public class CompressionSolver extends AbstractSolver {
     @Override
     Solution optimal(Parameters parameters) {
         FirstFitSolver firstFitSolver = new FirstFitSolver();
-        TopLeftSolver topLeftSolver = new TopLeftSolver();
+        SimpleTopLeftSolver simpleTopLeftSolver = new SimpleTopLeftSolver();
 
         Solution solution = firstFitSolver.solve(parameters);
-        solution = topLeftSolver.solve(solution.parameters);
+        solution = simpleTopLeftSolver.solve(solution.parameters);
 
         return new Solution(solution.parameters, this);
     }

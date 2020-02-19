@@ -1,16 +1,17 @@
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.time.Duration.ofSeconds;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -72,14 +73,16 @@ abstract class AbstractPackingSolverTest {
 
     /**
      * Amount of test to run in the TestFactory
+     *
      * @return default 10 test cases.
      */
-    int getTestCount(){
+    int getTestCount() {
         return 10;
     }
 
     /**
      * List of BinGenerators.Bin Generators for which the dynamic test should run.
+     *
      * @return All the dynamic generator you wish to run the algorithm on.
      */
     List<AbstractBinGenerator> getGenerators() {
@@ -87,35 +90,46 @@ abstract class AbstractPackingSolverTest {
                 new RotatingOptimalBinGenerator(), new FixedRotatingOptimalBinGenerator());
     }
 
+    public Optional<String> getExtension(String filename) {
+        return Optional.ofNullable(filename)
+                .filter(f -> f.contains("."))
+                .map(f -> f.substring(filename.lastIndexOf(".") + 1));
+    }
+
     /**
      * Tests all the generators in binGenerators against the concrete solver
      */
     @TestFactory
     @DisplayName("Solver Test Factory")
-    Stream<DynamicTest> dynamicSolverTests() {
+    Stream<DynamicTest> dynamicSolverTests() throws FileNotFoundException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        for (AbstractBinGenerator binGenerator :
-                getGenerators()) {
+        String path = "/home/samuel/IdeaProjects/dbl-algorithms/test/input/Non-perfect fit/Martello, 1998";
 
-            for (int i = 0; i < getTestCount(); i++) {
+        File folder = new File(path);
+        File[] files = folder.listFiles();
+        assert files != null;
+        files = Arrays.stream(files).filter(File::isFile).toArray(File[]::new);
 
-                // TODO Make generators for each parameter combo.
-                Parameters parameters = new Parameters();
-                parameters.heightVariant = Util.HeightSupport.FIXED;
-                parameters.rotationVariant = false;
-                Bin bin = binGenerator.generate(1000);
-                DynamicTest dynamicTest = dynamicTest(binGenerator.getClass().getSimpleName() + " #" + i, ()
-                        -> assertTrue(isValidSolution(bin)));
+        for (File file : files) {
 
-                dynamicTests.add(dynamicTest);
+            Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+            Bin bin = new Bin(params, null);
+            AbstractSolver solver = this.getSolver();
+            if (!solver.getHeightSupport().contains(params.heightVariant)) {
+                continue;
             }
+            DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)));
+
+            dynamicTests.add(dynamicTest);
         }
+
         return dynamicTests.stream();
     }
 
     /**
      * Check if the solution found by the solver is valid for the bin
+     *
      * @param bin The bin containing the precomputed optimal.
      * @return True if the solution is valid, else false.
      */
@@ -138,14 +152,14 @@ abstract class AbstractPackingSolverTest {
         System.out.println("Solve took " + duration / 1000000 + "ms");
 
         if (hasOverlapping(sol.parameters.rectangles)) {
-            System.out.println("There are overlapping rectangles");
+            System.err.println("There are overlapping rectangles");
             return false;
         }
 
         for (Rectangle rectangle :
                 sol.parameters.rectangles) {
             if (rectangle.x < 0 || rectangle.y < 0) {
-                System.out.println("Negative coordinates found");
+                System.err.println("Negative coordinates found");
                 return false;
             }
         }
@@ -173,6 +187,7 @@ abstract class AbstractPackingSolverTest {
 
     /**
      * Test to see if any of the rectangles in the list overlap.
+     *
      * @return True if overlapping rectangles in list else false.
      * TODO Improve runtime
      */
@@ -203,7 +218,7 @@ abstract class AbstractPackingSolverTest {
 
         ArrayList<String> paths = new ArrayList<String>();
 
-        paths.add("./test/momotor/prototype-1");
+//        paths.add("./test/momotor/prototype-1");
         paths.add("./test/momotor/prototype-2");
 
         for (String path : paths) {
@@ -221,13 +236,12 @@ abstract class AbstractPackingSolverTest {
                 if (!solver.getHeightSupport().contains(params.heightVariant)) {
                     continue;
                 }
-                DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)) );
+                DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(isValidSolution(bin)));
 
                 dynamicTests.add(dynamicTest);
             }
         }
 
-        System.out.println(dynamicTests.size());
         return dynamicTests.stream();
 
     }

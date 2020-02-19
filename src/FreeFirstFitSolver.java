@@ -32,7 +32,10 @@ public class FreeFirstFitSolver extends AbstractSolver {
             throw new IllegalArgumentException();
         }
 
+        firstFitSolver.animate = false;
+
         heights = getHeights(parameters);
+
         Util.animate(parameters, this);
 
         // Set the heightVariant for the first fit solver
@@ -45,7 +48,6 @@ public class FreeFirstFitSolver extends AbstractSolver {
 
             Solution newSolution = firstFitSolver.optimal(newParameters.copy());
 
-            Util.animate(newSolution.parameters, this);
 
             if (bestSolution == null) {
                 bestSolution = newSolution.copy();
@@ -54,6 +56,9 @@ public class FreeFirstFitSolver extends AbstractSolver {
                 bestSolution = newSolution.copy();
             }
         }
+
+        Util.animate(parameters, this);
+
         bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
         bestSolution.solvedBy = this;
         return bestSolution;

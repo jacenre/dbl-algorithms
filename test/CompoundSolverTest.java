@@ -1,7 +1,6 @@
 import org.junit.jupiter.api.DisplayName;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,6 +22,8 @@ public class CompoundSolverTest extends AbstractPackingSolverTest {
         compoundSolver.addSolver(new TopLeftSolver());
         compoundSolver.addSolver(new CompressionSolver());
         compoundSolver.addSolver(new FreeFirstFitSolver());
+        compoundSolver.addSolver(new ReverseFitSolver());
+        compoundSolver.addSolver(new SimpleTopLeftSolver());
         return compoundSolver;
     }
 }

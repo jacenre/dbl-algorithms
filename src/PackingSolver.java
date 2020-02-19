@@ -18,6 +18,8 @@ public class PackingSolver {
         compoundSolver.addSolver(new TopLeftSolver());
         compoundSolver.addSolver(new CompressionSolver());
         compoundSolver.addSolver(new FreeFirstFitSolver());
+        compoundSolver.addSolver(new ReverseFitSolver());
+        compoundSolver.addSolver(new SimpleTopLeftSolver());
         Solution solution = compoundSolver.optimal(params);
 
         Output.output(solution.parameters, inputOrder);

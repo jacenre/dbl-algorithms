@@ -9,6 +9,8 @@ public class FirstFitSolver extends AbstractSolver {
     public Util.HeightSupport[] heightSupport = new Util.HeightSupport[]{
             Util.HeightSupport.FIXED, Util.HeightSupport.FREE};
 
+    boolean animate = true;
+
     /**
      * Find the optimal value for the parameters without doing any other output.
      *
@@ -34,7 +36,7 @@ public class FirstFitSolver extends AbstractSolver {
 
         for (Rectangle rectangle :
                 parameters.rectangles) {
-            Util.animate(parameters, this);
+            if (animate) Util.animate(parameters, this);
             // First rectangle always fits
             if (boxes.size() == 0) {
                 rectangle.x = 0;
