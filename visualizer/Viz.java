@@ -99,6 +99,26 @@ public class Viz extends PApplet {
             setScale();
         }
 
+        // Arraylist filled with all the ID's of overlapping rectangles.
+        ArrayList<String> overlap = new ArrayList<>();
+
+        void setup() {
+            for (Rectangle rectangle : this.solution.parameters.rectangles) {
+                smallest = (smallest > rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : smallest;
+                largest = (largest < rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : largest;
+            }
+            for (Rectangle rectangle1 : this.solution.parameters.rectangles) {
+                for (Rectangle rectangle2 : this.solution.parameters.rectangles) {
+                    if (rectangle1 != rectangle2) {
+                        if (rectangle1.intersects(rectangle2)) {
+                            overlap.add(rectangle1.getId());
+                            overlap.add(rectangle2.getId());
+                        }
+                    }
+                }
+            }
+            setScale();
+        }
 
         void setScale() {
             // update sizes
@@ -123,31 +143,30 @@ public class Viz extends PApplet {
         int largest = 0;
 
         Viewport(Parameters parameters) {
-            for (Rectangle rectangle : parameters.rectangles) {
-                smallest = (smallest > rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : smallest;
-                largest = (largest < rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : largest;
-            }
             // Wrap the parameters in a solution object.
             this.solution = new Solution(parameters);
-            setScale();
+            setup();
         }
 
         Viewport(Solution solution) {
-            for (Rectangle rectangle : solution.parameters.rectangles) {
-                smallest = (smallest > rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : smallest;
-                largest = (largest < rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : largest;
-            }
             this.solution = solution;
-            setScale();
+            setup();
         }
 
         void draw() {
             fill(0, 0, 100, 100);
             for (Rectangle rectangle :
                     solution.parameters.rectangles) {
-                float hue = map((float)Math.log(rectangle.width * rectangle.height),
-                        (float)Math.log(activeView.smallest), (float)Math.log(activeView.largest), range, range + 180);
-                fill(hue, 100, 100);
+                float hue;
+                // If rectangle is overlapping draw it bright red.
+                if (activeView.overlap.contains(rectangle.getId())) {
+                    stroke(0,50,50);
+                    fill(0, 100, 100);
+                } else {
+                    hue = map((float)Math.log(rectangle.width * rectangle.height),
+                            (float)Math.log(activeView.smallest), (float)Math.log(activeView.largest), range, range + 180);
+                    fill(hue, 100, 100);
+                }
                 float x = map(rectangle.x, 0, solution.getWidth(), 0, drawWidth);
                 float y = map(rectangle.y, 0, solution.getHeight(), 0, drawHeight);
                 float rectw = map(rectangle.width, 0, solution.getWidth(), 0, drawWidth);
@@ -203,7 +222,13 @@ public class Viz extends PApplet {
     public void draw() {
         background(0, 0, 100);
         if (activeView != null) {
-            fill(0, 0, 0);
+            // If the view has overlap turn the text red.
+            if (activeView.overlap.size() != 0) {
+                fill(0, 100, 100);
+                text("OVERLAP!",TEXT_X, TEXT_Y - 15);
+            } else {
+                fill(0, 0, 0);
+            }
             text(activeView.solution.solvedBy.getClass().getSimpleName(), TEXT_X, TEXT_Y);
             text("Size = " + activeView.solution.getArea(), TEXT_X, TEXT_Y + 15);
             activeView.draw();

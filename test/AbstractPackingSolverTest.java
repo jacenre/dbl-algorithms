@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.File;
@@ -28,6 +29,7 @@ abstract class AbstractPackingSolverTest {
      */
     @TestFactory
     @DisplayName("Solver Test Factory")
+    @Tag("library")
     Stream<DynamicTest> dynamicSolverTests() throws FileNotFoundException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
@@ -61,6 +63,7 @@ abstract class AbstractPackingSolverTest {
      */
     @TestFactory
     @DisplayName("Momotor Test Cases")
+    @Tag("momotor")
     Stream<DynamicTest> momotorTests() throws IOException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 

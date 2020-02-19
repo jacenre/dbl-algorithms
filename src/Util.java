@@ -93,7 +93,7 @@ public class Util {
     /**
      * Test to see if any of the rectangles in the list overlap.
      *
-     * @return True if overlapping rectangles in list else false.
+     * @return a boolean that is true if there is overlap.
      * TODO Improve runtime
      */
     public static boolean hasOverlapping(ArrayList<Rectangle> rectangles) {
