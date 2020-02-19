@@ -33,7 +33,7 @@ public class TopLeftSolver extends AbstractSolver {
             move(rect, parameters.rectangles.subList(0, i));
             binWidth = Math.max(binWidth, rect.x + rect.width);
         }
-        return new Solution(binWidth, parameters.height, parameters);
+        return new Solution(parameters, this);
     }
 
     private void move(Rectangle rect, List<Rectangle> rectangles) {

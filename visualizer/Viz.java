@@ -28,6 +28,7 @@ public class Viz extends PApplet {
         solvers.add(new FirstFitSolver());
         solvers.add(new TopLeftSolver());
         solvers.add(new CompressionSolver());
+        solvers.add(new ReverseFitSolver());
         solvers.add(new SimpleTopLeftSolver());
         solvers.add(new FreeFirstFitSolver());
 

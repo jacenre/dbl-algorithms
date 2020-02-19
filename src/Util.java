@@ -35,16 +35,16 @@ public class Util {
      * TODO COMMENT OUT BEFORE HANDING IN.
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
-        if (Animator.getInstance() != null){
-            Animator.getInstance().draw();
-            Animator.getInstance().drawParameter(parameters, solver);
-        }
+//        if (Animator.getInstance() != null){
+//            Animator.getInstance().draw();
+//            Animator.getInstance().drawParameter(parameters, solver);
+//        }
     }
 
     public static void animate() {
-        if (Animator.getInstance() != null) {
-            Animator.getInstance().draw();
-        }
+//        if (Animator.getInstance() != null) {
+//            Animator.getInstance().draw();
+//        }
     }
 
 }
