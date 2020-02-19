@@ -14,8 +14,4 @@ public class CompressionSolverTest extends AbstractPackingSolverTest {
         return new CompressionSolver();
     }
 
-    @Override
-    List<AbstractBinGenerator> getGenerators() {
-        return Arrays.asList(new FixedOptimalBinGenerator(), new FixedRotatingOptimalBinGenerator());
-    }
 }

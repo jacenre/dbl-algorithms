@@ -14,8 +14,4 @@ public class SimpleTopLeftSolverTest extends AbstractPackingSolverTest {
         return new SimpleTopLeftSolver();
     }
 
-    @Override
-    List<AbstractBinGenerator> getGenerators() {
-        return Arrays.asList(new FixedOptimalBinGenerator(), new FixedRotatingOptimalBinGenerator());
-    }
 }

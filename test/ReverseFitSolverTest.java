@@ -13,8 +13,4 @@ public class ReverseFitSolverTest extends AbstractPackingSolverTest {
         return new ReverseFitSolver();
     }
 
-    @Override
-    List<AbstractBinGenerator> getGenerators() {
-        return Arrays.asList(new FixedOptimalBinGenerator(), new FixedRotatingOptimalBinGenerator());
-    }
 }
