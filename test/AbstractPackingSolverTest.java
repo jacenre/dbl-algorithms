@@ -31,7 +31,7 @@ abstract class AbstractPackingSolverTest {
     Stream<DynamicTest> dynamicSolverTests() throws FileNotFoundException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        String path = "/home/samuel/IdeaProjects/dbl-algorithms/test/input/Non-perfect fit/Martello, 1998";
+        String path = "./test/input/Non-perfect fit/Martello, 1998";
 
         File folder = new File(path);
         File[] files = folder.listFiles();
