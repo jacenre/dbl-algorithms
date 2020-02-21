@@ -6,6 +6,7 @@ import java.util.ArrayList;
  */
 public class FirstFitSolver extends AbstractSolver {
 
+
     public Util.HeightSupport[] heightSupport = new Util.HeightSupport[]{
             Util.HeightSupport.FIXED, Util.HeightSupport.FREE};
 

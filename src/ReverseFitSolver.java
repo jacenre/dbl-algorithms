@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -8,6 +6,11 @@ import java.util.List;
  * Cfr https://link.springer.com/content/pdf/10.1007%2FBFb0049416.pdf
  */
 public class ReverseFitSolver extends AbstractSolver {
+
+    @Override
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+    }
 
 
     /**
@@ -22,17 +25,6 @@ public class ReverseFitSolver extends AbstractSolver {
             throw new IllegalArgumentException();
         }
         Util.animate(parameters, this);
-        /* Commented out the rotating for now, first of all this should only happen if parameters.rotationVariant and
-         * this does not seem very helpful anyway
-        ArrayList<Rectangle> remainingRectangles = new ArrayList<>();
-        for (Rectangle rectangle : parameters.rectangles) {
-            if (rectangle.width > parameters.height / 2) {
-                rectangle.rotate();
-            }
-            remainingRectangles.add(rectangle);
-        }
-         */
-
 
         // STEP 1 #####
         ArrayList<Rectangle> firstLargeRectangles = new ArrayList<>();   // Rectangles with height > parameters.height/2
