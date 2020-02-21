@@ -188,7 +188,6 @@ public class ReverseFitSolver extends AbstractSolver {
             while (canPushRectangleUp(firstRow, remainingRectangles.get(0))) { // Still sorted by width
                 remainingRectangles.get(0).translate(0, -1);
             }
-            remainingRectangles.get(0).translate(0, 1);
             if (remainingRectangles.get(0).y + remainingRectangles.get(0).height >= parameters.height) { //   TODO: SEE IF THIS SHOULD BE > OR >=
                 // it doesnt fit unfortunately, so we simply make a new level at the right of the fathest block to the right
                 int new_level = findNewLevel(firstRow); // Just search for ride side of most right block
@@ -212,7 +211,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
     boolean canPushRectangleUp(ArrayList<Rectangle> firstRow, Rectangle rectangleToPushUp) {
         rectangleToPushUp.translate(0, -1);
-        if (rectangleToPushUp.y <= 0) {
+        if (rectangleToPushUp.y < 0) {
             rectangleToPushUp.translate(0, 1);
             return false;
         }

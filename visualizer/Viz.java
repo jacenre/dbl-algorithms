@@ -27,12 +27,12 @@ public class Viz extends PApplet {
         Parameters params = ui.getUserInput();
 
         ArrayList<AbstractSolver> solvers = new ArrayList<>();
-        solvers.add(new FirstFitSolver());
-        solvers.add(new TopLeftSolver());
-        solvers.add(new CompressionSolver());
-        solvers.add(new ReverseFitSolver());
-        solvers.add(new SimpleTopLeftSolver());
-        solvers.add(new FreeFirstFitSolver());
+            solvers.add(new FirstFitSolver());
+            solvers.add(new TopLeftSolver());
+            solvers.add(new CompressionSolver());
+            solvers.add(new ReverseFitSolver());
+            solvers.add(new SimpleTopLeftSolver());
+            solvers.add(new FreeFirstFitSolver());
 
         range = (int) Math.random() * 180;
 
