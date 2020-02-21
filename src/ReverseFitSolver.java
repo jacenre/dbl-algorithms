@@ -158,13 +158,10 @@ public class ReverseFitSolver extends AbstractSolver {
                 while (canPushRectangleUp(firstRow, lastOnReverse)) {
                     lastOnReverse.translate(0, -1);
                 }
-                // revert last translation
-                lastOnReverse.translate(0, 1);
             } else { // (H_2 > lastOnReverse.width) {
                 lastOnReverse.setLocation(x_third_level, lastOnReverse.y);
                 while (canPushRectangleUp(firstRow, lastOnReverse)) {
                     lastOnReverse.translate(0, -1);
-                    lastOnReverse.translate(0, 1);
                 }
             }
 
