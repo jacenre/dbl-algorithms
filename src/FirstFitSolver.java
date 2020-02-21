@@ -31,6 +31,7 @@ public class FirstFitSolver extends AbstractSolver {
         }
 
         // Sort the array from large to small
+        parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
         ArrayList<Box> boxes = new ArrayList<>();

@@ -6,17 +6,17 @@ import java.util.ArrayList;
 @SuppressWarnings("Duplicates")
 public class Viz extends PApplet {
 
-    Viewport activeView = null;
-    ArrayList<Viewport> viewports = new ArrayList<>();
-    int active = 0;
+    private Viewport activeView = null;
+    private ArrayList<Viewport> viewports = new ArrayList<>();
+    private int active = 0;
 
     // Due to concurrency P3 width and height dont work as expected.
-    int DEFAULT_WIDTH = 1000;
-    int DEFAULT_HEIGHT = 1000;
+    private int DEFAULT_WIDTH = 1000;
+    private int DEFAULT_HEIGHT = 1000;
 
     static boolean USER_INPUT;
 
-    int range = 0;
+    private int range = 0;
 
     public static void main(String[] args) {
         PApplet.main("Viz");
@@ -34,7 +34,7 @@ public class Viz extends PApplet {
             solvers.add(new SimpleTopLeftSolver());
             solvers.add(new FreeFirstFitSolver());
 
-        range = (int) Math.random() * 180;
+        range = (int) (Math.random() * 180);
 
         for (AbstractSolver solver :
                 solvers) {
@@ -183,7 +183,7 @@ public class Viz extends PApplet {
 
     private int oldX;
     private int oldY;
-    boolean moving = false;
+    private boolean moving = false;
 
     public void mousePressed() {
         oldX = mouseX;
@@ -230,16 +230,15 @@ public class Viz extends PApplet {
         oldY = mouseY;
     }
 
-    int TEXT_X = 50;
-    int TEXT_Y = 50;
-
     public void draw() {
         background(0, 0, 100);
         if (activeView != null) {
             // If the view has overlap turn the text red.
+            int TEXT_X = 50;
+            int TEXT_Y = 50;
             if (activeView.overlap.size() != 0) {
                 fill(0, 100, 100);
-                text("OVERLAP!",TEXT_X, TEXT_Y - 15);
+                text("OVERLAP!", TEXT_X, TEXT_Y - 15);
             } else {
                 fill(0, 0, 0);
             }
