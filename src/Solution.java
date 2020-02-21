@@ -24,6 +24,10 @@ public class Solution {
 
     /**
      * Returns the height of the {@code Solution} as an {@code Integer}.
+     * <p>
+     *     Returns the fixed height,{@link Parameters#height},
+     *     if {@code Parameters.heightVariant == Util.HeightSupport.FIXED}
+     * </p>
      *
      * @return the height of the {@code Solution}.
      */

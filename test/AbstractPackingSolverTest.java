@@ -30,15 +30,21 @@ abstract class AbstractPackingSolverTest {
     @TestFactory
     @DisplayName("Solver Test Factory")
     @Tag("library")
-    Stream<DynamicTest> dynamicSolverTests() throws FileNotFoundException {
+    Stream<DynamicTest> dynamicSolverTests() throws IOException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        String path = "./test/input/Non-perfect fit/Martello, 1998";
+        String path = "./test/input/selection";
+
         ArrayList<Double> average = new ArrayList<>();
         File folder = new File(path);
         File[] files = folder.listFiles();
         assert files != null;
-        files = Arrays.stream(files).filter(File::isFile).toArray(File[]::new);
+
+        // Filter files on .in extension.
+        files = Arrays.stream(files)
+                .filter(File::isFile)
+                .filter(file -> file.getName().substring(file.getName().lastIndexOf(".") + 1).equals("in"))
+                .toArray(File[]::new);
 
         for (File file : files) {
 
@@ -49,16 +55,10 @@ abstract class AbstractPackingSolverTest {
                 continue;
             }
 
-            Solution solution = solver.getSolution(params);
-            DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(Util.isValidSolution(solution)));
-            average.add(solution.getRate());
+            DynamicTest dynamicTest = dynamicTest(file.getName(),
+                    () -> assertTrue(Util.timedPacker(params, getSolver())));
             dynamicTests.add(dynamicTest);
         }
-        int av = 0;
-        for (int i = 0; i < average.size(); i++) {
-            av += average.get(i);
-        }
-        System.out.println("Average OPT rate of " + (double) av / (double) average.size());
         return dynamicTests.stream();
     }
 
@@ -73,8 +73,8 @@ abstract class AbstractPackingSolverTest {
 
         ArrayList<String> paths = new ArrayList<>();
 
-        paths.add("./test/momotor/prototype-1");
-//        paths.add("./test/momotor/prototype-2");
+//        paths.add("./test/momotor/prototype-1");
+        paths.add("./test/momotor/prototype-2");
 
         for (String path : paths) {
             // Get all files from the momotor folder
@@ -94,7 +94,8 @@ abstract class AbstractPackingSolverTest {
 
                 Solution solution = solver.getSolution(params);
 
-                DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(Util.isValidSolution(solution)));
+                DynamicTest dynamicTest = dynamicTest(file.getName(),
+                        () -> assertTrue(Util.timedPacker(params, getSolver())));
 
                 dynamicTests.add(dynamicTest);
             }

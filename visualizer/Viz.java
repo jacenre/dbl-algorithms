@@ -1,6 +1,7 @@
 import processing.core.PApplet;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 @SuppressWarnings("Duplicates")
@@ -41,7 +42,7 @@ public class Viz extends PApplet {
             try {
                 Solution solution = solver.getSolution(params.copy());
                 viewports.add(new Viewport(solution));
-            } catch (IllegalArgumentException e) {
+            } catch (Exception e) {
                 System.out.println(e);
             }
         }

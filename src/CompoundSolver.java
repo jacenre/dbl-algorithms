@@ -46,7 +46,7 @@ public class CompoundSolver extends AbstractSolver {
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
                     bestSolution = solution.copy();
                 }
-            } catch (IllegalArgumentException e) {
+            } catch (Exception e) {
                 // Ignore?
             }
         }

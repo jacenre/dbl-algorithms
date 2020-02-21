@@ -16,12 +16,13 @@ public class Util {
 
     /**
      * Creates a deep copy of a {@link Rectangle} ArrayList with the same {@link Rectangle#getId()} for each rectangle.
+     *
      * @param rects Input array to copy
      * @return A deep copy ArrayList.
      */
     public static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
         ArrayList<Rectangle> rectangles = new ArrayList<>();
-        for (Rectangle rect:
+        for (Rectangle rect :
                 rects) {
             rectangles.add(rect.copy());
         }
@@ -30,9 +31,10 @@ public class Util {
 
     /**
      * Used for animating the current parameters.
+     *
      * @param parameters Parameters to animate.
-     * @param solver Solver that called the animation.
-     * TODO COMMENT OUT BEFORE HANDING IN.
+     * @param solver     Solver that called the animation.
+     *                   TODO COMMENT OUT BEFORE HANDING IN.
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
 //        if (Animator.getInstance() != null){
@@ -45,6 +47,31 @@ public class Util {
 //        if (Animator.getInstance() != null) {
 //            Animator.getInstance().draw();
 //        }
+    }
+
+    /**
+     * Times how long it takes to find a solution, used for debugging and test cases.
+     *
+     * @param parameters the Parameters to be packed
+     * @param solver     the Solver to do the packing
+     */
+    public static boolean timedPacker(Parameters parameters, AbstractSolver solver) {
+        long startTime = System.nanoTime();
+
+        Solution solution = solver.getSolution(parameters);
+
+        long endTime = System.nanoTime();
+
+        //divide by 1000000 to get milliseconds
+        long duration = (endTime - startTime) / 1000000;
+        System.out.println("Packing took " + duration + "ms");
+
+        if (duration > 30000) {
+            System.err.println("Packing took longer than 30 seconds");
+            return false;
+        }
+
+        return isValidSolution(solution);
     }
 
     /**
