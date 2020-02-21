@@ -49,7 +49,7 @@ abstract class AbstractPackingSolverTest {
                 continue;
             }
 
-            Solution solution = solver.solve(params);
+            Solution solution = solver.getSolution(params);
             DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(Util.isValidSolution(solution)));
 
             dynamicTests.add(dynamicTest);
@@ -88,7 +88,7 @@ abstract class AbstractPackingSolverTest {
                     continue;
                 }
 
-                Solution solution = solver.solve(params);
+                Solution solution = solver.getSolution(params);
 
                 DynamicTest dynamicTest = dynamicTest(file.getName(), () -> assertTrue(Util.isValidSolution(solution)));
 

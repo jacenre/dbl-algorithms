@@ -16,7 +16,7 @@ public class ReverseFitSolver extends AbstractSolver {
      * @throws IllegalArgumentException if {@code !parameters.heightVariant.equals("fixed") || parameters.height <= 0 }
      * @return Solution object
      */
-    Solution optimal(Parameters parameters) throws IllegalArgumentException {
+    Solution pack(Parameters parameters) throws IllegalArgumentException {
         if (parameters.rectangles.size() > 5000) {
             throw new IllegalArgumentException();
         }

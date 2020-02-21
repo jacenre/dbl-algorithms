@@ -12,13 +12,13 @@ public class FirstFitSolver extends AbstractSolver {
     boolean animate = true;
 
     /**
-     * Find the optimal value for the parameters without doing any other output.
+     * Find the pack value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
-     * @return Returns the optimal area found by this solver.
+     * @return Returns the pack area found by this solver.
      */
     @Override
-    Solution optimal(Parameters parameters) {
+    Solution pack(Parameters parameters) {
         // Greedy choice, rotate every rectangle such that it is wider than that it is high.
         if (parameters.rotationVariant) {
             for (Rectangle rectangle :

@@ -39,7 +39,7 @@ public class Viz extends PApplet {
         for (AbstractSolver solver :
                 solvers) {
             try {
-                Solution solution = solver.solve(params.copy());
+                Solution solution = solver.getSolution(params.copy());
                 viewports.add(new Viewport(solution));
             } catch (IllegalArgumentException e) {
                 System.out.println(e);
@@ -93,14 +93,14 @@ public class Viz extends PApplet {
         Solution solution;
 
         void reset() {
-            this.maxSize = 800;
+//            this.maxSize = 800;
             this.x = 100;
             this.y = 100;
             setScale();
         }
 
         // Arraylist filled with all the ID's of overlapping rectangles.
-        ArrayList<String> overlap = new ArrayList<>();
+        ArrayList<Rectangle> overlap = new ArrayList<>();
 
         void setup() {
             for (Rectangle rectangle : this.solution.parameters.rectangles) {
@@ -111,8 +111,8 @@ public class Viz extends PApplet {
                 for (Rectangle rectangle2 : this.solution.parameters.rectangles) {
                     if (rectangle1 != rectangle2) {
                         if (rectangle1.intersects(rectangle2)) {
-                            overlap.add(rectangle1.getId());
-                            overlap.add(rectangle2.getId());
+                            overlap.add(rectangle1);
+                            overlap.add(rectangle2);
                         }
                     }
                 }
@@ -159,13 +159,14 @@ public class Viz extends PApplet {
                     solution.parameters.rectangles) {
                 float hue;
                 // If rectangle is overlapping draw it bright red.
-                if (activeView.overlap.contains(rectangle.getId())) {
-                    stroke(0,50,50);
-                    fill(0, 100, 100);
+                if (activeView.overlap.contains(rectangle)) {
+                    stroke(0,100,100);
+                    fill(0, 0, 0);
                 } else {
                     hue = map((float)Math.log(rectangle.width * rectangle.height),
                             (float)Math.log(activeView.smallest), (float)Math.log(activeView.largest), range, range + 180);
                     fill(hue, 100, 100);
+                    stroke(0,0,0);
                 }
                 float x = map(rectangle.x, 0, solution.getWidth(), 0, drawWidth);
                 float y = map(rectangle.y, 0, solution.getHeight(), 0, drawHeight);
@@ -180,12 +181,17 @@ public class Viz extends PApplet {
 
     }
 
-    int oldX;
-    int oldY;
+    private int oldX;
+    private int oldY;
+    boolean moving = false;
 
     public void mousePressed() {
         oldX = mouseX;
         oldY = mouseY;
+    }
+
+    public void mouseReleased() {
+        moving = false;
     }
 
     public void keyPressed() {
@@ -195,20 +201,28 @@ public class Viz extends PApplet {
             } else {
                 active = 0;
             }
+            activeView.reset();
         } else if (keyCode == LEFT) {
             if (active >= 1) {
                 active--;
             } else {
                 active = viewports.size() - 1;
             }
+            activeView.reset();
+        } else if (keyCode == UP) {
+            activeView.maxSize *= 2;
+            activeView.setScale();
+        } else if (keyCode == DOWN) {
+            activeView.maxSize /= 2;
+            activeView.setScale();
         }
         activeView = viewports.get(active);
-        activeView.reset();
     }
 
     public void mouseDragged() {
         // If you click on the strip, move it
-        if (activeView.boundingBox.contains(new Point(mouseX, mouseY))) {
+        if (activeView.boundingBox.contains(new Point(mouseX, mouseY)) || moving) {
+            moving = true;
             activeView.setX(activeView.x - oldX + mouseX);
             activeView.setY(activeView.y - oldY + mouseY);
         }

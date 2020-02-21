@@ -6,8 +6,8 @@ import java.util.Set;
  * Abstract Solver class
  * <p>
  * The main class that will be used for solving the Bin Packing problem.<br>
- * The intention is that the PackingSolver will call {@link #solve(Parameters)} on a concrete solver.<br>
- * To implement a {@code Solver} it suffices to implement the hook method {@link #optimal(Parameters)}.<br>
+ * The intention is that the PackingSolver will call {@link #getSolution(Parameters)} on a concrete solver.<br>
+ * To implement a {@code Solver} it suffices to implement the hook method {@link #pack(Parameters)}.<br>
  * </p>
  * <p>
  * To specify what type of Bin Packing problems the {@code Solver} can handle use {@link Util.HeightSupport}.<br>
@@ -37,11 +37,11 @@ public abstract class AbstractSolver {
      * heightVariant and the supported height variants of this {@code Solver} match.
      * </p>
      *
-     * @param parameters the parameters for which to solve
+     * @param parameters the parameters for which to getSolution
      * @return a {@code Solution} object containing the results
-     * @throws IllegalArgumentException if the Solver cannot solve the given parameters
+     * @throws IllegalArgumentException if the Solver cannot getSolution the given parameters
      */
-    public Solution solve(Parameters parameters) throws IllegalArgumentException {
+    public Solution getSolution(Parameters parameters) throws IllegalArgumentException {
         if (!getHeightSupport().contains(parameters.heightVariant)) {
             throw new IllegalArgumentException(this.getClass().getSimpleName() +
                     " does not support " + parameters.heightVariant);
@@ -57,8 +57,8 @@ public abstract class AbstractSolver {
             }
         }
 
-        // Create a new solution for this solve.
-        Solution solution = this.optimal(parameters);
+        // Create a new solution for this getSolution.
+        Solution solution = this.pack(parameters);
 
         // report(solution);
 
@@ -68,21 +68,21 @@ public abstract class AbstractSolver {
     /**
      * Hook method for implementing a {@code Solver}.
      * <p>
-     * The intention is that the PackingSolver calls {@link #solve(Parameters)} which will in turn call this function.
-     * The reasoning is that the solve function can contain all the Template code needed for the setup and the solve
+     * The intention is that the PackingSolver calls {@link #getSolution(Parameters)} which will in turn call this function.
+     * The reasoning is that the getSolution function can contain all the Template code needed for the setup and the getSolution
      * itself.
      * </p>
      * <p>
-     * To solve for a {@code Parameters} object you have to set all the x and y coordinates for all the rectangles in
+     * To getSolution for a {@code Parameters} object you have to set all the x and y coordinates for all the rectangles in
      * {@link Parameters#rectangles} in such a way that there is no overlap. The {@code Parameters} object in the
      * final {@code Solution} object should be the same or deep copied over via {@link Parameters#copy()}.
      * As of now the {@code PackingSolver} does not ensure that a given {@code Solution} is valid and thus this
-     * responsibility lies in the hand of the programming implementing the {@code optimal} function.
+     * responsibility lies in the hand of the programming implementing the {@code pack} function.
      * </p>
      *
      * @param parameters the {@code Parameters} to be used by the solver
      * @return the associated {@link Solution} object containing the results
      */
-    abstract Solution optimal(Parameters parameters);
+    abstract Solution pack(Parameters parameters);
 }
 

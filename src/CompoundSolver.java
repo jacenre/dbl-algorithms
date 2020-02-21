@@ -34,14 +34,14 @@ public class CompoundSolver extends AbstractSolver {
      * @return a {@link Solution} object associated with the smallest area
      */
     @Override
-    public Solution optimal(Parameters parameters) {
+    public Solution pack(Parameters parameters) {
         Parameters initialParameters = parameters.copy();
 
-        // Try and solve it using all the solvers in the array
+        // Try and getSolution it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {
             try {
-                Solution solution = solver.solve(initialParameters.copy());
+                Solution solution = solver.getSolution(initialParameters.copy());
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
                     bestSolution = solution.copy();
