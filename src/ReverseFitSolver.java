@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -119,7 +120,6 @@ public class ReverseFitSolver extends AbstractSolver {
         moved--;
         for (Rectangle rectangle : reverseRow) {
             Util.animate();
-            rectangle.place(true);
             rectangle.translate(1, 0);
         }
 
@@ -158,13 +158,10 @@ public class ReverseFitSolver extends AbstractSolver {
                 while (canPushRectangleUp(firstRow, lastOnReverse)) {
                     lastOnReverse.translate(0, -1);
                 }
-                // revert last translation
-                lastOnReverse.translate(0, 1);
             } else { // (H_2 > lastOnReverse.width) {
-                lastOnReverse.setLocation(x_third_level, lastOnReverse.y);
+                lastOnReverse.setLocation(x_third_level, parameters.height);
                 while (canPushRectangleUp(firstRow, lastOnReverse)) {
                     lastOnReverse.translate(0, -1);
-                    lastOnReverse.translate(0, 1);
                 }
             }
 
