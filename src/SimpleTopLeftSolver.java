@@ -13,15 +13,15 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     }
 
     /**
-     * Find the optimal value for the parameters without doing any other output.
+     * Find the pack value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
      * @return Returns the associated {@link Solution} object
      */
     @Override
-    Solution optimal(Parameters parameters) throws IllegalArgumentException {
+    Solution pack(Parameters parameters) throws IllegalArgumentException {
         if (parameters.rectangles.size() > 2000) {
-            throw new IllegalArgumentException("Too many rectangles");
+//            throw new IllegalArgumentException("Too many rectangles");
         }
 
         Util.animate(parameters, this);

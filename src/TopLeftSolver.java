@@ -8,14 +8,14 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
     int binWidth = 0;
 
     /**
-     * Find the optimal value for the parameters without doing any other output.
+     * Find the pack value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
      * @return Returns the associated {@link Solution} object
      */
-    Solution optimal(Parameters parameters) throws IllegalArgumentException {
+    Solution pack(Parameters parameters) throws IllegalArgumentException {
         if (parameters.rectangles.size() > 2000) {
-            throw new IllegalArgumentException("Too many rectangles");
+//            throw new IllegalArgumentException("Too many rectangles");
         }
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;

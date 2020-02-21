@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Fixed height version of the FirstFitSolver.
+ * Free height version of the FirstFitSolver.
  */
 public class FreeFirstFitSolver extends AbstractSolver {
 
@@ -21,13 +21,13 @@ public class FreeFirstFitSolver extends AbstractSolver {
     Solution bestSolution = null;
 
     /**
-     * Find the optimal value for the parameters without doing any other output.
+     * Find the pack value for the parameters without doing any other output.
      *
      * @param parameters The parameters to be used by the solver.
-     * @return Returns the optimal area found by this solver.
+     * @return Returns the pack area found by this solver.
      */
     @Override
-    Solution optimal(Parameters parameters) {
+    Solution pack(Parameters parameters) {
         if (parameters.rectangles.size() > 5000) {
             throw new IllegalArgumentException();
         }
@@ -46,8 +46,8 @@ public class FreeFirstFitSolver extends AbstractSolver {
             Parameters newParameters = parameters.copy();
             newParameters.height = height;
 
-            Solution newSolution = firstFitSolver.optimal(newParameters.copy());
-
+            Solution newSolution = firstFitSolver.pack(newParameters.copy());
+            Util.animate(newSolution.parameters, this);
 
             if (bestSolution == null) {
                 bestSolution = newSolution.copy();
@@ -66,7 +66,7 @@ public class FreeFirstFitSolver extends AbstractSolver {
 
     /**
      * Creates an ArrayList of all the y's of the first fit solver without height limit.
-     * @param parameters The parameters used for the solve
+     * @param parameters The parameters used for the getSolution
      * @return ArrayList containing all the y's.
      */
     ArrayList<Integer> getHeights(Parameters parameters) {
