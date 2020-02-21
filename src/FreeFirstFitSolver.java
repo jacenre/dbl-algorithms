@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Fixed height version of the FirstFitSolver.
+ * Free height version of the FirstFitSolver.
  */
 public class FreeFirstFitSolver extends AbstractSolver {
 

@@ -1,7 +1,17 @@
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * First runs FFT and then TLS to 'compress' the first result.
  */
 public class CompressionSolver extends AbstractSolver {
+
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(
+                Util.HeightSupport.FIXED));
+    }
+
     /**
      * Find the pack value for the parameters without doing any other output.
      *
@@ -9,7 +19,7 @@ public class CompressionSolver extends AbstractSolver {
      * @return Returns the associated {@link Solution} object
      */
     @Override
-    Solution pack(Parameters parameters) throws IllegalArgumentException{
+    Solution pack(Parameters parameters) throws IllegalArgumentException {
         FirstFitSolver firstFitSolver = new FirstFitSolver();
         SimpleTopLeftSolver simpleTopLeftSolver = new SimpleTopLeftSolver();
 
