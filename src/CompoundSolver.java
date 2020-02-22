@@ -13,8 +13,9 @@ public class CompoundSolver extends AbstractSolver {
     /**
      * Add a solver to the CompoundSolver.
      */
-    public void addSolver(AbstractSolver solver) {
+    public CompoundSolver addSolver(AbstractSolver solver) {
         this.solvers.add(solver);
+        return this;
     }
 
     /**
@@ -47,7 +48,7 @@ public class CompoundSolver extends AbstractSolver {
                     bestSolution = solution.copy();
                 }
             } catch (Exception e) {
-                // Ignore?
+                // ignore
             }
         }
         return bestSolution;

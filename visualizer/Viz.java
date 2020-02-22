@@ -1,7 +1,6 @@
 import processing.core.PApplet;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 
 @SuppressWarnings("Duplicates")
@@ -33,7 +32,7 @@ public class Viz extends PApplet {
             solvers.add(new CompressionSolver());
             solvers.add(new ReverseFitSolver());
             solvers.add(new SimpleTopLeftSolver());
-            solvers.add(new FreeFirstFitSolver());
+            solvers.add(new FreeHeightSolver());
 
         range = (int) (Math.random() * 180);
 

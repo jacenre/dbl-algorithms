@@ -23,6 +23,21 @@ public class Solution {
     }
 
     /**
+     * Returns the area, or score, of the {@code Solution} as an {@code Integer}.
+     * <p>
+     *     Calling {@code getArea(false)} is the same as calling {@link #getArea()}.
+     * </p>
+     *
+     * @param ignoreHeightVariant the Boolean representing if the height variant should be ignored.
+     * @return the Area of the {@code Solution}.
+     *
+     * @see Util.HeightSupport
+     */
+    public int getArea(boolean ignoreHeightVariant) {
+        return this.getWidth() * this.getHeight(ignoreHeightVariant);
+    }
+
+    /**
      * Returns the height of the {@code Solution} as an {@code Integer}.
      * <p>
      *     Returns the fixed height,{@link Parameters#height},
@@ -36,6 +51,29 @@ public class Solution {
         if (parameters.heightVariant == Util.HeightSupport.FIXED) {
             return parameters.height;
         }
+
+        int maxHeight = 0;
+
+        for (Rectangle rectangle :
+                this.parameters.rectangles) {
+            if (rectangle.y + rectangle.height > maxHeight) maxHeight = rectangle.y + rectangle.height;
+        }
+
+        return maxHeight;
+    }
+
+    /**
+     * Returns the height of the {@code Solution} as an {@code Integer}.
+     * <p>
+     *     Returns the fixed height,{@link Parameters#height},
+     *     if {@code ignoreHeightVariant == false}.
+     *     Calling {@link #getHeight()} is the same as calling {@code getHeight(false)}.
+     * </p>
+     * @param ignoreHeightVariant a boolean representing if the height variant should be ignored or not
+     * @return the height of the {@code Solution}
+     */
+    public int getHeight(boolean ignoreHeightVariant) {
+        if (!ignoreHeightVariant) return getHeight();
 
         int maxHeight = 0;
 

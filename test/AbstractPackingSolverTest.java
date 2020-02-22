@@ -73,8 +73,8 @@ abstract class AbstractPackingSolverTest {
 
         ArrayList<String> paths = new ArrayList<>();
 
-//        paths.add("./test/momotor/prototype-1");
-        paths.add("./test/momotor/prototype-2");
+        paths.add("./test/momotor/prototype-1");
+//        paths.add("./test/momotor/prototype-2");
 
         for (String path : paths) {
             // Get all files from the momotor folder
@@ -91,8 +91,6 @@ abstract class AbstractPackingSolverTest {
                 if (!solver.getHeightSupport().contains(params.heightVariant)) {
                     continue;
                 }
-
-                Solution solution = solver.getSolution(params);
 
                 DynamicTest dynamicTest = dynamicTest(file.getName(),
                         () -> assertTrue(Util.timedPacker(params, getSolver())));
