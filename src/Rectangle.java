@@ -86,4 +86,14 @@ public class Rectangle extends java.awt.Rectangle {
         rectangle.rotated = this.rotated;
         return rectangle;
     }
+
+    /**
+     * Returns whether Object is equals to this Rectangle object.
+     * @param o the object to equal
+     * @return True if the object is of the type Rectangle and has the same UUID
+     */
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof Rectangle && ((Rectangle) o).getId().equals(getId()));
+    }
 }
