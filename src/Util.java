@@ -1,4 +1,6 @@
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 /**
@@ -72,6 +74,30 @@ public class Util {
         }
 
         return isValidSolution(solution);
+    }
+
+    /**
+     * Sweepline algorithm to check if the solution has overlap.
+     *
+     * @param solution the Solution to check for overlap
+     * @return boolean value representing if there is overlap
+     */
+    public static boolean sweepline(Solution solution) {
+        boolean overlap = false;
+
+        class segment {
+            boolean left;
+
+            segment() {
+
+            }
+
+        }
+
+        // Deep copy to prevent modification of the solution
+        Solution solutionCopy = solution.copy();
+
+        return overlap;
     }
 
     /**
