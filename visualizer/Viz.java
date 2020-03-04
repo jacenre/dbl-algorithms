@@ -27,6 +27,7 @@ public class Viz extends PApplet {
         Parameters params = ui.getUserInput();
 
         ArrayList<AbstractSolver> solvers = new ArrayList<>();
+            solvers.add(new BottomUpSolver());
             solvers.add(new FirstFitSolver());
             solvers.add(new TopLeftSolver());
             solvers.add(new CompressionSolver());

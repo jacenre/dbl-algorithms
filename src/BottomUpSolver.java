@@ -1,15 +1,19 @@
-import org.w3c.dom.css.Rect;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Bottom-up solver, both for rotation and no rotation.
- * This algorithm is very similar to the first fit solver, but it tries to fit
- * rectangles into already filled bins.
+ * Bottom-up solver
+ * <p>
+ *     both for rotation and no rotation.
+ *     This algorithm is very similar to the first fit solver, but it tries to fit
+ *     rectangles into already filled bins.
+ * </p>
  */
 //todo: look into the slack variable mentioned in paper
 //todo: currently, it will spread over the whole height even if it causes ugly gaps. This doesn't cause a worse
-    //todo: result as far as I am aware, but it is a bit ugly
+//todo: result as far as I am aware, but it is a bit ugly
 public class BottomUpSolver extends AbstractSolver {
 
     @Override
@@ -20,6 +24,7 @@ public class BottomUpSolver extends AbstractSolver {
     boolean animate = true;
 
     @Override
+    @SuppressWarnings("Duplicates")
     Solution pack(Parameters parameters) {
         // Start with all rectangles rotated so that width >= height.
         if (parameters.rotationVariant) {
@@ -38,16 +43,15 @@ public class BottomUpSolver extends AbstractSolver {
         ArrayList<Box> boxes = new ArrayList<>();
         //up until this point, the code was identical to the first fit solver, here it diverges
 
-        ArrayList<Rectangle> toGo = new ArrayList<>();
-        toGo.addAll(parameters.rectangles);
+        ArrayList<Rectangle> toPlace = new ArrayList<>(parameters.rectangles);
 
         int xPos = 0; //starting x position for the next box
-        while(!toGo.isEmpty()) {
-            Rectangle first = toGo.get(0);
-            toGo.remove(0);
+        while(!toPlace.isEmpty()) {
+            Rectangle first = toPlace.get(0);
+            toPlace.remove(0);
 
             //if this was the last rectangle, rotate it to minimize width
-            if(toGo.isEmpty()) {
+            if(toPlace.isEmpty()) {
                 if(first.width > first.height && first.width <= parameters.height) {
                     first.rotate();
                 }
@@ -58,8 +62,8 @@ public class BottomUpSolver extends AbstractSolver {
 
             xPos += box.width; //the width of the first box
 
-            if(!toGo.isEmpty()) {
-                packRun(box, toGo);
+            if(!toPlace.isEmpty()) {
+                packRun(box, toPlace);
             }
         }
 
@@ -68,15 +72,15 @@ public class BottomUpSolver extends AbstractSolver {
 
     /**
      * Packs as many rectangles as possible into a single box.
-     * Updates the toGo list.
+     * Updates the toPlace list.
      * @param box the box to fill
-     * @param toGo the rectangles that still need to be filled
+     * @param toPlace the rectangles that still need to be filled
      */
-    private void packRun(Box box, ArrayList<Rectangle> toGo) {
+    private void packRun(Box box, ArrayList<Rectangle> toPlace) {
         ArrayList<Rectangle> toRemove = new ArrayList<>();
 
         // place the largest width rectangle that fits in the remaining height
-        for(Rectangle rectangle : toGo) {
+        for(Rectangle rectangle : toPlace) {
             if( box.heightFilled >= box.height) {
                 break; //will no longer fit anything
             }
@@ -87,7 +91,7 @@ public class BottomUpSolver extends AbstractSolver {
                 box.heightFilled += rectangle.height;
             }
         }
-        toGo.removeAll(toRemove); //todo: I am sure there are better ways to do this, I could do a removeIf with the placed variable
+        toPlace.removeAll(toRemove); //todo: I am sure there are better ways to do this, I could do a removeIf with the placed variable
 
         //merge rows together that have the same remaining width
         box.mergeRows();
@@ -99,7 +103,7 @@ public class BottomUpSolver extends AbstractSolver {
         //now we need an list of all rectangles to go sorted on area
         //todo: I now make a second array for this, however, it might be faster to just resort the toGo array later, unsure
         ArrayList<Rectangle> areaSorted = new ArrayList<>();
-        areaSorted.addAll(toGo);
+        areaSorted.addAll(toPlace);
         areaSorted.sort((o1, o2) -> (o2.height * o2.width) - (o1.height * o1.width));
 
         //keep finding the row with the most remaining width
@@ -126,7 +130,7 @@ public class BottomUpSolver extends AbstractSolver {
             }
             if (placedAny) {
                 areaSorted.removeAll(toRemove);
-                toGo.removeAll(toRemove);
+                toPlace.removeAll(toRemove);
             } else {
                 //pick the neighbouring row with the most space left
                 Row toMerge;

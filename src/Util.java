@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 
 /**
@@ -8,6 +7,9 @@ public class Util {
 
     /**
      * Used for checking height variants.
+     *
+     * Enables the solver to throw an IllegalArgumentException if the wrong {@link Parameters} are given to a solver.
+     * @see Parameters#heightVariant
      */
     public enum HeightSupport {
         FIXED,
