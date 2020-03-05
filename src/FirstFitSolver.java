@@ -75,9 +75,9 @@ public class FirstFitSolver extends AbstractSolver {
     }
 
     /**
-     * Tries and fit the rectangle in one of the bins
+     * Tries and fit the rectangle in one of the boxes
      *
-     * @return {@code true} if it fits in any of the bins, else {@code false}
+     * @return {@code true} if it fits in any of the boxes, else {@code false}
      */
     private boolean fitRectangle(ArrayList<Box> boxes, Rectangle rectangle, int height) {
         for (Box box :

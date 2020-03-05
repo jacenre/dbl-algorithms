@@ -84,6 +84,7 @@ public class Rectangle extends java.awt.Rectangle {
     public Rectangle copy() {
         Rectangle rectangle = new Rectangle(this);
         rectangle.rotated = this.rotated;
+        rectangle.place(this.isPlaced());
         return rectangle;
     }
 
