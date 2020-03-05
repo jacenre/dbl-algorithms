@@ -8,12 +8,14 @@ import java.util.Set;
  * <p>
  *     both for rotation and no rotation.
  *     This algorithm is very similar to the first fit solver, but it tries to fit
- *     rectangles into already filled bins.
+ *     rectangles into already filled bins, keeping rotation options in mind.
  * </p>
  */
 //todo: look into the slack variable mentioned in paper
 //todo: currently, it will spread over the whole height even if it causes ugly gaps. This doesn't cause a worse
-//todo: result as far as I am aware, but it is a bit ugly
+//      todo: result as far as I am aware, but it is a bit ugly
+//todo: still causing overlap and I don't know why
+//todo: just an idea, but maybe when picking the first rectangle for a box, you could check if the next rectangle has height <= width of the rectangle. Then you could rotate it I think
 public class BottomUpSolver extends AbstractSolver {
 
     @Override
@@ -46,7 +48,7 @@ public class BottomUpSolver extends AbstractSolver {
         ArrayList<Rectangle> toPlace = new ArrayList<>(parameters.rectangles);
 
         int xPos = 0; //starting x position for the next box
-        while(!toPlace.isEmpty()) {
+        while (!toPlace.isEmpty()) {
             Rectangle first = toPlace.get(0);
             toPlace.remove(0);
 
@@ -57,12 +59,12 @@ public class BottomUpSolver extends AbstractSolver {
                 }
             }
 
-            Box box = new Box(first,xPos, parameters.height, parameters.rotationVariant);
-            boxes.add(box);
+            Box box = new Box(first, xPos, parameters.height, parameters.rotationVariant);
+            boxes.add(box); //todo: I don't think I ever use my list of boxes, so I can just drop it
 
             xPos += box.width; //the width of the first box
 
-            if(!toPlace.isEmpty()) {
+            if (!toPlace.isEmpty()) {
                 packRun(box, toPlace);
             }
         }
@@ -80,41 +82,44 @@ public class BottomUpSolver extends AbstractSolver {
         ArrayList<Rectangle> toRemove = new ArrayList<>();
 
         // place the largest width rectangle that fits in the remaining height
-        for(Rectangle rectangle : toPlace) {
-            if( box.heightFilled >= box.height) {
+        for (Rectangle rectangle : toPlace) {
+            if (box.heightFilled >= box.height) {
                 break; //will no longer fit anything
             }
 
-            if( box.heightFilled + rectangle.height <= box.height) {
+            if (box.heightFilled + rectangle.height <= box.height) {
                 toRemove.add(rectangle);
-                box.firstPassPlace(rectangle, box.heightFilled);
-                box.heightFilled += rectangle.height;
+                box.firstPassPlace(rectangle);
             }
         }
         toPlace.removeAll(toRemove); //todo: I am sure there are better ways to do this, I could do a removeIf with the placed variable
 
+        //if needed, add final row to fit last bit of height.
+        if (box.heightFilled != box.height) {
+            Row finalRow = box.rows.get(box.rows.size() - 1);
+            Row newRow = new Row(box, finalRow);
+            box.rows.add(newRow);
+            finalRow.next = newRow;
+        }
+
+
         //merge rows together that have the same remaining width
         box.mergeRows();
 
-        //final row should be extended to reach the max height
-        Row finalRow = box.rows.get(box.rows.size() -1);
-        finalRow.height = box.height - finalRow.yPos;
-
         //now we need an list of all rectangles to go sorted on area
-        //todo: I now make a second array for this, however, it might be faster to just resort the toGo array later, unsure
-        ArrayList<Rectangle> areaSorted = new ArrayList<>();
-        areaSorted.addAll(toPlace);
+        //todo: I now make a second array for this, however, it might be faster to just resort the toPlace array later, unsure
+        ArrayList<Rectangle> areaSorted = new ArrayList<>(toPlace);
         areaSorted.sort((o1, o2) -> (o2.height * o2.width) - (o1.height * o1.width));
 
         //keep finding the row with the most remaining width
         //place the largest area rectangle that fits
-        while( box.rows.size() > 1) {
+        while (box.rows.size() >= 1) { //the border row is not considered a row
             box.rows.sort((o1, o2) -> (o2.widthLeft) - (o1.widthLeft)); //todo after the first sort only the just altered rows will be changed, faster way?
             Row row = box.rows.get(0);
             toRemove = new ArrayList<>(); //todo: this continues to not be a great way of doing this
             boolean placedAny = false;
 
-            for( Rectangle rectangle : areaSorted) {
+            for (Rectangle rectangle : areaSorted) {
                 if( rectangle.width <= row.widthLeft && rectangle.height <= row.height) {
                     box.place(rectangle, row);
                     placedAny = true;
@@ -132,16 +137,22 @@ public class BottomUpSolver extends AbstractSolver {
                 areaSorted.removeAll(toRemove);
                 toPlace.removeAll(toRemove);
             } else {
+                if (box.rows.size() == 1) {
+                    break;
+                }
+
                 //pick the neighbouring row with the most space left
                 Row toMerge;
-                if( row.next == null || (row.previous != null && row.previous.widthLeft >= row.next.widthLeft)) {
+                if(row.previous.widthLeft >= row.next.widthLeft) {
                     toMerge = row.previous;
+                    toMerge.next = row.next;
                 } else {
                     toMerge = row.next;
+                    toMerge.previous = row.previous;
                 }
 
                 toMerge.height += row.height;
-                if( row.yPos < toMerge.yPos) {
+                if (row.yPos < toMerge.yPos) {
                     toMerge.yPos = row.yPos;
                 }
 
@@ -164,6 +175,7 @@ public class BottomUpSolver extends AbstractSolver {
         ArrayList<Row> rows = new ArrayList<>();
         boolean rotation;
         int heightFilled = 0;
+        Row border = new Row(this);
 
         /**
          * Constructor
@@ -180,51 +192,50 @@ public class BottomUpSolver extends AbstractSolver {
             this.heightFilled += first.height;
             first.x = x;
             first.y = 0;
-            rows.add(new Row(first, this, null, null));
+            rows.add(new Row(first, this, border, border));
             first.place(true);
         }
 
-        void firstPassPlace(Rectangle rectangle, int y) {
-            rectangle.add(rectangle);
+        void firstPassPlace(Rectangle rectangle) {
+            //rectangle.add(rectangle); I have no idea what this line was supposed to do
             rectangle.x = xPos;
-            rectangle.y = y;
+            rectangle.y = heightFilled;
+            heightFilled += rectangle.height;
             rectangle.place(true);
-            Row previous = rows.get(rows.size() - 1);
-            Row row = new Row(rectangle, this, previous, null);
+            Row previous = rows.get(rows.size() - 1); //only works because this is before row sorting
+            Row row = new Row(rectangle, this, previous, border);
             rows.add(row);
             previous.next = row;
         }
 
         void place(Rectangle rectangle, Row row) {
-            rectangle.x = row.xPos + (width - row.widthLeft);
+            rectangle.x = row.xPos;
 
             //put it up against the neighbouring row with the least width left, or the edge of the box if possible
-            int y = row.yPos;
-            if( row.next == null || (row.previous != null && row.previous.widthLeft > row.next.widthLeft)) {
-                y += row.height - rectangle.height;
+            int yPos = row.yPos;
+            if (row.previous.widthLeft > row.next.widthLeft) {
+                yPos += row.height - rectangle.height; //place it against the next row instead
             }
 
-            rectangle.y = y;
+            rectangle.y = yPos;
             rectangle.place(true);
 
-            if( rectangle.height == row.height) {
+            if (rectangle.height == row.height) {
                 row.widthLeft -= rectangle.width;
+                row.xPos += rectangle.width;
             } else {
                 Row previous;
                 Row next;
                 Row newRow = new Row(rectangle, this, row.widthLeft);
 
-                if( y == row.yPos) { //our new row starts where the old row started
+                if (rectangle.y == row.yPos) { //our new row starts where the old row started
                     previous = row.previous;
                     next = row;
                     row.yPos += rectangle.height; // old row is shifted down
-                    if( row.yPos + row.height > row.box.height) {
-                        row.height = row.box.height - row.yPos;
-                    }
                     row.previous = newRow;
                 } else {
                     previous = row;
-                    next = row.previous;
+                    next = row.next;
                     row.next = newRow;
                 }
 
@@ -236,24 +247,19 @@ public class BottomUpSolver extends AbstractSolver {
             mergeRows(); //todo: this might be slow, but I don't think there's any way around this
         }
 
-        void mergeRows(){
+        void mergeRows(){ //todo: I suspect this is where it is still going wrong in terms of unoptimal solving
             ArrayList<Row> toRemove = new ArrayList<>(); //todo: again, must be better way, removeIf height = 0?
-            for( Row row : rows) {
-                if( row.previous == null) {
+            for (Row row : rows) {
+                if (row.previous == border) {
                     continue;
                 }
 
-                if( row.widthLeft == row.previous.widthLeft) {
+                if (row.widthLeft == row.previous.widthLeft) {
                     row.previous.height += row.height;
-                    if( row.previous.height + row.previous.yPos > row.box.height) {
-                        row.previous.height = row.box.height - row.previous.yPos;
-                    }
                     row.height = 0;
-                    if(row.next != null) {
+                    row.previous.next = row.next;
+                    if (row.next != border) {
                         row.next.previous = row.previous;
-                        row.previous.next = row.next;
-                    } else {
-                        //row.previous.next = null; //todo this causes a nullpointer exception to occur somewhere and I don't know where or why
                     }
                     toRemove.add(row);
                 }
@@ -274,16 +280,19 @@ public class BottomUpSolver extends AbstractSolver {
         int widthLeft;
         int height;
         Box box;
-        Row previous;
-        Row next;
+        Row previous; //todo: I am a bit worried that when I do things like row.previous.next = row.next I am modifying objects instead of pointers.
+        Row next; //todo: so if weird errors occur, that is worth checking
 
         /**
          * Constructor when creating a new row from a single rectangle
-         * @param first
+         * @param first the first rectangle placed in this row
+         * @param box the box this row is for
+         * @param next the row below this one, border if there is no row below
+         * @param previous the row above this one, border if there is no row above
          */
         Row(Rectangle first, Box box, Row previous, Row next) {
             this.box = box;
-            this.xPos = first.x;
+            this.xPos = first.x + first.width;
             this.yPos = first.y;
             this.height = first.height;
             this.widthLeft = box.width - first.width;
@@ -293,10 +302,29 @@ public class BottomUpSolver extends AbstractSolver {
 
         Row(Rectangle first, Box box, int widthLeft) {
             this.box = box;
-            this.xPos = first.x;
+            this.xPos = first.x + first.width;
             this.yPos = first.y;
             this.height = first.height;
             this.widthLeft = widthLeft - first.width;
+        }
+
+        Row(Box box, Row previous) {
+            this.box = box;
+            this.xPos = previous.xPos;
+            this.yPos = box.heightFilled;
+            this.height = box.height - box.heightFilled;
+            box.heightFilled += this.height;
+            this.previous = previous;
+            this.next = box.border;
+            this.widthLeft = previous.widthLeft;
+        }
+
+        Row(Box box) { //used only for the border, has no previous or next
+            this.widthLeft = 0;
+            this.height = 0;
+            this.box = box;
+            xPos = box.xPos;
+            yPos = 0;
         }
 
     }
