@@ -47,6 +47,7 @@ public class Animator extends PApplet {
             activeView = new Viewport(parameters, solver);
         } else {
             activeView.solution.parameters = parameters;
+            activeView.solution.solvedBy = solver;
         }
         activeView.setScale();
     }

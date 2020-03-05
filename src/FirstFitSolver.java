@@ -55,7 +55,7 @@ public class FirstFitSolver extends AbstractSolver {
                     int maxX = 0;
                     for (Box box : boxes) {
                         if (box.y == 0) {
-                            maxX = (box.x + box.width > maxX) ? box.x + box.width : maxX;
+                            maxX = Math.max(box.x + box.width, maxX);
                         }
                     }
 
