@@ -38,7 +38,6 @@ public class FirstFitSolver extends AbstractSolver {
 
         for (Rectangle rectangle :
                 parameters.rectangles) {
-            if (animate) Util.animate(parameters, this);
             // First rectangle always fits
             if (boxes.size() == 0) {
                 rectangle.x = 0;
@@ -55,7 +54,7 @@ public class FirstFitSolver extends AbstractSolver {
                     int maxX = 0;
                     for (Box box : boxes) {
                         if (box.y == 0) {
-                            maxX = (box.x + box.width > maxX) ? box.x + box.width : maxX;
+                            maxX = Math.max(box.x + box.width, maxX);
                         }
                     }
 
@@ -69,15 +68,16 @@ public class FirstFitSolver extends AbstractSolver {
                 }
             }
             rectangle.place(true);
+            if (animate) Util.animate(parameters, this);
         }
 
         return new Solution(parameters, this);
     }
 
     /**
-     * Tries and fit the rectangle in one of the bins
+     * Tries and fit the rectangle in one of the boxes
      *
-     * @return {@code true} if it fits in any of the bins, else {@code false}
+     * @return {@code true} if it fits in any of the boxes, else {@code false}
      */
     private boolean fitRectangle(ArrayList<Box> boxes, Rectangle rectangle, int height) {
         for (Box box :
