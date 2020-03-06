@@ -17,7 +17,6 @@ public class PackingSolver {
         compoundSolver.addSolver(new FreeHeightSolver());
         compoundSolver.addSolver(new ReverseFitSolver());
         compoundSolver.addSolver(new SimpleTopLeftSolver());
-        compoundSolver.addSolver(new BottomUpSolver());
         Solution solution = compoundSolver.getSolution(params);
 
         Output.output(solution.parameters, inputOrder);
