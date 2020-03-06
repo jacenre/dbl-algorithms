@@ -63,25 +63,37 @@ public class FreeHeightUtil {
         parameters.heightVariant = Util.HeightSupport.FIXED;
         bestSolution = subSolver.getSolution(parameters.copy());
 
+        boolean firstIteration = true;
+        int[] chartYData = new int[(int)((stopRange - startRange)/searchSize) + 1];
+        int[] chartXData = new int[(int)((stopRange - startRange)/searchSize) + 1];
+        int iter = 0;
+
         while (stopRange - startRange > 1) {
             for (double i = startRange; i <= stopRange; i += searchSize) {
 
                 Parameters params = parameters.copy();
                 params.height = (int) i;
-                System.out.println(params.heightVariant);
                 Solution newSolution = subSolver.getSolution(params);
+
+                if (firstIteration) {
+                    chartXData[iter] = (int) i;
+                    chartYData[iter] = newSolution.getArea();
+                }
 
                 if (bestSolution == null || newSolution.getArea(true) < bestSolution.getArea(true)) {
                     minima = (int) i;
                     bestSolution = newSolution;
                 }
+                iter++;
 
             }
+            firstIteration = false;
             startRange = (int) Math.max(1, minima - searchSize);
             stopRange = (int) (minima + searchSize);
             searchSize = Math.max(searchSize / 2, 0);
         }
 
+        bestSolution.chartData = new int[][]{chartXData, chartYData};
         return bestSolution;
     }
 

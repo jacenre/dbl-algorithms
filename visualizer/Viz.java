@@ -1,4 +1,5 @@
 import org.knowm.xchart.*;
+import org.knowm.xchart.style.Styler;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 import processing.core.PApplet;
 
@@ -29,15 +30,15 @@ public class Viz extends PApplet {
         Parameters params = ui.getUserInput();
 
         ArrayList<AbstractSolver> solvers = new ArrayList<>();
-            solvers.add(new FirstFitSolver());
-            solvers.add(new TopLeftSolver());
-            solvers.add(new CompressionSolver());
-            solvers.add(new ReverseFitSolver());
-            solvers.add(new SimpleTopLeftSolver());
+        solvers.add(new FirstFitSolver());
+        solvers.add(new ReverseFitSolver());
+        solvers.add(new SimpleTopLeftSolver());
+        solvers.add(new CompoundSolver().addSolver(new FirstFitSolver()).addSolver(new ReverseFitSolver()).addSolver(new SimpleTopLeftSolver()));
 
         range = (int) (Math.random() * 180);
 
-        XYChart chart = new XYChartBuilder().xAxisTitle("Height").yAxisTitle("Area").width(1000).height(1000).build();
+        XYChart chart = new XYChartBuilder().xAxisTitle("Height").yAxisTitle("Area").theme(Styler.ChartTheme.Matlab).width(2000).height(1000).build();
+        chart.getStyler().setYAxisMin(0.0);
 
         for (AbstractSolver solver :
                 solvers) {
@@ -67,7 +68,6 @@ public class Viz extends PApplet {
             } catch (Exception e) {
                 System.out.println(e);
             }
-
         }
 
         if (params.copy().heightVariant.equals(Util.HeightSupport.FREE)) {
