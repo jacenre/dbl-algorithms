@@ -165,7 +165,7 @@ public class Animator extends PApplet {
 
     int TEXT_X = 50;
     int TEXT_Y = 50;
-    boolean stepping = true; // Turn on or off that you manually click through each view
+    boolean stepping = false; // Turn on or off that you manually click through each view
     boolean showNext = true;
     int currentViewIndex = 0;
 
