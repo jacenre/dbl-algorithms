@@ -1,7 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Util that allows any {@Code Util.HeightSupport.FIXED} to be turned into a {@Code Util.HeightSupport.FREE} solver
@@ -37,6 +34,11 @@ public class FreeHeightUtil {
      * @return Returns the pack area found by this solver.
      */
     Solution pack(Parameters parameters) {
+        if (!this.subSolver.getHeightSupport().contains(Util.HeightSupport.FREE)) {
+            throw new IllegalArgumentException("Doesn't support free height");
+        }
+
+
         Util.animate(parameters, subSolver);
 
         if (parameters.rectangles.size() > 100) {
@@ -61,11 +63,13 @@ public class FreeHeightUtil {
 
         // ensure that best solution is never null
         parameters.heightVariant = Util.HeightSupport.FIXED;
-        bestSolution = subSolver.getSolution(parameters.copy());
+        parameters.height = (int) stopRange;
+
+        bestSolution = subSolver.pack(parameters.copy());
 
         boolean firstIteration = true;
-        int[] chartYData = new int[(int)((stopRange - startRange)/searchSize) + 1];
-        int[] chartXData = new int[(int)((stopRange - startRange)/searchSize) + 1];
+        int[] chartYData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
+        int[] chartXData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
         int iter = 0;
 
         while (stopRange - startRange > 1) {
@@ -73,7 +77,7 @@ public class FreeHeightUtil {
 
                 Parameters params = parameters.copy();
                 params.height = (int) i;
-                Solution newSolution = subSolver.getSolution(params);
+                Solution newSolution = subSolver.pack(params);
 
                 if (firstIteration) {
                     chartXData[iter] = (int) i;
