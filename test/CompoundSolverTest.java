@@ -15,6 +15,7 @@ public class CompoundSolverTest extends AbstractPackingSolverTest {
         compoundSolver.addSolver(new FreeHeightSolver());
         compoundSolver.addSolver(new ReverseFitSolver());
         compoundSolver.addSolver(new SimpleTopLeftSolver());
+        compoundSolver.addSolver(new BottomUpSolver());
         return compoundSolver;
     }
 }

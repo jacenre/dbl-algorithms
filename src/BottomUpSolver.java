@@ -16,6 +16,7 @@ import java.util.Set;
 //      todo: result as far as I am aware, but it is a bit ugly
 //todo: still causing overlap and I don't know why
 //todo: just an idea, but maybe when picking the first rectangle for a box, you could check if the next rectangle has height <= width of the rectangle. Then you could rotate it I think
+//todo: or instead try to rotate all rectangles in the last box
 public class BottomUpSolver extends AbstractSolver {
 
     @Override
@@ -23,11 +24,12 @@ public class BottomUpSolver extends AbstractSolver {
         return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
-    boolean animate = true;
+    Parameters parameters;
 
     @Override
     @SuppressWarnings("Duplicates")
     Solution pack(Parameters parameters) {
+        this.parameters = parameters;
         // Start with all rectangles rotated so that width >= height.
         if (parameters.rotationVariant) {
             for (Rectangle rectangle :
@@ -42,7 +44,6 @@ public class BottomUpSolver extends AbstractSolver {
         parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
         parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
 
-        ArrayList<Box> boxes = new ArrayList<>();
         //up until this point, the code was identical to the first fit solver, here it diverges
 
         ArrayList<Rectangle> toPlace = new ArrayList<>(parameters.rectangles);
@@ -60,7 +61,6 @@ public class BottomUpSolver extends AbstractSolver {
             }
 
             Box box = new Box(first, xPos, parameters.height, parameters.rotationVariant);
-            boxes.add(box); //todo: I don't think I ever use my list of boxes, so I can just drop it
 
             xPos += box.width; //the width of the first box
 
@@ -156,6 +156,8 @@ public class BottomUpSolver extends AbstractSolver {
                     toMerge.yPos = row.yPos;
                 }
 
+                row.height = 0;
+                row.widthLeft = 0;
                 box.rows.remove(row);
             }
             box.mergeRows();
@@ -194,10 +196,10 @@ public class BottomUpSolver extends AbstractSolver {
             first.y = 0;
             rows.add(new Row(first, this, border, border));
             first.place(true);
+            Util.animate(parameters, getSolver());
         }
 
         void firstPassPlace(Rectangle rectangle) {
-            //rectangle.add(rectangle); I have no idea what this line was supposed to do
             rectangle.x = xPos;
             rectangle.y = heightFilled;
             heightFilled += rectangle.height;
@@ -206,6 +208,7 @@ public class BottomUpSolver extends AbstractSolver {
             Row row = new Row(rectangle, this, previous, border);
             rows.add(row);
             previous.next = row;
+            Util.animate(parameters, getSolver());
         }
 
         void place(Rectangle rectangle, Row row) {
@@ -219,11 +222,12 @@ public class BottomUpSolver extends AbstractSolver {
 
             rectangle.y = yPos;
             rectangle.place(true);
+            Util.animate(parameters, getSolver());
 
-            if (rectangle.height == row.height) {
-                row.widthLeft -= rectangle.width;
-                row.xPos += rectangle.width;
-            } else {
+            //if (rectangle.height == row.height) {
+              //  row.widthLeft -= rectangle.width;
+              //  row.xPos += rectangle.width;
+            //} else {
                 Row previous;
                 Row next;
                 Row newRow = new Row(rectangle, this, row.widthLeft);
@@ -243,7 +247,7 @@ public class BottomUpSolver extends AbstractSolver {
                 newRow.next = next;
                 row.height -= rectangle.height; //old row loses height
                 rows.add(newRow);
-            }
+            //}
             mergeRows(); //todo: this might be slow, but I don't think there's any way around this
         }
 
@@ -257,6 +261,7 @@ public class BottomUpSolver extends AbstractSolver {
                 if (row.widthLeft == row.previous.widthLeft) {
                     row.previous.height += row.height;
                     row.height = 0;
+                    row.widthLeft = 0; //todo: why the fuck does this affect overlaps
                     row.previous.next = row.next;
                     if (row.next != border) {
                         row.next.previous = row.previous;
@@ -327,5 +332,9 @@ public class BottomUpSolver extends AbstractSolver {
             yPos = 0;
         }
 
+    }
+
+    public AbstractSolver getSolver() {
+        return this;
     }
 }
