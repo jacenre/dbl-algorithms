@@ -23,7 +23,7 @@ public class CompoundSolver extends AbstractSolver {
     /**
      * Solution object containing the best solution found.
      */
-    private Solution bestSolution = null;
+    //private
 
     /**
      * Returns the name of the subSolver that solved it.
@@ -48,7 +48,7 @@ public class CompoundSolver extends AbstractSolver {
     @Override
     public Solution pack(Parameters parameters) {
         Parameters initialParameters = parameters.copy();
-
+        Solution bestSolution = null;
         // Try and getSolution it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {
