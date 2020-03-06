@@ -12,9 +12,6 @@ import java.util.Set;
  * </p>
  */
 //todo: look into the slack variable mentioned in paper
-//todo: currently, it will spread over the whole height even if it causes ugly gaps. This doesn't cause a worse
-//      todo: result as far as I am aware, but it is a bit ugly
-//todo: still causing overlap and I don't know why
 //todo: just an idea, but maybe when picking the first rectangle for a box, you could check if the next rectangle has height <= width of the rectangle. Then you could rotate it I think
 //todo: or instead try to rotate all rectangles in the last box
 public class BottomUpSolver extends AbstractSolver {
@@ -92,9 +89,9 @@ public class BottomUpSolver extends AbstractSolver {
                 box.firstPassPlace(rectangle);
             }
         }
-        toPlace.removeAll(toRemove); //todo: I am sure there are better ways to do this, I could do a removeIf with the placed variable
+        toPlace.removeAll(toRemove);
 
-        //if needed, add final row to fit last bit of height.
+        //if needed, add final row to fit last bit of height. This will always be merged with the one before it
         if (box.heightFilled != box.height) {
             Row finalRow = box.rows.get(box.rows.size() - 1);
             Row newRow = new Row(box, finalRow);
@@ -102,21 +99,19 @@ public class BottomUpSolver extends AbstractSolver {
             finalRow.next = newRow;
         }
 
-
         //merge rows together that have the same remaining width
         box.mergeRows();
 
         //now we need an list of all rectangles to go sorted on area
-        //todo: I now make a second array for this, however, it might be faster to just resort the toPlace array later, unsure
         ArrayList<Rectangle> areaSorted = new ArrayList<>(toPlace);
         areaSorted.sort((o1, o2) -> (o2.height * o2.width) - (o1.height * o1.width));
 
         //keep finding the row with the most remaining width
         //place the largest area rectangle that fits
         while (box.rows.size() >= 1) { //the border row is not considered a row
-            box.rows.sort((o1, o2) -> (o2.widthLeft) - (o1.widthLeft)); //todo after the first sort only the just altered rows will be changed, faster way?
+            box.rows.sort((o1, o2) -> (o2.widthLeft) - (o1.widthLeft));
             Row row = box.rows.get(0);
-            toRemove = new ArrayList<>(); //todo: this continues to not be a great way of doing this
+            toRemove = new ArrayList<>();
             boolean placedAny = false;
 
             for (Rectangle rectangle : areaSorted) {
@@ -224,35 +219,32 @@ public class BottomUpSolver extends AbstractSolver {
             rectangle.place(true);
             Util.animate(parameters, getSolver());
 
-            //if (rectangle.height == row.height) {
-              //  row.widthLeft -= rectangle.width;
-              //  row.xPos += rectangle.width;
-            //} else {
-                Row previous;
-                Row next;
-                Row newRow = new Row(rectangle, this, row.widthLeft);
+            //if the placed rectangle overlaps with the row perfectly, this could be done more efficiently.
+            //not currently doing that
+            Row previous;
+            Row next;
+            Row newRow = new Row(rectangle, this, row.widthLeft);
 
-                if (rectangle.y == row.yPos) { //our new row starts where the old row started
-                    previous = row.previous;
-                    next = row;
-                    row.yPos += rectangle.height; // old row is shifted down
-                    row.previous = newRow;
-                } else {
-                    previous = row;
-                    next = row.next;
-                    row.next = newRow;
-                }
+            if (rectangle.y == row.yPos) { //our new row starts where the old row started
+                previous = row.previous;
+                next = row;
+                row.yPos += rectangle.height; // old row is shifted down
+                row.previous = newRow;
+            } else {
+                previous = row;
+                next = row.next;
+                row.next = newRow;
+            }
 
-                newRow.previous = previous;
-                newRow.next = next;
-                row.height -= rectangle.height; //old row loses height
-                rows.add(newRow);
-            //}
-            mergeRows(); //todo: this might be slow, but I don't think there's any way around this
+            newRow.previous = previous;
+            newRow.next = next;
+            row.height -= rectangle.height; //old row loses height
+            rows.add(newRow);
+            mergeRows();
         }
 
-        void mergeRows(){ //todo: I suspect this is where it is still going wrong in terms of unoptimal solving
-            ArrayList<Row> toRemove = new ArrayList<>(); //todo: again, must be better way, removeIf height = 0?
+        void mergeRows(){
+            ArrayList<Row> toRemove = new ArrayList<>();
             for (Row row : rows) {
                 if (row.previous == border) {
                     continue;
@@ -261,7 +253,7 @@ public class BottomUpSolver extends AbstractSolver {
                 if (row.widthLeft == row.previous.widthLeft) {
                     row.previous.height += row.height;
                     row.height = 0;
-                    row.widthLeft = 0; //todo: why the fuck does this affect overlaps
+                    row.widthLeft = 0; //not having this causes overlaps and I don't know why
                     row.previous.next = row.next;
                     if (row.next != border) {
                         row.next.previous = row.previous;
@@ -285,8 +277,8 @@ public class BottomUpSolver extends AbstractSolver {
         int widthLeft;
         int height;
         Box box;
-        Row previous; //todo: I am a bit worried that when I do things like row.previous.next = row.next I am modifying objects instead of pointers.
-        Row next; //todo: so if weird errors occur, that is worth checking
+        Row previous;
+        Row next;
 
         /**
          * Constructor when creating a new row from a single rectangle
