@@ -1,4 +1,5 @@
 import org.knowm.xchart.*;
+import org.knowm.xchart.style.markers.SeriesMarkers;
 import processing.core.PApplet;
 
 import java.awt.*;
@@ -46,10 +47,22 @@ public class Viz extends PApplet {
                 if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE)) {
                     int[][] chartData = solution.getChartData();
                     if (chartData.length == 2) {
-                        chart.addSeries(solver.toString(), chartData[0], chartData[1]);
+                        if (solver.toString().startsWith("Compound")) {
+                            XYSeries series = chart.addSeries(solver.toString(), chartData[0], chartData[1]);
+                            series.setXYSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Area);
+                            series.setMarker(SeriesMarkers.NONE);
+                            int[] bestScoreX = chartData[0];
+                            int[] bestScoreY = chartData[1];
+                            for (int i = 0; i < bestScoreY.length; i++) {
+                                bestScoreY[i] = solution.getArea();
+                            }
+                            chart.addSeries("Best Score", bestScoreX, bestScoreY).setMarker(SeriesMarkers.NONE);
+                        } else {
+                            XYSeries series = chart.addSeries(solver.toString(), chartData[0], chartData[1]);
+                            series.setMarker(SeriesMarkers.NONE);
+                        }
                     }
                 }
-
                 viewports.add(new Viewport(solution));
             } catch (Exception e) {
                 System.out.println(e);
