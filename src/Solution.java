@@ -162,7 +162,8 @@ public class Solution {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         if (solvedBy != null) {
-            stringBuilder.append("Solution found by ").append(solvedBy.getClass().getSimpleName()).append("\n \n");
+            stringBuilder.append("Solution found by ").append(solvedBy.getName());
+            stringBuilder.append("\n \n");
         }
         stringBuilder.append("Amount of rectangles ").append(this.parameters.rectangles.size()).append("\n");
         stringBuilder.append("Minimum area is ").append(this.getMinimumArea()).append("\n");
