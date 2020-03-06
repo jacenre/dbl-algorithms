@@ -1,9 +1,8 @@
+import org.knowm.xchart.*;
 import processing.core.PApplet;
 
 import java.awt.*;
 import java.util.ArrayList;
-
-import org.knowm.xchart.*;
 
 @SuppressWarnings("Duplicates")
 public class Viz extends PApplet {
