@@ -12,6 +12,8 @@ public class CompoundSolver extends AbstractSolver {
 
     /**
      * Add a solver to the CompoundSolver.
+     *
+     * @return this CompoundSolver
      */
     public CompoundSolver addSolver(AbstractSolver solver) {
         this.solvers.add(solver);
@@ -22,6 +24,15 @@ public class CompoundSolver extends AbstractSolver {
      * Solution object containing the best solution found.
      */
     private Solution bestSolution = null;
+
+    /**
+     * Returns the name of the subSolver that solved it.
+     * @return the simple class name of the sub solver
+     */
+    @Override
+    String getName() {
+        return this.bestSolution.solvedBy.getName();
+    }
 
     /**
      * Solves the given {@code parameters} using every {@code Solver} in {@code solvers}, returns the {@code Solution}

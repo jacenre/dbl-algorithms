@@ -1,3 +1,7 @@
+
+//import org.jetbrains.annotations.NotNull;
+
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -7,9 +11,6 @@ public class Util {
 
     /**
      * Used for checking height variants.
-     *
-     * Enables the solver to throw an IllegalArgumentException if the wrong {@link Parameters} are given to a solver.
-     * @see Parameters#heightVariant
      */
     public enum HeightSupport {
         FIXED,
@@ -31,6 +32,8 @@ public class Util {
         return rectangles;
     }
 
+    static boolean animate = false;
+
     /**
      * Used for animating the current parameters.
      *
@@ -39,16 +42,16 @@ public class Util {
      *                   TODO COMMENT OUT BEFORE HANDING IN.
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
-//        if (Animator.getInstance() != null){
-//            Animator.getInstance().draw();
-//            Animator.getInstance().drawParameter(parameters, solver);
-//        }
+        if (animate && Animator.getInstance() != null){
+            Animator.getInstance().draw();
+            Animator.getInstance().drawParameter(parameters, solver);
+        }
     }
 
     public static void animate() {
-//        if (Animator.getInstance() != null) {
-//            Animator.getInstance().draw();
-//        }
+        if (animate && Animator.getInstance() != null) {
+            Animator.getInstance().draw();
+        }
     }
 
     /**
@@ -77,14 +80,37 @@ public class Util {
     }
 
     /**
+     * Sweepline algorithm to check if the solution has overlap.
+     *
+     * @param solution the Solution to check for overlap
+     * @return boolean value representing if there is overlap
+     */
+    public static boolean sweepline(Solution solution) {
+        boolean overlap = false;
+
+        class segment {
+            boolean left;
+
+            segment() {
+
+            }
+
+        }
+
+        // Deep copy to prevent modification of the solution
+        Solution solutionCopy = solution.copy();
+
+        return overlap;
+    }
+
+    /**
      * Check if the solution found by the solver is valid.
      *
      * @param solution the solution to be checked
      * @return a boolean that is true if the solution is valid.
      */
     public static boolean isValidSolution(Solution solution) {
-        Double rate;
-        rate = solution.getRate();
+        double rate = solution.getRate();
 
         // Test report
         System.out.println(solution);

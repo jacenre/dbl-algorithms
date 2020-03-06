@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -85,5 +84,15 @@ public abstract class AbstractSolver {
      * @return the associated {@link Solution} object containing the results
      */
     abstract Solution pack(Parameters parameters);
+
+    /**
+     * Returns the name of the solver
+     *
+     * @return string of this class name
+     */
+    String getName() {
+        return this.getClass().getSimpleName();
+    }
+
 }
 

@@ -84,6 +84,17 @@ public class Rectangle extends java.awt.Rectangle {
     public Rectangle copy() {
         Rectangle rectangle = new Rectangle(this);
         rectangle.rotated = this.rotated;
+        rectangle.place(this.isPlaced());
         return rectangle;
+    }
+
+    /**
+     * Returns whether Object is equals to this Rectangle object.
+     * @param o the object to equal
+     * @return True if the object is of the type Rectangle and has the same UUID
+     */
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof Rectangle && ((Rectangle) o).getId().equals(getId()));
     }
 }

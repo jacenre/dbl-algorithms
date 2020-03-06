@@ -19,6 +19,20 @@ public class FreeHeightSolver extends AbstractSolver {
     private AbstractSolver subSolver;
 
     /**
+     * Solution object containing the best solution found.
+     */
+    private Solution bestSolution = null;
+
+    /**
+     * Returns the name of the subSolver that solved it.
+     * @return the simple class name of the sub solver
+     */
+    @Override
+    String getName() {
+        return this.bestSolution.solvedBy.getName();
+    }
+
+    /**
      * Default constructor for method overriding.
      */
     FreeHeightSolver() {
@@ -58,7 +72,6 @@ public class FreeHeightSolver extends AbstractSolver {
         Util.animate(parameters, this);
 
         bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
-        bestSolution.solvedBy = this;
         return bestSolution;
     }
 
@@ -71,7 +84,7 @@ public class FreeHeightSolver extends AbstractSolver {
         int minima = 0;
 
         // ensure that best solution is never null
-        Solution bestSolution = subSolver.getSolution(parameters.copy());
+        bestSolution = subSolver.getSolution(parameters.copy());
         parameters.heightVariant = Util.HeightSupport.FIXED;
 
         while (stopRange - startRange > 1) {
