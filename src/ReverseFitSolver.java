@@ -7,12 +7,6 @@ import java.util.*;
  */
 public class ReverseFitSolver extends AbstractSolver {
 
-    @Override
-    Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED, Util.HeightSupport.FREE));
-    }
-
-
     /**
      * Solves for parameters.
      *
