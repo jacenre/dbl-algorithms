@@ -9,7 +9,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED, Util.HeightSupport.FREE));
     }
 
 
@@ -35,7 +35,6 @@ public class ReverseFitSolver extends AbstractSolver {
         for (Rectangle rectangle : parameters.rectangles) {
             Util.animate();
             if (rectangle.height > parameters.height / 2) {
-                rectangle.place(true);
                 rectangle.setLocation(x_0, 0);
                 firstLargeRectangles.add(rectangle);
                 x_0 += rectangle.width;
@@ -95,6 +94,7 @@ public class ReverseFitSolver extends AbstractSolver {
                 reverseRow.add(rectangle);
             }
         }
+
         remainingRectangles.removeAll(firstRow);
         remainingRectangles.removeAll(reverseRow);
 
@@ -116,7 +116,6 @@ public class ReverseFitSolver extends AbstractSolver {
         }
 
         int w_1 = x_0 + w_max + d_1 - moved;   // As in the paper
-
         // Either no rectangles anymore or reverse row reached far enough
         if (remainingRectangles.isEmpty()) {
             return new Solution(parameters, this);

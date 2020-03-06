@@ -14,6 +14,21 @@ public class Solution {
     public Parameters parameters;
 
     /**
+     * Data necessary for the charts
+     */
+    public int[][] chartData = new int[][]{};
+
+
+    /**
+     * Returns the chartData, which is a double int array containing the x and y axis data.
+     *
+     * @return the chartData needed in viz
+     */
+    public int[][] getChartData() {
+        return chartData;
+    }
+
+    /**
      * Returns the area, or score, of the {@code Solution} as an {@code Integer}.
      *
      * @return the Area of the {@code Solution}.

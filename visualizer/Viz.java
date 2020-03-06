@@ -3,10 +3,10 @@ import processing.core.PApplet;
 import java.awt.*;
 import java.util.ArrayList;
 
+import org.knowm.xchart.*;
+
 @SuppressWarnings("Duplicates")
 public class Viz extends PApplet {
-
-    private static final double zoomFactor  = 2;
 
     private Viewport activeView = null;
     private ArrayList<Viewport> viewports = new ArrayList<>();
@@ -34,19 +34,32 @@ public class Viz extends PApplet {
             solvers.add(new CompressionSolver());
             solvers.add(new ReverseFitSolver());
             solvers.add(new SimpleTopLeftSolver());
-            solvers.add(new FreeHeightSolver());
-            solvers.add(new BottomUpSolver());
 
         range = (int) (Math.random() * 180);
+
+        XYChart chart = new XYChartBuilder().xAxisTitle("Height").yAxisTitle("Area").width(1000).height(1000).build();
 
         for (AbstractSolver solver :
                 solvers) {
             try {
                 Solution solution = solver.getSolution(params.copy());
+
+                if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE)) {
+                    int[][] chartData = solution.getChartData();
+                    if (chartData.length == 2) {
+                        chart.addSeries(solver.toString(), chartData[0], chartData[1]);
+                    }
+                }
+
                 viewports.add(new Viewport(solution));
             } catch (Exception e) {
                 System.out.println(e);
             }
+
+        }
+
+        if (params.copy().heightVariant.equals(Util.HeightSupport.FREE)) {
+            new SwingWrapper<>(chart).displayChart();
         }
 
         activeView = viewports.get(0);
@@ -96,7 +109,7 @@ public class Viz extends PApplet {
         Solution solution;
 
         void reset() {
-            this.maxSize = 800;
+//            this.maxSize = 800;
             this.x = 100;
             this.y = 100;
             setScale();
@@ -107,8 +120,8 @@ public class Viz extends PApplet {
 
         void setup() {
             for (Rectangle rectangle : this.solution.parameters.rectangles) {
-                smallest = Math.min(smallest, rectangle.width * rectangle.height);
-                largest = Math.max(largest, rectangle.width * rectangle.height);
+                smallest = (smallest > rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : smallest;
+                largest = (largest < rectangle.width * rectangle.height) ? rectangle.width * rectangle.height : largest;
             }
             for (Rectangle rectangle1 : this.solution.parameters.rectangles) {
                 for (Rectangle rectangle2 : this.solution.parameters.rectangles) {
@@ -123,7 +136,8 @@ public class Viz extends PApplet {
             setScale();
         }
 
-        private void updateSizes() {
+        void setScale() {
+            // update sizes
             this.solutionHeight = this.solution.getHeight();
             this.solutionWidth = this.solution.getWidth();
 
@@ -134,32 +148,11 @@ public class Viz extends PApplet {
                 drawWidth = (solutionWidth * maxSize) / solutionHeight;
                 drawHeight = maxSize;
             }
-        }
 
-        void setScale() {
-            updateSizes();
-            // translate rectangle position
-            this.x = (DEFAULT_WIDTH - drawWidth)/2;
-            this.y = (DEFAULT_HEIGHT - drawHeight)/2;
+            this.x = (DEFAULT_WIDTH - drawWidth) / 2;
+            this.y = (DEFAULT_HEIGHT - drawHeight) / 2;
 
             boundingBox = new Rectangle(this.x, this.y, drawWidth, drawHeight);
-        }
-
-        void setScale(double factor) {
-            // update sizes
-            updateSizes();
-
-            double scaleChange = (1-factor);
-
-            double dx = (mouseX - this.x) * scaleChange;
-            double dy = (mouseY - this.y) * scaleChange;
-
-            // translate rectangle position
-            this.x = this.x + (int)dx;
-            this.y = this.y + (int)dy;
-
-            boundingBox = new Rectangle(this.x, this.y, drawWidth, drawHeight);
-
         }
 
         int smallest = Integer.MAX_VALUE;
@@ -233,19 +226,13 @@ public class Viz extends PApplet {
             }
             activeView.reset();
         } else if (keyCode == UP) {
-            // zoom in
-            zoom(zoomFactor);
+            activeView.maxSize *= 2;
+            activeView.setScale();
         } else if (keyCode == DOWN) {
-            // zoom out
-            zoom(1/zoomFactor);
+            activeView.maxSize /= 2;
+            activeView.setScale();
         }
         activeView = viewports.get(active);
-    }
-
-    /* Zooms view centered at mouse pointer. */
-    private void zoom(double factor) {
-        activeView.maxSize *= factor;
-        activeView.setScale(factor);
     }
 
     public void mouseDragged() {
