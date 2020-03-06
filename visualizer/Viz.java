@@ -3,6 +3,8 @@ import processing.core.PApplet;
 import java.awt.*;
 import java.util.ArrayList;
 
+import org.knowm.xchart.*;
+
 @SuppressWarnings("Duplicates")
 public class Viz extends PApplet {
 
@@ -32,18 +34,32 @@ public class Viz extends PApplet {
             solvers.add(new CompressionSolver());
             solvers.add(new ReverseFitSolver());
             solvers.add(new SimpleTopLeftSolver());
-            solvers.add(new FreeHeightSolver());
 
         range = (int) (Math.random() * 180);
+
+        XYChart chart = new XYChartBuilder().xAxisTitle("Height").yAxisTitle("Area").width(1000).height(1000).build();
 
         for (AbstractSolver solver :
                 solvers) {
             try {
                 Solution solution = solver.getSolution(params.copy());
+
+                if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE)) {
+                    int[][] chartData = solution.getChartData();
+                    if (chartData.length == 2) {
+                        chart.addSeries(solver.toString(), chartData[0], chartData[1]);
+                    }
+                }
+
                 viewports.add(new Viewport(solution));
             } catch (Exception e) {
                 System.out.println(e);
             }
+
+        }
+
+        if (params.copy().heightVariant.equals(Util.HeightSupport.FREE)) {
+            new SwingWrapper<>(chart).displayChart();
         }
 
         activeView = viewports.get(0);
