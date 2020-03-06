@@ -236,7 +236,7 @@ public class Viz extends PApplet {
             zoom(zoomFactor);
         } else if (keyCode == DOWN) {
             // zoom out
-            zoom(zoomFactor/2);
+            zoom(1/zoomFactor);
         }
         activeView = viewports.get(active);
     }
