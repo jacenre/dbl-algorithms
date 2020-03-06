@@ -44,26 +44,7 @@ public class Viz extends PApplet {
                 solvers) {
             try {
                 Solution solution = solver.getSolution(params.copy());
-
-                if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE)) {
-                    int[][] chartData = solution.getChartData();
-                    if (chartData.length == 2) {
-                        if (solver.toString().startsWith("Compound")) {
-                            XYSeries series = chart.addSeries(solver.toString(), chartData[0], chartData[1]);
-                            series.setXYSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Area);
-                            series.setMarker(SeriesMarkers.NONE);
-                            int[] bestScoreX = chartData[0];
-                            int[] bestScoreY = chartData[1];
-                            for (int i = 0; i < bestScoreY.length; i++) {
-                                bestScoreY[i] = solution.getArea();
-                            }
-                            chart.addSeries("Best Score", bestScoreX, bestScoreY).setMarker(SeriesMarkers.NONE);
-                        } else {
-                            XYSeries series = chart.addSeries(solver.toString(), chartData[0], chartData[1]);
-                            series.setMarker(SeriesMarkers.NONE);
-                        }
-                    }
-                }
+                if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE))addSeries(chart, solver, solution);
                 viewports.add(new Viewport(solution));
             } catch (Exception e) {
                 System.out.println(e);
@@ -78,6 +59,27 @@ public class Viz extends PApplet {
 
         size(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
+
+    private void addSeries(XYChart chart, AbstractSolver solver, Solution solution) {
+        int[][] chartData = solution.getChartData();
+        if (chartData.length == 2) {
+            if (solver.toString().startsWith("Compound")) {
+                XYSeries series = chart.addSeries(solver.toString(), chartData[0], chartData[1]);
+                series.setXYSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Area);
+                series.setMarker(SeriesMarkers.NONE);
+                int[] bestScoreX = chartData[0];
+                int[] bestScoreY = chartData[1];
+                for (int i = 0; i < bestScoreY.length; i++) {
+                    bestScoreY[i] = solution.getArea();
+                }
+                chart.addSeries("Best Score", bestScoreX, bestScoreY).setMarker(SeriesMarkers.NONE);
+            } else {
+                XYSeries series = chart.addSeries(solver.toString(), chartData[0], chartData[1]);
+                series.setMarker(SeriesMarkers.NONE);
+            }
+        }
+    }
+
 
     public void setup() {
         colorMode(HSB, 360, 100, 100);
