@@ -26,10 +26,6 @@ public class BottomUpSolver extends AbstractSolver {
     @Override
     @SuppressWarnings("Duplicates")
     Solution pack(Parameters parameters) {
-        if (parameters.rectangles.size() > 5000) {
-            throw new IllegalArgumentException();
-        }
-
         this.parameters = parameters;
         // Start with all rectangles rotated so that width >= height.
         if (parameters.rotationVariant) {

@@ -31,6 +31,26 @@ public abstract class AbstractSolver {
     }
 
     /**
+     * Returns a boolean that is true if {@code this} AbstractSolver can handle the parameter object.
+     * <p>
+     *     This was added since all the {@code IllegalArgumentException} were having seriously horrendous performance
+     *     impact on the {@link FreeHeightUtil} since it would throw in the order of 10k errors in a single solve.
+     *     To prevent this we have this function to replace the error checking.
+     * </p>
+     * <p>
+     *     {@code IllegalArgumentException} should never be thrown in normal use case but is left as a defensive
+     *     programming catch all for if something is FUBAR.
+     * </p>
+     * @param parameters the parameters for which to check
+     * @return true if this solver can handle the parameters.
+     */
+    public boolean canSolveParameters(Parameters parameters) {
+        // Default check
+        if (parameters.freeHeightUtil && !this.getHeightSupport().contains(Util.HeightSupport.FREE)) return false;
+        return this.getHeightSupport().contains(parameters.heightVariant);
+    }
+
+    /**
      * Returns a {@code Solution} for the given {@code Parameters}
      * <p>
      * Contains the template code for most solvers. By default it will rotate any rectangle

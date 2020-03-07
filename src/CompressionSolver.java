@@ -13,6 +13,14 @@ public class CompressionSolver extends AbstractSolver {
         return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
+    @Override
+    public boolean canSolveParameters(Parameters parameters) {
+        boolean superResult = super.canSolveParameters(parameters);
+        if (!superResult) return false;
+        if (parameters.rectangles.size() > 2000) return false;
+        return true;
+    }
+
     /**
      * Find the pack value for the parameters without doing any other output.
      *

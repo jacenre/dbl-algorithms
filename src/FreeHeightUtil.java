@@ -43,10 +43,16 @@ public class FreeHeightUtil {
 
         Util.animate(parameters, subSolver);
 
-        if (parameters.rectangles.size() > 100) {
+        // TODO Find something less dumb, like basing the sampling rate on the HEIGHT.
+        // TODO Find the maximum number solves that is < 30 sec runtime.
+        if (parameters.rectangles.size() < 100) {
+            bestSolution = localMinimaFinder(parameters, 1);
+        } else if (parameters.rectangles.size() < 1000) {
+            bestSolution = localMinimaFinder(parameters, 0.1);
+        } else if (parameters.rectangles.size() < 9000) {
             bestSolution = localMinimaFinder(parameters, 0.01);
         } else {
-            bestSolution = localMinimaFinder(parameters, 1);
+            bestSolution = localMinimaFinder(parameters, 0.0005);
         }
 
         Util.animate(parameters, subSolver);
@@ -58,12 +64,11 @@ public class FreeHeightUtil {
 
     Solution localMinimaFinder(Parameters parameters, double samplingRate) {
         // Starting conditions
-        double minimum = largestRect(parameters);
-        double maximum = sumHeight(parameters);
+        double minimum = Util.largestRect(parameters);
+        double maximum = Util.sumHeight(parameters);
 
         double startRange = minimum;
         double stopRange = maximum;
-        System.out.println(minimum + ", " + maximum);
         double searchSize = 1 / samplingRate;
         int minima = 0;
 
@@ -104,38 +109,4 @@ public class FreeHeightUtil {
         bestSolution.chartData = new int[][]{chartXData, chartYData};
         return bestSolution;
     }
-
-    /**
-     * Returns the height of the largest rectangle in the parameters rectangle arrays.
-     *
-     * @param parameters the Parameters in which to search
-     * @return the height of the largest rectangle
-     */
-    private int largestRect(Parameters parameters) {
-        int height = 0;
-        for (Rectangle rectangle :
-                parameters.rectangles) {
-            height = Math.max(rectangle.height, height);
-            if (parameters.rotationVariant) {
-                height = Math.max(rectangle.width, height);
-            }
-        }
-        return height;
-    }
-
-    /**
-     * Returns the sum of all the heights in the parameters rectangle arrays.
-     *
-     * @param parameters the Parameters for which to sum
-     * @return the sum of all the heights
-     */
-    private int sumHeight(Parameters parameters) {
-        int sum = 0;
-        for (Rectangle rectangle :
-                parameters.rectangles) {
-            sum += rectangle.height;
-        }
-        return sum;
-    }
-
 }

@@ -264,4 +264,37 @@ public class Util {
         return false;
     }
 
+    /**
+     * Returns the height of the largest rectangle in the parameters rectangle arrays.
+     *
+     * @param parameters the Parameters in which to search
+     * @return the height of the largest rectangle
+     */
+    static int largestRect(Parameters parameters) {
+        int height = 0;
+        for (Rectangle rectangle :
+                parameters.rectangles) {
+            height = Math.max(rectangle.height, height);
+            if (parameters.rotationVariant) {
+                height = Math.max(rectangle.width, height);
+            }
+        }
+        return height;
+    }
+
+    /**
+     * Returns the sum of all the heights in the parameters rectangle arrays.
+     *
+     * @param parameters the Parameters for which to sum
+     * @return the sum of all the heights
+     */
+    static int sumHeight(Parameters parameters) {
+        int sum = 0;
+        for (Rectangle rectangle :
+                parameters.rectangles) {
+            sum += rectangle.height;
+        }
+        return sum;
+    }
+
 }

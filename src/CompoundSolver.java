@@ -53,7 +53,7 @@ public class CompoundSolver extends AbstractSolver {
                 solvers) {
             try {
                 // Prevent solvers that don't have FIXED to be used in the free height util.
-                if (parameters.freeHeightUtil && !solver.getHeightSupport().contains(Util.HeightSupport.FREE)) {
+                if (!solver.canSolveParameters(parameters)) {
                     continue;
                 }
                 Solution solution = solver.pack(initialParameters.copy());
@@ -70,7 +70,7 @@ public class CompoundSolver extends AbstractSolver {
                     bestSolution = solution.copy();
                 }
             } catch (Exception e) {
-                // ignore
+                e.printStackTrace();
             }
         }
         return bestSolution;

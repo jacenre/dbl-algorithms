@@ -9,7 +9,15 @@ public class SimpleTopLeftSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED, Util.HeightSupport.FREE));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+    }
+
+    @Override
+    public boolean canSolveParameters(Parameters parameters) {
+        boolean superResult = super.canSolveParameters(parameters);
+        if (!superResult) return false;
+        if (parameters.rectangles.size() > 2000) return false;
+        return true;
     }
 
     /**

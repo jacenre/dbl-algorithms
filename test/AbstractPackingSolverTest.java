@@ -1,7 +1,4 @@
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -100,7 +97,32 @@ abstract class AbstractPackingSolverTest {
         }
 
         return dynamicTests.stream();
+    }
 
+    @DisplayName("Benchmark")
+    @Test
+    public void benchmark() throws FileNotFoundException {
+        // Use the hardest file as benchmark
+        String path = "./test/momotor/extra.in";
+        File file = new File(path);
+        Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+
+        long count = 0;
+
+        AbstractSolver solver = getSolver();
+
+        long duration = 0L;
+        long startTime = System.nanoTime();
+        long endTime = System.nanoTime();
+
+        while (duration < 30000) {
+            Solution solution = solver.getSolution(params);
+            count++;
+            endTime = System.nanoTime();
+            duration = (endTime - startTime) / 1000000;
+        }
+        System.out.println(solver.getClass().getSimpleName() + " reached a solve count of " + count);
+        System.out.println("Where the params had a range of " + Util.largestRect(params) + " : " + Util.sumHeight(params));
     }
 
 }

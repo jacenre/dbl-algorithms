@@ -11,6 +11,15 @@ public class ReverseFitSolver extends AbstractSolver {
         return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
+    @Override
+    public boolean canSolveParameters(Parameters parameters) {
+        boolean superResult = super.canSolveParameters(parameters);
+        if (!superResult) return false;
+        if (parameters.rectangles.size() > 5000) return false;
+
+        return true;
+    }
+
     /**
      * Solves for parameters.
      *
