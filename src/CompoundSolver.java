@@ -20,10 +20,26 @@ public class CompoundSolver extends AbstractSolver {
 
     /**
      * Add a solver to the CompoundSolver.
+     *
+     * @return this CompoundSolver
      */
     public CompoundSolver addSolver(AbstractSolver solver) {
         this.solvers.add(solver);
         return this;
+    }
+
+    /**
+     * Solution object containing the best solution found.
+     */
+    private Solution bestSolution = null;
+
+    /**
+     * Returns the name of the subSolver that solved it.
+     * @return the simple class name of the sub solver
+     */
+    @Override
+    String getName() {
+        return this.bestSolution.solvedBy.getName();
     }
 
     /**
@@ -40,7 +56,7 @@ public class CompoundSolver extends AbstractSolver {
     @Override
     public Solution pack(Parameters parameters) {
         Parameters initialParameters = parameters.copy();
-        Solution bestSolution = null;
+
         // Try and getSolution it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {
@@ -60,5 +76,4 @@ public class CompoundSolver extends AbstractSolver {
         }
         return bestSolution;
     }
-
 }

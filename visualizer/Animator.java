@@ -1,6 +1,5 @@
 import processing.core.PApplet;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -43,10 +42,14 @@ public class Animator extends PApplet {
     }
 
     public void drawParameter(Parameters parameters, AbstractSolver solver) {
-        if (activeView == null) {
+        if (stepping) {
+            activeView = new Viewport(parameters.copy(), solver);
+            viewports.add(activeView);
+        } else if (activeView == null) {
             activeView = new Viewport(parameters, solver);
         } else {
             activeView.solution.parameters = parameters;
+            activeView.solution.solvedBy = solver;
         }
         activeView.setScale();
     }
@@ -149,20 +152,39 @@ public class Animator extends PApplet {
         oldY = mouseY;
     }
 
+    public void keyPressed() {
+        if (keyCode == RIGHT) {
+            currentViewIndex = (currentViewIndex + 1 + viewports.size()) % viewports.size();
+            currentView().reset();
+        } else if (keyCode == LEFT) {
+            currentViewIndex = (currentViewIndex - 1 + viewports.size()) % viewports.size();
+            currentView().reset();
+        }
+        currentView().setScale();
+    }
+
     int TEXT_X = 50;
     int TEXT_Y = 50;
+    boolean stepping = false; // Turn on or off that you manually click through each view
+    boolean showNext = true;
+    int currentViewIndex = 0;
+
+    private Viewport currentView() {
+        return stepping ? viewports.get(currentViewIndex) : activeView;
+    }
 
     public void draw() {
         try {
             if (Animator.getInstance() != null) {
+                Viewport view = currentView();
                 background(0,0,100);
-                if (activeView != null) {
+                if (view != null) {
                     fill(0, 0, 0);
-                    text(activeView.solution.solvedBy.getClass().getSimpleName(), TEXT_X, TEXT_Y);
-                    text("Size = " + activeView.solution.getArea(), TEXT_X, TEXT_Y + 15);
-                    activeView.draw();
+                    text(view.solution.solvedBy.getClass().getSimpleName(), TEXT_X, TEXT_Y);
+                    text("Size = " + view.solution.getArea(), TEXT_X, TEXT_Y + 15);
+                    view.draw();
                 }
-                delay(100);
+                delay(stepping ? 10 : 100);
             }
         } catch (Exception e) {
             // ignore
