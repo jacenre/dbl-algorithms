@@ -5,6 +5,14 @@ import java.util.ArrayList;
  */
 public class CompoundSolver extends AbstractSolver {
 
+    public ArrayList<AbstractSolver> getSolvers() {
+        return solvers;
+    }
+
+    public void setSolvers(ArrayList<AbstractSolver> solvers) {
+        this.solvers = solvers;
+    }
+
     /**
      * ArrayList containing all the solvers used.
      */
@@ -53,7 +61,11 @@ public class CompoundSolver extends AbstractSolver {
         for (AbstractSolver solver :
                 solvers) {
             try {
-                Solution solution = solver.getSolution(initialParameters.copy());
+                // Prevent solvers that don't have FIXED to be used in the free height util.
+                if (parameters.freeHeightUtil && !solver.getHeightSupport().contains(Util.HeightSupport.FIXED)) {
+                    continue;
+                }
+                Solution solution = solver.pack(initialParameters.copy());
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
                     bestSolution = solution.copy();

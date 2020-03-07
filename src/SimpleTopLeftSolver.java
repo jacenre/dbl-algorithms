@@ -9,16 +9,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
-    }
-
-    // Template part.
-    @Override
-    public Solution getSolution(Parameters parameters) throws IllegalArgumentException {
-        if (parameters.rectangles.size() > 2000) {
-            throw new IllegalArgumentException("Too many rectangles");
-        }
-        return super.getSolution(parameters);
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED, Util.HeightSupport.FREE));
     }
 
     /**
@@ -29,6 +20,10 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      */
     @Override
     Solution pack(Parameters parameters) throws IllegalArgumentException {
+        if (parameters.rectangles.size() > 2000) {
+            throw new IllegalArgumentException("Too many rectangles");
+        }
+
         Util.animate(parameters, this);
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;

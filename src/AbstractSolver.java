@@ -57,11 +57,16 @@ public abstract class AbstractSolver {
             }
         }
 
+        Solution solution; // Solution
+
         // Create a new solution for this getSolution.
-        Solution solution = this.pack(parameters);
+        if (parameters.heightVariant.equals(Util.HeightSupport.FIXED)) {
+            solution = this.pack(parameters);
+        } else {
+            solution = new FreeHeightUtil(this).pack(parameters);
+        }
 
         // report(solution);
-
         return solution;
     }
 

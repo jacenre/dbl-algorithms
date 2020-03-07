@@ -1,17 +1,10 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Free height version of the FirstFitSolver.
+ * Util that allows any {@Code Util.HeightSupport.FIXED} to be turned into a {@Code Util.HeightSupport.FREE} solver
+ * using local minima finder.
  */
-public class FreeHeightSolver extends AbstractSolver {
-
-    @Override
-    Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE));
-    }
+public class FreeHeightUtil {
 
     /**
      * The AbstractSolver used during {@link #localMinimaFinder(Parameters, double)}, by default {@link FirstFitSolver}.
@@ -24,30 +17,12 @@ public class FreeHeightSolver extends AbstractSolver {
     private Solution bestSolution = null;
 
     /**
-     * Returns the name of the subSolver that solved it.
-     * @return the simple class name of the sub solver
-     */
-    @Override
-    String getName() {
-        return this.bestSolution.solvedBy.getName();
-    }
-
-    /**
-     * Default constructor for method overriding.
-     */
-    FreeHeightSolver() {
-        this.subSolver = new CompoundSolver()
-                .addSolver(new FirstFitSolver());
-//                .addSolver(new ReverseFitSolver());
-    }
-
-    /**
-     * Constructor that sets the {@code subSolver} to a different solver.
+     * Constructor that sets the {@code subSolver}
      *
      * @param subSolver the AbstractSolver to use
      * @see #localMinimaFinder(Parameters, double)
      */
-    FreeHeightSolver(AbstractSolver subSolver) {
+    FreeHeightUtil(AbstractSolver subSolver) {
         this.subSolver = subSolver;
     }
 
@@ -58,10 +33,15 @@ public class FreeHeightSolver extends AbstractSolver {
      * @param parameters The parameters to be used by the solver.
      * @return Returns the pack area found by this solver.
      */
-    @Override
     Solution pack(Parameters parameters) {
-        Util.animate(parameters, this);
-        Solution bestSolution;
+        if (!this.subSolver.getHeightSupport().contains(Util.HeightSupport.FREE)) {
+            throw new IllegalArgumentException("Doesn't support free height");
+        }
+
+        // fixed the compound solver
+        parameters.freeHeightUtil = true;
+
+        Util.animate(parameters, subSolver);
 
         if (parameters.rectangles.size() > 100) {
             bestSolution = localMinimaFinder(parameters, 0.01);
@@ -69,7 +49,7 @@ public class FreeHeightSolver extends AbstractSolver {
             bestSolution = localMinimaFinder(parameters, 1);
         }
 
-        Util.animate(parameters, this);
+        Util.animate(parameters, subSolver);
 
         bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
         return bestSolution;
@@ -84,28 +64,41 @@ public class FreeHeightSolver extends AbstractSolver {
         int minima = 0;
 
         // ensure that best solution is never null
-        bestSolution = subSolver.getSolution(parameters.copy());
         parameters.heightVariant = Util.HeightSupport.FIXED;
+        parameters.height = (int) stopRange;
+        bestSolution = subSolver.pack(parameters.copy());
+
+        boolean firstIteration = true;
+        int[] chartYData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
+        int[] chartXData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
+        int iter = 0;
 
         while (stopRange - startRange > 1) {
             for (double i = startRange; i <= stopRange; i += searchSize) {
 
                 Parameters params = parameters.copy();
                 params.height = (int) i;
+                Solution newSolution = subSolver.pack(params);
 
-                Solution newSolution = subSolver.getSolution(params);
+                if (firstIteration) {
+                    chartXData[iter] = (int) i;
+                    chartYData[iter] = newSolution.getArea();
+                }
 
                 if (bestSolution == null || newSolution.getArea(true) < bestSolution.getArea(true)) {
                     minima = (int) i;
                     bestSolution = newSolution;
                 }
+                iter++;
 
             }
+            firstIteration = false;
             startRange = (int) Math.max(1, minima - searchSize);
             stopRange = (int) (minima + searchSize);
             searchSize = Math.max(searchSize / 2, 0);
         }
 
+        bestSolution.chartData = new int[][]{chartXData, chartYData};
         return bestSolution;
     }
 
@@ -119,7 +112,7 @@ public class FreeHeightSolver extends AbstractSolver {
         int height = 0;
         for (Rectangle rectangle :
                 parameters.rectangles) {
-            height = (rectangle.height > height)? rectangle.height: height;
+            height = Math.max(rectangle.height, height);
         }
         return height;
     }
