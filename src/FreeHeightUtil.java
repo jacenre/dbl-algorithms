@@ -38,6 +38,8 @@ public class FreeHeightUtil {
             throw new IllegalArgumentException("Doesn't support free height");
         }
 
+        // fixed the compound solver
+        parameters.freeHeightUtil = true;
 
         Util.animate(parameters, subSolver);
 
@@ -64,7 +66,6 @@ public class FreeHeightUtil {
         // ensure that best solution is never null
         parameters.heightVariant = Util.HeightSupport.FIXED;
         parameters.height = (int) stopRange;
-
         bestSolution = subSolver.pack(parameters.copy());
 
         boolean firstIteration = true;
