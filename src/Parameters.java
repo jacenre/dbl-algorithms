@@ -19,6 +19,20 @@ public class Parameters {
     public Util.HeightSupport heightVariant;
 
     /**
+     * Boolean representing if this Parameters object was parsed by the {@link FreeHeightUtil}.
+     * <p>
+     *     The reason for this boolean is that when you use the compound solver in the {@code FreeHeightUtil} it will
+     *     set the {@link #heightVariant} to {@code HeightSupport.FIXED} and since it only checks the HeightSupport at
+     *     the beginning of the {@link FreeHeightUtil#pack(Parameters)} it will send the {@code Parameters} to all the
+     *     children of a {@link CompoundSolver} without them being suited for free height solving.
+     * </p>
+     * <p>
+     *     If this boolean is set to {@code True} it means that the {@code heightVariant} should be overruled to FIXED.
+     * </p>
+     */
+    public boolean freeHeightUtil;
+
+    /**
      * The height of the {@link #heightVariant}.
      * <p>
      *     If the input has {@code heightVariant == Util.HeightSupport.FIXED} then this will represent the maximum
