@@ -13,12 +13,12 @@ public class PackingSolver {
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
         compoundSolver.addSolver(new TopLeftSolver());
+        compoundSolver.addSolver(new BottomUpSolver());
         compoundSolver.addSolver(new CompressionSolver());
         compoundSolver.addSolver(new ReverseFitSolver());
         compoundSolver.addSolver(new SimpleTopLeftSolver());
-        compoundSolver.addSolver(new BottomUpSolver());
-        Solution solution = compoundSolver.getSolution(params);
 
+        Solution solution = compoundSolver.getSolution(params);
         Output.output(solution.parameters, inputOrder);
     }
 

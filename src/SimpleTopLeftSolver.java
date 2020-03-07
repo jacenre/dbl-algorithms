@@ -37,8 +37,10 @@ public class SimpleTopLeftSolver extends AbstractSolver {
             rect.place(true);
             Util.animate();
             rect.x = binWidth;
-            if (rect.height > parameters.height) {
-                rect.rotate();
+            if (parameters.rotationVariant) {
+                if (rect.height > parameters.height) {
+                    rect.rotate();
+                }
             }
             rect.y = parameters.height - rect.height;
             move(rect, parameters.rectangles.subList(0, i));

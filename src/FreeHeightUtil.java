@@ -51,16 +51,20 @@ public class FreeHeightUtil {
 
         Util.animate(parameters, subSolver);
 
+        bestSolution.parameters.freeHeightUtil = false;
         bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
         return bestSolution;
     }
 
     Solution localMinimaFinder(Parameters parameters, double samplingRate) {
         // Starting conditions
-        double startRange = largestRect(parameters);
-        double stopRange = sumHeight(parameters);
-        double searchSize = 1 / samplingRate;
+        double minimum = largestRect(parameters);
+        double maximum = sumHeight(parameters);
 
+        double startRange = minimum;
+        double stopRange = maximum;
+        System.out.println(minimum + ", " + maximum);
+        double searchSize = 1 / samplingRate;
         int minima = 0;
 
         // ensure that best solution is never null
@@ -75,7 +79,6 @@ public class FreeHeightUtil {
 
         while (stopRange - startRange > 1) {
             for (double i = startRange; i <= stopRange; i += searchSize) {
-
                 Parameters params = parameters.copy();
                 params.height = (int) i;
                 Solution newSolution = subSolver.pack(params);
@@ -93,8 +96,8 @@ public class FreeHeightUtil {
 
             }
             firstIteration = false;
-            startRange = (int) Math.max(1, minima - searchSize);
-            stopRange = (int) (minima + searchSize);
+            startRange = (int) Math.max(minimum, minima - searchSize);
+            stopRange = (int) Math.min(maximum, minima + searchSize);
             searchSize = Math.max(searchSize / 2, 0);
         }
 
@@ -113,6 +116,9 @@ public class FreeHeightUtil {
         for (Rectangle rectangle :
                 parameters.rectangles) {
             height = Math.max(rectangle.height, height);
+            if (parameters.rotationVariant) {
+                height = Math.max(rectangle.width, height);
+            }
         }
         return height;
     }

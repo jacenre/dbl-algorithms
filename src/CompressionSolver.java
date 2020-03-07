@@ -8,7 +8,6 @@ import java.util.Set;
  */
 public class CompressionSolver extends AbstractSolver {
 
-
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
         return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));

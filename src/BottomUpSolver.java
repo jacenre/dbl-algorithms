@@ -26,6 +26,10 @@ public class BottomUpSolver extends AbstractSolver {
     @Override
     @SuppressWarnings("Duplicates")
     Solution pack(Parameters parameters) {
+        if (parameters.rectangles.size() > 5000) {
+            throw new IllegalArgumentException();
+        }
+
         this.parameters = parameters;
         // Start with all rectangles rotated so that width >= height.
         if (parameters.rotationVariant) {
@@ -53,7 +57,7 @@ public class BottomUpSolver extends AbstractSolver {
             //if this was the last rectangle, rotate it to minimize width
             if(toPlace.isEmpty()) {
                 if(first.width > first.height && first.width <= parameters.height) {
-                    first.rotate();
+                    if (parameters.rotationVariant) first.rotate();
                 }
             }
 
@@ -121,7 +125,7 @@ public class BottomUpSolver extends AbstractSolver {
                     toRemove.add(rectangle);
                     break;
                 } else if (box.rotation && rectangle.height <= row.widthLeft && rectangle.width <= row.height) {
-                    rectangle.rotate();
+                    if (parameters.rotationVariant) rectangle.rotate();
                     box.place(rectangle, row);
                     placedAny = true;
                     toRemove.add(rectangle);

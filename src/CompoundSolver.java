@@ -53,16 +53,20 @@ public class CompoundSolver extends AbstractSolver {
                 solvers) {
             try {
                 // Prevent solvers that don't have FIXED to be used in the free height util.
-                if (parameters.freeHeightUtil && !solver.getHeightSupport().contains(Util.HeightSupport.FIXED)) {
+                if (parameters.freeHeightUtil && !solver.getHeightSupport().contains(Util.HeightSupport.FREE)) {
                     continue;
                 }
                 Solution solution = solver.pack(initialParameters.copy());
-                if (Util.sweepline(solution)) {
-                    System.err.println("Overlap from " + solver.getClass().getSimpleName());
-                    continue;
-                }
+
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
+
+                    // Disable debug output and check if valid
+                    if (!Util.isValidSolution(solution, false)) {
+                        if (Util.debug) System.err.println("Error from " + solver.getClass().getSimpleName());
+                        continue;
+                    }
+
                     bestSolution = solution.copy();
                 }
             } catch (Exception e) {

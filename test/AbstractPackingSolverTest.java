@@ -27,7 +27,7 @@ abstract class AbstractPackingSolverTest {
     /**
      * Test the solver against the gigantic library.
      */
-    @TestFactory
+//    @TestFactory
     @DisplayName("Solver Test Factory")
     @Tag("library")
     Stream<DynamicTest> dynamicSolverTests() throws IOException {
@@ -74,7 +74,7 @@ abstract class AbstractPackingSolverTest {
         ArrayList<String> paths = new ArrayList<>();
 
         paths.add("./test/momotor/prototype-1");
-//        paths.add("./test/momotor/prototype-2");
+        paths.add("./test/momotor/prototype-2");
 
         for (String path : paths) {
             // Get all files from the momotor folder

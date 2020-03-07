@@ -1,11 +1,15 @@
 import java.util.*;
 
-
 /**
  * Solver algorithm ReverseFit.
  * Cfr https://link.springer.com/content/pdf/10.1007%2FBFb0049416.pdf
  */
 public class ReverseFitSolver extends AbstractSolver {
+
+    @Override
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+    }
 
     /**
      * Solves for parameters.

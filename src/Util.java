@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * Global Util class for commonly used function and constants.
@@ -29,6 +28,8 @@ public class Util {
         return rectangles;
     }
 
+    private static boolean animate = true;
+
     /**
      * Used for animating the current parameters.
      *
@@ -37,14 +38,14 @@ public class Util {
      *                   TODO COMMENT OUT BEFORE HANDING IN.
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
-//        if (Animator.getInstance() != null){
+//        if (animate && Animator.getInstance() != null){
 //            Animator.getInstance().draw();
 //            Animator.getInstance().drawParameter(parameters, solver);
 //        }
     }
 
     public static void animate() {
-//        if (Animator.getInstance() != null) {
+//        if (animate && Animator.getInstance() != null) {
 //            Animator.getInstance().draw();
 //        }
     }
@@ -71,7 +72,7 @@ public class Util {
             return false;
         }
 
-        return isValidSolution(solution);
+        return isValidSolution(solution, true);
     }
 
     /**
@@ -123,7 +124,7 @@ public class Util {
                 active.add(segment);
             }
             // Right side of rectangle
-            else if (segment.type == Type.END){
+            else if (segment.type == Type.END) {
                 active.remove(segment);
             }
         }
@@ -169,6 +170,9 @@ public class Util {
         END
     }
 
+    // Global debug boolean
+    static boolean debug = false;
+
     /**
      * Check if the solution found by the solver is valid.
      *
@@ -180,17 +184,20 @@ public class Util {
         rate = solution.getRate();
 
         // Test report
-        System.out.println(solution);
+        if (debug) {
+            System.out.println(solution);
+        }
+
 
         if (sweepline(solution)) {
-            System.err.println("There are overlapping rectangles");
+            if (debug) System.err.println("There are overlapping rectangles");
             return false;
         }
 
         for (Rectangle rectangle :
                 solution.parameters.rectangles) {
             if (rectangle.x < 0 || rectangle.y < 0) {
-                System.err.println("Negative coordinates found");
+                if (debug) System.err.println("Negative coordinates found");
                 return false;
             }
         }
@@ -198,18 +205,40 @@ public class Util {
         if (solution.parameters.heightVariant == Util.HeightSupport.FIXED) {
             for (Rectangle rectangle : solution.parameters.rectangles) {
                 if (rectangle.y + rectangle.height > solution.parameters.height) {
-                    System.err.println("The height limit is not maintained");
+                    if (debug) System.err.println("The height limit is not maintained, " +
+                            (rectangle.y + rectangle.height) + " went over the maximum height of " +
+                            solution.parameters.height);
                     return false;
                 }
             }
         }
 
         if (rate < 1) {
-            System.err.println("Impossible result.");
+            if (debug) System.err.println("Impossible result.");
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Check if the solution found by the solver is valid without debug parameter.
+     * <p>
+     *     Calling this with {@code debug == false} makes it useful as a utility to quickly check if the solution is
+     *     valid and should be reported. Due to the speed of {@link #sweepline(Solution)} it is viable to use this
+     *     at runtime.
+     * </p>
+     *
+     * @param solution the solution to be checked
+     * @param debug boolean representing if there should be debug output
+     * @return a boolean that is true if the solution is valid.
+     */
+    public static boolean isValidSolution(Solution solution, boolean debug) {
+        boolean oldDebug = Util.debug;
+        Util.debug = debug;
+        boolean valid = isValidSolution(solution);
+        Util.debug = oldDebug;
+        return valid;
     }
 
     /**

@@ -64,6 +64,7 @@ public class Parameters {
     public Parameters copy() {
         Parameters parameters = new Parameters();
         parameters.heightVariant = this.heightVariant;
+        parameters.freeHeightUtil = this.freeHeightUtil;
         parameters.height = this.height;
         parameters.rotationVariant = this.rotationVariant;
         parameters.rectangles = Util.cloneRectangleState(rectangles);
@@ -93,7 +94,7 @@ public class Parameters {
         toString.append("\n");
         toString.append("number of rectangles: ").append(this.rectangles.size()).append("\n");
         for (Rectangle rectangle : rectangles) {
-            toString.append(rectangle.width).append(" ").append(rectangle.height).append(" ");
+            toString.append(rectangle.width).append(" ").append(rectangle.height).append("\n");
         }
         return toString.toString();
     }
