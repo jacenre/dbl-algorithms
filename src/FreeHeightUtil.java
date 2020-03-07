@@ -43,16 +43,15 @@ public class FreeHeightUtil {
 
         Util.animate(parameters, subSolver);
 
+        int MAX_SOLVE_COUNT = 150; // ? random number tbf.
+
         // TODO Find something less dumb, like basing the sampling rate on the HEIGHT.
         // TODO Find the maximum number solves that is < 30 sec runtime.
         if (parameters.rectangles.size() < 100) {
             bestSolution = localMinimaFinder(parameters, 1);
-        } else if (parameters.rectangles.size() < 1000) {
-            bestSolution = localMinimaFinder(parameters, 0.1);
-        } else if (parameters.rectangles.size() < 9000) {
-            bestSolution = localMinimaFinder(parameters, 0.01);
         } else {
-            bestSolution = localMinimaFinder(parameters, 0.0005);
+            double solves = Util.sumHeight(parameters) - Util.largestRect(parameters);
+            bestSolution = localMinimaFinder(parameters, MAX_SOLVE_COUNT / solves);
         }
 
         Util.animate(parameters, subSolver);

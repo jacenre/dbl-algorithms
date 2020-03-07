@@ -292,7 +292,11 @@ public class Util {
         int sum = 0;
         for (Rectangle rectangle :
                 parameters.rectangles) {
-            sum += rectangle.height;
+            if (parameters.rotationVariant) {
+                sum += Math.max(rectangle.height, rectangle.width);
+            } else {
+                sum += rectangle.height;
+            }
         }
         return sum;
     }

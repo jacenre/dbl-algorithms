@@ -16,7 +16,9 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-        if (parameters.rectangles.size() > 2000) return false;
+        if (parameters.rectangles.size() > 2000 && (
+                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
+        if (parameters.rectangles.size() > 5000) return false;
         return true;
     }
 
@@ -28,10 +30,6 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      */
     @Override
     Solution pack(Parameters parameters) throws IllegalArgumentException {
-        if (parameters.rectangles.size() > 2000) {
-            throw new IllegalArgumentException("Too many rectangles");
-        }
-
         Util.animate(parameters, this);
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;

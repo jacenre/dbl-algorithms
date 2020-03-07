@@ -15,8 +15,9 @@ public class ReverseFitSolver extends AbstractSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
+        if (parameters.rectangles.size() > 2000 && (
+                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
         if (parameters.rectangles.size() > 5000) return false;
-
         return true;
     }
 
@@ -28,9 +29,6 @@ public class ReverseFitSolver extends AbstractSolver {
      * @return Solution object
      */
     Solution pack(Parameters parameters) throws IllegalArgumentException {
-        if (parameters.rectangles.size() > 5000) {
-            throw new IllegalArgumentException();
-        }
         Util.animate(parameters, this);
 
         // STEP 1 #####

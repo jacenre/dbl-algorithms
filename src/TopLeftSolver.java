@@ -19,9 +19,6 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
      * @return Returns the associated {@link Solution} object
      */
     Solution pack(Parameters parameters) throws IllegalArgumentException {
-        if (parameters.rectangles.size() > 2000) {
-            throw new IllegalArgumentException("Too many rectangles");
-        }
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;
         parameters.rectangles.get(0).y = 0;
