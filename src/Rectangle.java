@@ -91,7 +91,7 @@ public class Rectangle extends java.awt.Rectangle {
     /**
      * Returns whether Object is equals to this Rectangle object.
      * @param o the object to equal
-     * @return True if the object is of the type Rectangle and has the same UUID
+     * @return True if the object is of the Type Rectangle and has the same UUID
      */
     @Override
     public boolean equals(Object o) {

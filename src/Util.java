@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Global Util class for commonly used function and constants.
@@ -80,21 +81,92 @@ public class Util {
      * @return boolean value representing if there is overlap
      */
     public static boolean sweepline(Solution solution) {
-        boolean overlap = false;
+        // ArrayList holding all the segments we sweep over.
+        ArrayList<Segment> segments = new ArrayList<>();
+        ArrayList<Segment> active = new ArrayList<>();
 
-        class segment {
-            boolean left;
+        // Copy parameters to prevent interference with the original result
+        Parameters parameters = solution.parameters.copy();
 
-            segment() {
-
-            }
-
+        for (Rectangle rectangle : parameters.rectangles) {
+            segments.add(new Segment(Type.START, rectangle.y, rectangle.y + rectangle.height, rectangle.x, rectangle));
+            segments.add(new Segment(Type.END, rectangle.y, rectangle.y + rectangle.height, rectangle.x + rectangle.width, rectangle));
         }
 
-        // Deep copy to prevent modification of the solution
-        Solution solutionCopy = solution.copy();
+        // We sweep from left to right
+        segments.sort((o1, o2) -> {
+            if (o1.x == o2.x) {
+                // END has higher priority then START
+                if (o1.type == Type.END) return -1;
+                if (o2.type == Type.END) return 1;
+            }
+            // Else sort on x
+            return o1.x - o2.x;
+        });
 
-        return overlap;
+        // Start sweep
+        for (Segment segment :
+                segments) {
+            // Left side of rectangle
+            if (segment.type == Type.START) {
+                // If the interval is already in the tree there is overlap.
+                if (active.contains(segment)) return true;
+
+                for (Segment segment1 :
+                        active) {
+                    if ((segment.yStart > segment1.yStart && segment.yStart < segment1.yEnd)
+                            || (segment.yEnd > segment1.yStart && segment.yEnd < segment1.yEnd)) {
+                        // Overlap
+                        return true;
+                    }
+                }
+                active.add(segment);
+            }
+            // Right side of rectangle
+            else if (segment.type == Type.END){
+                active.remove(segment);
+            }
+        }
+        return false;
+    }
+
+    // Representing a line Segment for the sweep
+    static class Segment {
+        // Left or right side of the rectangle
+        Type type;
+
+        // y values
+        int yStart;
+        int yEnd;
+        int x;
+
+        // What rectangle this segment is representing.
+        Rectangle rectangle;
+
+        Segment(Type type, int yStart, int yEnd, int x, Rectangle rectangle) {
+            this.type = type;
+            this.yStart = yStart;
+            this.yEnd = yEnd;
+            this.x = x;
+            this.rectangle = rectangle;
+        }
+
+        @Override
+        public String toString() {
+            return this.type + ", " + this.yStart + " : " + this.yEnd + ", " + this.x + "  ";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj.getClass() != this.getClass()) return false;
+            Segment seg = (Segment) obj;
+            return (seg.yStart == this.yStart && seg.yEnd == this.yEnd);
+        }
+    }
+
+    enum Type {
+        START,
+        END
     }
 
     /**
@@ -110,7 +182,7 @@ public class Util {
         // Test report
         System.out.println(solution);
 
-        if (hasOverlapping(solution.parameters.rectangles)) {
+        if (sweepline(solution)) {
             System.err.println("There are overlapping rectangles");
             return false;
         }

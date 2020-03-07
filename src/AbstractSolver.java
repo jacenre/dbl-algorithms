@@ -11,7 +11,7 @@ import java.util.Set;
  * To implement a {@code Solver} it suffices to implement the hook method {@link #pack(Parameters)}.<br>
  * </p>
  * <p>
- * To specify what type of Bin Packing problems the {@code Solver} can handle use {@link Util.HeightSupport}.<br>
+ * To specify what Type of Bin Packing problems the {@code Solver} can handle use {@link Util.HeightSupport}.<br>
  * Throw an {@code IllegalArgumentException} if the given {@code Parameters} violate the {@code Solver} preconditions.<br>
  * </p>
  */
@@ -90,5 +90,14 @@ public abstract class AbstractSolver {
      * @return the associated {@link Solution} object containing the results
      */
     abstract Solution pack(Parameters parameters);
+
+
+    /**
+     * Returns the name of this solver
+     * @return the simple class name of this solver
+     */
+    String getName() {
+        return this.getClass().getSimpleName();
+    }
 }
 

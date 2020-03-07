@@ -14,6 +14,11 @@ public class CompoundSolver extends AbstractSolver {
     }
 
     /**
+     * Solution object containing the best solution found.
+     */
+    private Solution bestSolution = null;
+
+    /**
      * ArrayList containing all the solvers used.
      */
     private ArrayList<AbstractSolver> solvers = new ArrayList<>();
@@ -42,7 +47,7 @@ public class CompoundSolver extends AbstractSolver {
     @Override
     public Solution pack(Parameters parameters) {
         Parameters initialParameters = parameters.copy();
-        Solution bestSolution = null;
+        bestSolution = null;
         // Try and getSolution it using all the solvers in the array
         for (AbstractSolver solver :
                 solvers) {
@@ -52,6 +57,10 @@ public class CompoundSolver extends AbstractSolver {
                     continue;
                 }
                 Solution solution = solver.pack(initialParameters.copy());
+                if (Util.sweepline(solution)) {
+                    System.err.println("Overlap from " + solver.getClass().getSimpleName());
+                    continue;
+                }
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
                     bestSolution = solution.copy();
@@ -61,6 +70,15 @@ public class CompoundSolver extends AbstractSolver {
             }
         }
         return bestSolution;
+    }
+
+    /**
+     * Returns the name of the subSolver that solved it.
+     * @return the simple class name of the sub solver
+     */
+    @Override
+    String getName() {
+        return this.bestSolution.solvedBy.getName();
     }
 
 }

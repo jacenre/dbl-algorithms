@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Data type to store all the parameters of the problem.
+ * Data Type to store all the parameters of the problem.
  *
  * @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1"> Problem description 2.1 Input Format</a>
  */
