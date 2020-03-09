@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,8 +16,7 @@ public class CompressionSolver extends AbstractSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-        if (parameters.rectangles.size() > 2000) return false;
-        return true;
+        return parameters.rectangles.size() <= 2000;
     }
 
     /**

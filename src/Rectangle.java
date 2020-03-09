@@ -29,9 +29,8 @@ public class Rectangle extends java.awt.Rectangle {
     /**
      * Construction method which also assigns a random unique id.
      *
-     * @param width The width of the {@code Rectangle}.
+     * @param width  The width of the {@code Rectangle}.
      * @param height The height of the {@code Rectangle}.
-     *
      * @see java.awt.Rectangle
      */
     public Rectangle(int width, int height) {
@@ -56,12 +55,16 @@ public class Rectangle extends java.awt.Rectangle {
         this.id = UUID.randomUUID().toString();
     }
 
-    /** Get rotated property. */
+    /**
+     * Get rotated property.
+     */
     public boolean isRotated() {
         return rotated;
     }
 
-    /** Get id. */
+    /**
+     * Get id.
+     */
     public String getId() {
         return id;
     }
@@ -90,6 +93,7 @@ public class Rectangle extends java.awt.Rectangle {
 
     /**
      * Returns whether Object is equals to this Rectangle object.
+     *
      * @param o the object to equal
      * @return True if the object is of the Type Rectangle and has the same UUID
      */

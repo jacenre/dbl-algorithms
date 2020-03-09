@@ -18,8 +18,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         if (!superResult) return false;
         if (parameters.rectangles.size() > 2000 && (
                 parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
-        if (parameters.rectangles.size() > 5000) return false;
-        return true;
+        return parameters.rectangles.size() <= 5000;
     }
 
     /**

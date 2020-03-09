@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -84,6 +83,7 @@ public abstract class AbstractSolver {
         if (parameters.heightVariant.equals(Util.HeightSupport.FIXED)) {
             solution = this.pack(parameters);
         } else {
+            // If applicable, try and use free height util
             solution = new FreeHeightUtil(this).pack(parameters);
         }
 

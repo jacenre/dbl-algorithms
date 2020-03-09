@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 /**
  * Solver algorithm using the First Fit Heuristic where height is fixed.
- * TODO Implement heightVariant and rotationVariant
+ * TODO Implement rotationVariant
  */
 public class FirstFitSolver extends AbstractSolver {
 
@@ -76,13 +76,14 @@ public class FirstFitSolver extends AbstractSolver {
      * @return {@code true} if it fits in any of the boxes, else {@code false}
      */
     private boolean fitRectangle(ArrayList<Box> boxes, Rectangle rectangle, int height) {
-        for (Box box :
-                boxes) {
+        for (Box box : boxes) {
+            // If adding the box respects the height limit and isn't to wide...
             if (rectangle.height + box.height + box.y <= height && rectangle.width <= box.width) {
                 rectangle.x = box.x;
                 rectangle.y = box.y + box.height;
                 box.add(rectangle);
 
+                // Create a new box to the right of the rectangle
                 if (box.rectangles.size() > 1) {
                     Rectangle previousRect = box.rectangles.get(box.rectangles.size() - 2);
                     int boundX = previousRect.width - rectangle.width;
@@ -91,12 +92,15 @@ public class FirstFitSolver extends AbstractSolver {
                     boxes.add(recursiveBox);
                 }
 
+                // Success
                 return true;
             }
         }
+        // Failure
         return false;
     }
 
+    // Boxes in which we store rectangles
     private class Box {
 
         // All the Rectangles in this box.
@@ -110,6 +114,7 @@ public class FirstFitSolver extends AbstractSolver {
         int width;
         int height;
 
+        // The width and height are soft wrap, meaning that adding a bigger rectangle overwrites these.
         Box(int x, int y, int width, int height) {
             this.x = x;
             this.y = y;
@@ -117,6 +122,7 @@ public class FirstFitSolver extends AbstractSolver {
             this.height = height;
         }
 
+        // Add a new rectangle to this box.
         public void add(Rectangle rect) {
             rectangles.add(rect);
             this.height = (rect.y + rect.height > this.y + this.height) ? rect.y + rect.height - this.y : this.height;

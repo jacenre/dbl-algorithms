@@ -1,5 +1,3 @@
-import processing.core.PApplet;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -27,9 +25,7 @@ public class BottomUpSolver extends AbstractSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-        if (parameters.rectangles.size() > 2000 && (
-                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
-        return true;
+        return parameters.rectangles.size() <= 2000 || (parameters.heightVariant != Util.HeightSupport.FREE && !parameters.freeHeightUtil);
     }
 
     Parameters parameters;
