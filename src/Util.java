@@ -7,6 +7,11 @@ public class Util {
 
     /**
      * Used for checking height variants.
+     * <p>
+     *     Here {@code FIXED} represents the fixed height problem and {@code FREE} represents the free height problem.
+     *     Mostly used in checking if a parameter is applicable to a certain solver, like {@link AbstractSolver#canSolveParameters(Parameters)}
+     *     @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1"> Height Formats</a>
+     * </p>
      */
     public enum HeightSupport {
         FIXED,
@@ -28,6 +33,7 @@ public class Util {
         return rectangles;
     }
 
+    // Global switch if the solution should be animated.
     private static boolean animate = true;
 
     /**
@@ -243,10 +249,15 @@ public class Util {
 
     /**
      * Test to see if any of the rectangles in the list overlap.
+     * <p>
+     *     Running time is O(n^2), the running time of {@link #sweepline(Solution)} is O(n log n).
+     *     Therefore use the sweepline instead of this.
+     * </p>
      *
-     * @return a boolean that is true if there is overlap.
-     * TODO Improve runtime
+     * @deprecated since {@link #sweepline(Solution)} is faster
+     * @return a boolean that is true if there is overlap
      */
+    @Deprecated
     public static boolean hasOverlapping(ArrayList<Rectangle> rectangles) {
         for (Rectangle rectangle1 :
                 rectangles) {
