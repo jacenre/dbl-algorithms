@@ -9,7 +9,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));
     }
 
     @Override
@@ -75,18 +75,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      * blocking it from going all the way to the left, and move to just the right side of them.
      */
     protected void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
-        rect.x = 0;
-        boolean intersects;
-        // Check intersection with all placed rectangles
-        do {
-            intersects = false;
-            for (Rectangle rectangle : rectangles) {
-                if (rect.intersects(rectangle)) {
-                    intersects = true;
-                    rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
-                }
+        Rectangle path = new Rectangle(0, rect.y, rect.x, rect.height);
+        rect.y = 0;
+        for (Rectangle rectangle : rectangles) {
+            if (rectangle.getId().equals(rect.getId())) break;
+            if (path.intersects(rectangle)) {
+                rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
             }
-        } while (intersects);
+        }
     }
 
     /**

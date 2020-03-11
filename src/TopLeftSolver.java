@@ -4,12 +4,6 @@ import java.util.*;
  * Solver algorithm adapted from the BL-algorithm, where the height has to be fixed.
  */
 public class TopLeftSolver extends SimpleTopLeftSolver {
-
-    @Override
-    Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
-    }
-
     int binWidth = 0;
 
     /**
@@ -39,7 +33,5 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
      * Move up until there is a possibility to move left.
      */
     @Override
-    protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
-        rect.y--;
-    }
+    protected void moveUp(Rectangle rect, List<Rectangle> rectangles) { rect.y--; }
 }
