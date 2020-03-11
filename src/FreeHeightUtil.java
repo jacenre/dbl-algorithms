@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Util that allows any {@Code Util.HeightSupport.FIXED} to be turned into a {@Code Util.HeightSupport.FREE} solver
+ * Util that allows any {@code Util.HeightSupport.FIXED} to be turned into a {@code Util.HeightSupport.FREE} solver
  * using local minima finder.
  */
 public class FreeHeightUtil {
@@ -32,6 +32,7 @@ public class FreeHeightUtil {
      *
      * @param parameters The parameters to be used by the solver.
      * @return Returns the pack area found by this solver.
+     * @throws IllegalArgumentException if subsolver does not support free height
      */
     Solution pack(Parameters parameters) {
         if (!this.subSolver.getHeightSupport().contains(Util.HeightSupport.FREE)) {
@@ -39,28 +40,38 @@ public class FreeHeightUtil {
         }
 
         // fixed the compound solver
-        parameters.freeHeightUtil = true;
+        parameters.freeHeightUtil = true; // TODO properly document what this does
 
         Util.animate(parameters, subSolver);
 
-        int MAX_SOLVE_COUNT = 150; // ? random number tbf.
+        int MAX_SOLVE_COUNT = 150; // TODO find metric to base this number on
 
         // TODO Find something less dumb, like basing the sampling rate on the HEIGHT.
         // TODO Find the maximum number solves that is < 30 sec runtime.
+
+        // set samplingRate
+        double samplingRate;
         if (parameters.rectangles.size() < 100) {
-            bestSolution = localMinimaFinder(parameters, 1);
+            samplingRate = 1;
         } else {
             double solves = Util.sumHeight(parameters) - Util.largestRect(parameters);
-            bestSolution = localMinimaFinder(parameters, MAX_SOLVE_COUNT / solves);
+            samplingRate = MAX_SOLVE_COUNT / solves;
         }
+        bestSolution = localMinimaFinder(parameters, samplingRate);
 
         Util.animate(parameters, subSolver);
 
-        bestSolution.parameters.freeHeightUtil = false;
+        bestSolution.parameters.freeHeightUtil = false; // TODO properly document what his does
         bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
         return bestSolution;
     }
 
+    /**
+     * Return best solution dependent on the height.
+     * @param parameters of the problem
+     * @param samplingRate // TODO replace with an explainable number
+     * @return best Solution found
+     */
     Solution localMinimaFinder(Parameters parameters, double samplingRate) {
         // Starting conditions
         double minimum = Util.largestRect(parameters);
@@ -102,6 +113,7 @@ public class FreeHeightUtil {
             firstIteration = false;
             startRange = (int) Math.max(minimum, minima - searchSize);
             stopRange = (int) Math.min(maximum, minima + searchSize);
+            // TODO do'nt just use half of the search size above (or do, it might be oke)
             searchSize = Math.max(searchSize / 2, 0);
         }
 
