@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Util that allows any {@Code Util.HeightSupport.FIXED} to be turned into a {@Code Util.HeightSupport.FREE} solver
+ * Util that allows any {@code Util.HeightSupport.FIXED} to be turned into a {@code Util.HeightSupport.FREE} solver
  * using local minima finder.
  */
 public class FreeHeightUtil {
@@ -32,6 +32,7 @@ public class FreeHeightUtil {
      *
      * @param parameters The parameters to be used by the solver.
      * @return Returns the pack area found by this solver.
+     * @throws IllegalArgumentException if subsolver does not support free height
      */
     Solution pack(Parameters parameters) {
         if (!this.subSolver.getHeightSupport().contains(Util.HeightSupport.FREE)) {
@@ -39,69 +40,85 @@ public class FreeHeightUtil {
         }
 
         // fixed the compound solver
-        parameters.freeHeightUtil = true;
+        parameters.freeHeightUtil = true; // TODO properly document what this does
 
         Util.animate(parameters, subSolver);
 
-        int MAX_SOLVE_COUNT = 150; // ? random number tbf.
+        int MAX_SOLVE_COUNT = 150; // TODO find metric to base this number on
 
         // TODO Find something less dumb, like basing the sampling rate on the HEIGHT.
         // TODO Find the maximum number solves that is < 30 sec runtime.
+
+        // set samplingRate
+        double samplingRate;
         if (parameters.rectangles.size() < 100) {
-            bestSolution = localMinimaFinder(parameters, 1);
+            samplingRate = 1;
         } else {
             double solves = Util.sumHeight(parameters) - Util.largestRect(parameters);
-            bestSolution = localMinimaFinder(parameters, MAX_SOLVE_COUNT / solves);
+            samplingRate = MAX_SOLVE_COUNT / solves;
         }
+        bestSolution = localMinimaFinder(parameters, samplingRate);
 
         Util.animate(parameters, subSolver);
 
-        bestSolution.parameters.freeHeightUtil = false;
+        bestSolution.parameters.freeHeightUtil = false; // TODO properly document what his does
         bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
         return bestSolution;
     }
 
+    /**
+     * Return best solution dependent on the height.
+     * @param parameters of the problem
+     * @param samplingRate // TODO replace with an explainable number
+     * @return best Solution found
+     */
     Solution localMinimaFinder(Parameters parameters, double samplingRate) {
         // Starting conditions
-        double minimum = Util.largestRect(parameters);
-        double maximum = Util.sumHeight(parameters);
+        double minimumHeight = Util.largestRect(parameters);
+        double maximumHeight = Util.sumHeight(parameters);
 
-        double startRange = minimum;
-        double stopRange = maximum;
+        double startRange = minimumHeight;
+        double stopRange = maximumHeight;
         double searchSize = 1 / samplingRate;
-        int minima = 0;
 
-        // ensure that best solution is never null
+        // set current bests with the maximum possible height
+        double currentBestHeight = maximumHeight;
         parameters.heightVariant = Util.HeightSupport.FIXED;
-        parameters.height = (int) stopRange;
+        parameters.height = (int) currentBestHeight;
         bestSolution = subSolver.pack(parameters.copy());
 
-        boolean firstIteration = true;
+        // create empty arrays in which to store data to plot
         int[] chartYData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
         int[] chartXData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
-        int iter = 0;
+        int chartIndex = 0; // determines where to place data in chart arrays
+
+        boolean firstIteration = true;
 
         while (stopRange - startRange > 1) {
-            for (double i = startRange; i <= stopRange; i += searchSize) {
+            for (double newHeight = startRange + searchSize; newHeight < stopRange; newHeight += searchSize) {
                 Parameters params = parameters.copy();
-                params.height = (int) i;
+                params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
 
-                if (firstIteration) {
-                    chartXData[iter] = (int) i;
-                    chartYData[iter] = newSolution.getArea();
+                if (firstIteration) { // only plot the data of the first iteration
+                    chartXData[chartIndex] = (int) newHeight;
+                    chartYData[chartIndex] = newSolution.getArea();
                 }
 
-                if (bestSolution == null || newSolution.getArea(true) < bestSolution.getArea(true)) {
-                    minima = (int) i;
+                if (newSolution.getArea(true) < bestSolution.getArea(true)) {
+                    // update bestSolution
+                    currentBestHeight = (int) newHeight;
                     bestSolution = newSolution;
                 }
-                iter++;
+                chartIndex++;
 
             }
             firstIteration = false;
-            startRange = (int) Math.max(minimum, minima - searchSize);
-            stopRange = (int) Math.min(maximum, minima + searchSize);
+
+            // update ranges around the best found value
+            startRange = (int) Math.max(minimumHeight, currentBestHeight - searchSize);
+            stopRange = (int) Math.min(maximumHeight, currentBestHeight + searchSize);
+            // TODO do'nt just use half of the search size above (or do, it might be oke)
             searchSize = Math.max(searchSize / 2, 0);
         }
 
