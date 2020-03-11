@@ -74,45 +74,50 @@ public class FreeHeightUtil {
      */
     Solution localMinimaFinder(Parameters parameters, double samplingRate) {
         // Starting conditions
-        double minimum = Util.largestRect(parameters);
-        double maximum = Util.sumHeight(parameters);
+        double minimumHeight = Util.largestRect(parameters);
+        double maximumHeight = Util.sumHeight(parameters);
 
-        double startRange = minimum;
-        double stopRange = maximum;
+        double startRange = minimumHeight;
+        double stopRange = maximumHeight;
         double searchSize = 1 / samplingRate;
-        int minima = 0;
 
-        // ensure that best solution is never null
+        // set current bests with the maximum possible height
+        double currentBestHeight = maximumHeight;
         parameters.heightVariant = Util.HeightSupport.FIXED;
-        parameters.height = (int) stopRange;
+        parameters.height = (int) currentBestHeight;
         bestSolution = subSolver.pack(parameters.copy());
 
-        boolean firstIteration = true;
+        // create empty arrays in which to store data to plot
         int[] chartYData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
         int[] chartXData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
-        int iter = 0;
+        int chartIndex = 0; // determines where to place data in chart arrays
+
+        boolean firstIteration = true;
 
         while (stopRange - startRange > 1) {
-            for (double i = startRange; i <= stopRange; i += searchSize) {
+            for (double newHeight = startRange + searchSize; newHeight < stopRange; newHeight += searchSize) {
                 Parameters params = parameters.copy();
-                params.height = (int) i;
+                params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
 
-                if (firstIteration) {
-                    chartXData[iter] = (int) i;
-                    chartYData[iter] = newSolution.getArea();
+                if (firstIteration) { // only plot the data of the first iteration
+                    chartXData[chartIndex] = (int) newHeight;
+                    chartYData[chartIndex] = newSolution.getArea();
                 }
 
-                if (bestSolution == null || newSolution.getArea(true) < bestSolution.getArea(true)) {
-                    minima = (int) i;
+                if (newSolution.getArea(true) < bestSolution.getArea(true)) {
+                    // update bestSolution
+                    currentBestHeight = (int) newHeight;
                     bestSolution = newSolution;
                 }
-                iter++;
+                chartIndex++;
 
             }
             firstIteration = false;
-            startRange = (int) Math.max(minimum, minima - searchSize);
-            stopRange = (int) Math.min(maximum, minima + searchSize);
+
+            // update ranges around the best found value
+            startRange = (int) Math.max(minimumHeight, currentBestHeight - searchSize);
+            stopRange = (int) Math.min(maximumHeight, currentBestHeight + searchSize);
             // TODO do'nt just use half of the search size above (or do, it might be oke)
             searchSize = Math.max(searchSize / 2, 0);
         }
