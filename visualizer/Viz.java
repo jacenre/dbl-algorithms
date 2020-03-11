@@ -46,12 +46,10 @@ public class Viz extends PApplet {
 
         for (AbstractSolver solver :
                 solvers) {
-            try {
+            if (solver.canSolveParameters(params)) {
                 Solution solution = solver.getSolution(params.copy());
                 if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE))ChartMaker.addSeries(chart, solver, solution);
                 viewports.add(new Viewport(solution));
-            } catch (Exception e) {
-                System.out.println(e);
             }
         }
 
