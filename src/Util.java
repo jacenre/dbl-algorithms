@@ -33,8 +33,7 @@ public class Util {
         return rectangles;
     }
 
-    // Global switch if the solution should be animated.
-    private static boolean animate = true;
+
 
     /**
      * Used for animating the current parameters.
@@ -44,16 +43,19 @@ public class Util {
      *                   TODO COMMENT OUT BEFORE HANDING IN.
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
-//        if (animate && Animator.getInstance() != null){
-//            Animator.getInstance().draw();
-//            Animator.getInstance().drawParameter(parameters, solver);
-//        }
+        if (animate && Animator.getInstance() != null){
+            Animator.getInstance().draw();
+            Animator.getInstance().drawParameter(parameters, solver);
+        }
     }
 
+    // Global switch if the solution should be animated.
+    private static boolean animate = false;
+
     public static void animate() {
-//        if (animate && Animator.getInstance() != null) {
-//            Animator.getInstance().draw();
-//        }
+        if (animate && Animator.getInstance() != null) {
+            Animator.getInstance().draw();
+        }
     }
 
     /**
