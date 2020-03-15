@@ -65,7 +65,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
                 Rectangle rect = parameters.rectangles.get(i);
                 rect.place(true);
                 Util.animate();
-                if ((new Random()).nextBoolean() && rect.width < parameters.height) {
+                if (parameters.rotationVariant && (new Random()).nextBoolean() && rect.width < parameters.height) {
                     rect.rotate();
                 }
                 rect.x = binWidth;
@@ -74,8 +74,6 @@ public class SimpleTopLeftSolver extends AbstractSolver {
                 binWidth = Math.max(binWidth, rect.x + rect.width);
             }
             Solution sol = new Solution(parameters, this);
-            int solArea = sol.getArea();
-            int bestSolutionArea = bestSolution.getArea();
             bestSolution = sol.getArea() < bestSolution.getArea() ? sol : bestSolution;
             parameters = initialParameters.copy();
         }

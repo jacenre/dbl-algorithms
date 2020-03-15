@@ -10,6 +10,15 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
         return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));
     }
 
+    @Override
+    public boolean canSolveParameters(Parameters parameters) {
+        boolean superResult = super.canSolveParameters(parameters);
+        if (!superResult) return false;
+//        if (parameters.rectangles.size() > 999 && (
+//                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
+        return parameters.rectangles.size() <= 999;
+    }
+
     /**
      * Find the pack value for the parameters without doing any other output.
      *
@@ -18,16 +27,6 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
      */
     @Override
     Solution pack(Parameters parameters) throws IllegalArgumentException {
-        if (parameters.rectangles.size() > 2000) {
-            // Return a trivial solution
-            int x = 0;
-            for (Rectangle rectangle: parameters.rectangles ) {
-                rectangle.x = x;
-                x += rectangle.width;
-                rectangle.place(true);
-            }
-            return new Solution(parameters, this);
-        }
         Solution sol = super.pack(parameters);
         return new Solution(sol.parameters, this);
     }

@@ -44,19 +44,14 @@ public class Util {
      * TODO: Comment out before submission
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
-//        if (animate && Animator.getInstance() != null){
+//        if (Animator.getInstance() != null){
 //            Animator.getInstance().draw();
 //            Animator.getInstance().drawParameter(parameters, solver);
 //        }
     }
 
-    /**
-     *  Global switch if the solution should be animated.
-      */
-    private static boolean animate = false;
-
     public static void animate() {
-//        if (animate && Animator.getInstance() != null) {
+//        if (Animator.getInstance() != null) {
 //            Animator.getInstance().draw();
 //        }
     }
