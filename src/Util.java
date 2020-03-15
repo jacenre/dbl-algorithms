@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Global Util class for commonly used function and constants.
@@ -40,7 +41,6 @@ public class Util {
      *
      * @param parameters Parameters to animate.
      * @param solver     Solver that called the animation.
-     *                   TODO COMMENT OUT BEFORE HANDING IN.
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
         if (animate && Animator.getInstance() != null){
@@ -49,7 +49,10 @@ public class Util {
         }
     }
 
-    // Global switch if the solution should be animated.
+    /**
+     *  Global switch if the solution should be animated.
+     *  TODO: Set false before handing in
+      */
     private static boolean animate = false;
 
     public static void animate() {
@@ -314,4 +317,34 @@ public class Util {
         return sum;
     }
 
+    /**
+     * Move up until there is a possibility to move left.
+     */
+    public static void moveUp(Rectangle rect, List<Rectangle> rectangles) {
+        Rectangle path = new Rectangle(rect.x, 0, rect.width, rect.y);
+        rect.y = 0;
+        for (Rectangle rectangle : rectangles) {
+            if (rectangle.getId().equals(rect.getId())) break;
+            if (rectangle.isPlaced() && path.intersects(rectangle)) {
+                rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
+            }
+        }
+    }
+
+
+
+    /**
+     * Instead of going step by step, this method looks at what rectangles are
+     * blocking it from going all the way to the left, and move to just the right side of them.
+     */
+    public static void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
+        Rectangle path = new Rectangle(0, rect.y, rect.x, rect.height);
+        rect.x = 0;
+        for (Rectangle rectangle : rectangles) {
+            if (rectangle.getId().equals(rect.getId())) break;
+            if (rectangle.isPlaced() && path.intersects(rectangle)) {
+                rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
+            }
+        }
+    }
 }

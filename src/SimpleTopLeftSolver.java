@@ -30,6 +30,10 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     @Override
     Solution pack(Parameters parameters) throws IllegalArgumentException {
         Util.animate(parameters, this);
+
+        // Sort the array from large to small
+        parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
+
         // Put the first rectangle in the top left corner
         parameters.rectangles.get(0).x = 0;
         parameters.rectangles.get(0).y = 0;
@@ -48,7 +52,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
                 }
             }
             rect.y = parameters.height - rect.height;
-            move(rect, parameters.rectangles.subList(0, i));
+            move(rect, parameters.rectangles);
             binWidth = Math.max(binWidth, rect.x + rect.width);
         }
 
@@ -59,15 +63,18 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         if (!canMoveLeft(rect, rectangles) && !canMoveUp(rect, rectangles)) {
             return;
         }
-        while (canMoveLeft(rect, rectangles)) {
+        if (canMoveLeft(rect, rectangles)) {
             moveLeft(rect, rectangles);
         }
         while (canMoveUp(rect, rectangles)) {
+            Util.animate();
             moveUp(rect, rectangles);
             if (canMoveLeft(rect, rectangles)) {
                 moveLeft(rect, rectangles);
             }
         }
+        Util.animate();
+        rect.place(true);
     }
 
     /**
@@ -75,28 +82,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      * blocking it from going all the way to the left, and move to just the right side of them.
      */
     protected void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
-        Rectangle path = new Rectangle(0, rect.y, rect.x, rect.height);
-        rect.y = 0;
-        for (Rectangle rectangle : rectangles) {
-            if (rectangle.getId().equals(rect.getId())) break;
-            if (path.intersects(rectangle)) {
-                rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
-            }
-        }
+        Util.moveLeft(rect, rectangles);
     }
 
     /**
      * Move up until there is a possibility to move left.
      */
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
-        Rectangle path = new Rectangle(rect.x, 0, rect.width, rect.y);
-        rect.y = 0;
-        for (Rectangle rectangle : rectangles) {
-            if (rectangle.getId().equals(rect.getId())) break;
-            if (path.intersects(rectangle)) {
-                rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
-            }
-        }
+        Util.moveUp(rect, rectangles);
     }
 
     /** Check if the rectangle can move to its left */
@@ -105,6 +98,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         rect.x--;
         // Check intersection with all placed rectangles
         for (Rectangle rectangle : rectangles) {
+            if (rect.getId().equals(rectangle.getId())) break;
             if (rect.intersects(rectangle)) {
                 rect.x++;
                 return false;
@@ -120,6 +114,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         rect.y--;
         // Check intersection with all placed rectangles
         for (Rectangle rectangle : rectangles) {
+            if (rect.getId().equals(rectangle.getId())) break;
             if (rect.intersects(rectangle)) {
                 rect.y++;
                 return false;
@@ -127,16 +122,5 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         }
         rect.y++;
         return true;
-    }
-
-    /** Check intersection of rect with all placed rectangles. */
-    protected List<Rectangle> findIntersections(Rectangle rect, List<Rectangle> rectangles) {
-        List<Rectangle> rects = new ArrayList<>();
-        for (Rectangle rectangle : rectangles) {
-            if (rect.intersects(rectangle)) {
-                rects.add(rectangle);
-            }
-        }
-        return rects;
     }
 }
