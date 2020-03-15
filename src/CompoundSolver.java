@@ -57,7 +57,6 @@ public class CompoundSolver extends AbstractSolver {
                     continue;
                 }
                 Solution solution = solver.pack(initialParameters.copy());
-
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
 

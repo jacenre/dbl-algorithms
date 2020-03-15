@@ -202,6 +202,12 @@ public class Util {
 
         for (Rectangle rectangle :
                 solution.parameters.rectangles) {
+            // Rotation without rotation variant.
+            if (rectangle.isRotated() && !solution.parameters.rotationVariant) {
+                if (debug) System.err.println("Illegal rotation found");
+                return false;
+            }
+
             if (rectangle.x < 0 || rectangle.y < 0) {
                 if (debug) System.err.println("Negative coordinates found");
                 return false;

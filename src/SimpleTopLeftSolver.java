@@ -9,7 +9,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE, Util.HeightSupport.FIXED));
     }
 
     @Override
@@ -24,7 +24,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     /**
      * Find the pack value for the parameters without doing any other output.
      *
-     * @param parameters The parameters to be used by the solver.
+     * @param parameters The parameters to be used by the solver.|
      * @return Returns the associated {@link Solution} object
      */
     @Override
