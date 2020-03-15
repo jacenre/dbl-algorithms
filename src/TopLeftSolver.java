@@ -4,7 +4,6 @@ import java.util.*;
  * Solver algorithm adapted from the BL-algorithm, where the height has to be fixed.
  */
 public class TopLeftSolver extends SimpleTopLeftSolver {
-    int binWidth = 0;
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {

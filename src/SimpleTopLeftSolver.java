@@ -29,44 +29,59 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      */
     @Override
     Solution pack(Parameters parameters) throws IllegalArgumentException {
-        if (parameters.rectangles.size() > 4000) {
-            // Return a trivial solution
-            int x = 0;
-            for (Rectangle rectangle: parameters.rectangles ) {
-                rectangle.x = x;
-                x += rectangle.width;
-                rectangle.place(true);
-            }
-            return new Solution(parameters, this);
+        // Get a trivial solution
+        int x = 0;
+        for (Rectangle rectangle: parameters.rectangles ) {
+            rectangle.x = x;
+            x += rectangle.width;
+            rectangle.place(true);
         }
+        Solution trivialSolution = new Solution(parameters, this);
+
+        // If the problem is too big
+        if (parameters.rectangles.size() > 4000) {
+            return trivialSolution;
+        }
+
+
         Util.animate(parameters, this);
 
         // Sort the array from large to small
         parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
 
-        // Put the first rectangle in the top left corner
-        parameters.rectangles.get(0).x = 0;
-        parameters.rectangles.get(0).y = 0;
-        parameters.rectangles.get(0).place(true);
-        binWidth = parameters.rectangles.get(0).width;
+        // Get 50 solutions based on rotating differently
+        Solution bestSolution = trivialSolution;
+        Parameters initialParameters = parameters.copy();
 
-        for (int i = 1; i < parameters.rectangles.size(); i++) {
-            // Put the rectangle in the bottom right corner
-            Rectangle rect = parameters.rectangles.get(i);
-            rect.place(true);
-            Util.animate();
-            rect.x = binWidth;
-            if (parameters.rotationVariant) {
-                if (rect.height > parameters.height) {
+        for (int n = 0; n < 50; n++) {
+            // Put the first rectangle in the top left corner
+            parameters.rectangles.get(0).x = 0;
+            parameters.rectangles.get(0).y = 0;
+            parameters.rectangles.get(0).place(true);
+            binWidth = parameters.rectangles.get(0).width;
+
+            for (int i = 1; i < parameters.rectangles.size(); i++) {
+                // Put the rectangle in the bottom right corner
+                Rectangle rect = parameters.rectangles.get(i);
+                rect.place(true);
+                Util.animate();
+                if ((new Random()).nextBoolean() && rect.width < parameters.height) {
                     rect.rotate();
                 }
+                rect.x = binWidth;
+                rect.y = parameters.height - rect.height;
+                move(rect, parameters.rectangles);
+                binWidth = Math.max(binWidth, rect.x + rect.width);
             }
-            rect.y = parameters.height - rect.height;
-            move(rect, parameters.rectangles);
-            binWidth = Math.max(binWidth, rect.x + rect.width);
+            Solution sol = new Solution(parameters, this);
+            int solArea = sol.getArea();
+            int bestSolutionArea = bestSolution.getArea();
+            bestSolution = sol.getArea() < bestSolution.getArea() ? sol : bestSolution;
+            parameters = initialParameters.copy();
         }
 
-        return new Solution(parameters, this);
+
+        return bestSolution;
     }
 
     protected void move(Rectangle rect, List<Rectangle> rectangles) {
@@ -77,13 +92,11 @@ public class SimpleTopLeftSolver extends AbstractSolver {
             moveLeft(rect, rectangles);
         }
         while (canMoveUp(rect, rectangles)) {
-            Util.animate();
             moveUp(rect, rectangles);
             if (canMoveLeft(rect, rectangles)) {
                 moveLeft(rect, rectangles);
             }
         }
-        Util.animate();
         rect.place(true);
     }
 
