@@ -19,7 +19,7 @@ public class PackingSolver {
         compoundSolver.addSolver(new SimpleTopLeftSolver());
 
         Solution solution = compoundSolver.getSolution(params);
-        System.err.println(solution.solvedBy);
+        if (Util.debug) System.err.println(solution.solvedBy);
         Output.output(solution.parameters, inputOrder);
     }
 
