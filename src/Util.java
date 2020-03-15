@@ -41,25 +41,25 @@ public class Util {
      *
      * @param parameters Parameters to animate.
      * @param solver     Solver that called the animation.
+     * TODO: Comment out before submission
      */
-    public static void animate(Parameters parameters, AbstractSolver solver) {
-        if (animate && Animator.getInstance() != null){
-            Animator.getInstance().draw();
-            Animator.getInstance().drawParameter(parameters, solver);
-        }
-    }
-
-    /**
-     *  Global switch if the solution should be animated.
-     *  TODO: Set false before handing in
-      */
-    private static boolean animate = false;
-
-    public static void animate() {
-        if (animate && Animator.getInstance() != null) {
-            Animator.getInstance().draw();
-        }
-    }
+//    public static void animate(Parameters parameters, AbstractSolver solver) {
+//        if (animate && Animator.getInstance() != null){
+//            Animator.getInstance().draw();
+//            Animator.getInstance().drawParameter(parameters, solver);
+//        }
+//    }
+//
+//    /**
+//     *  Global switch if the solution should be animated.
+//      */
+//    private static boolean animate = false;
+//
+//    public static void animate() {
+//        if (animate && Animator.getInstance() != null) {
+//            Animator.getInstance().draw();
+//        }
+//    }
 
     /**
      * Times how long it takes to find a solution, used for debugging and test cases.
