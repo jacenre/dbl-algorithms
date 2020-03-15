@@ -14,8 +14,6 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-//        if (parameters.rectangles.size() > 999 && (
-//                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
         return parameters.rectangles.size() <= 999;
     }
 

@@ -16,9 +16,9 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-        if (parameters.rectangles.size() > 2000 && (
+        if (parameters.rectangles.size() > 999 && (
                 parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
-        return parameters.rectangles.size() <= 5000;
+        return parameters.rectangles.size() <= 1999;
     }
 
     /**
@@ -37,12 +37,6 @@ public class SimpleTopLeftSolver extends AbstractSolver {
             rectangle.place(true);
         }
         Solution trivialSolution = new Solution(parameters, this);
-
-        // If the problem is too big
-        if (parameters.rectangles.size() > 4000) {
-            return trivialSolution;
-        }
-
 
         Util.animate(parameters, this);
 
