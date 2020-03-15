@@ -29,6 +29,16 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      */
     @Override
     Solution pack(Parameters parameters) throws IllegalArgumentException {
+        if (parameters.rectangles.size() > 4000) {
+            // Return a trivial solution
+            int x = 0;
+            for (Rectangle rectangle: parameters.rectangles ) {
+                rectangle.x = x;
+                x += rectangle.width;
+                rectangle.place(true);
+            }
+            return new Solution(parameters, this);
+        }
         Util.animate(parameters, this);
 
         // Sort the array from large to small

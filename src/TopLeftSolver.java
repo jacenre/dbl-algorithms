@@ -6,6 +6,11 @@ import java.util.*;
 public class TopLeftSolver extends SimpleTopLeftSolver {
     int binWidth = 0;
 
+    @Override
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));
+    }
+
     /**
      * Find the pack value for the parameters without doing any other output.
      *
