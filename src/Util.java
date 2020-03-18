@@ -177,7 +177,7 @@ public class Util {
     }
 
     // Global debug boolean
-    static boolean debug = true;
+    static boolean debug = false;
 
     /**
      * Check if the solution found by the solver is valid.
