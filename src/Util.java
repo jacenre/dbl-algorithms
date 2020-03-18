@@ -177,7 +177,7 @@ public class Util {
     }
 
     // Global debug boolean
-    static boolean debug = false;
+    static boolean debug = true;
 
     /**
      * Check if the solution found by the solver is valid.
@@ -186,8 +186,7 @@ public class Util {
      * @return a boolean that is true if the solution is valid.
      */
     public static boolean isValidSolution(Solution solution) {
-        Double rate;
-        rate = solution.getRate();
+        double rate = solution.getRate();
 
         // Test report
         if (debug) {
@@ -326,7 +325,7 @@ public class Util {
         rect.y = 0;
         for (Rectangle rectangle : rectangles) {
             if (rectangle.getId().equals(rect.getId())) break;
-            if (rectangle.isPlaced() && path.intersects(rectangle)) {
+            if (path.intersects(rectangle)) {
                 rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
             }
         }
@@ -343,7 +342,7 @@ public class Util {
         rect.x = 0;
         for (Rectangle rectangle : rectangles) {
             if (rectangle.getId().equals(rect.getId())) break;
-            if (rectangle.isPlaced() && path.intersects(rectangle)) {
+            if (path.intersects(rectangle)) {
                 rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
             }
         }
