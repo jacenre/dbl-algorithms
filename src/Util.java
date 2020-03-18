@@ -11,7 +11,7 @@ public class Util {
      * <p>
      *     Here {@code FIXED} represents the fixed height problem and {@code FREE} represents the free height problem.
      *     Mostly used in checking if a parameter is applicable to a certain solver, like {@link AbstractSolver#canSolveParameters(Parameters)}
-     *     @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1"> Height Formats</a>
+     *     @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1">Height Formats</a>
      * </p>
      */
     public enum HeightSupport {
@@ -116,11 +116,11 @@ public class Util {
                 segments) {
             // Left side of rectangle
             if (segment.type == Type.START) {
-                // If the interval is already in the tree there is overlap.
-                if (active.contains(segment)) return true;
 
                 for (Segment segment1 :
                         active) {
+                    // If the interval is already in the tree there is overlap.
+                    if (segment1.equals(segment)) return true;
                     if ((segment.yStart > segment1.yStart && segment.yStart < segment1.yEnd)
                             || (segment.yEnd > segment1.yStart && segment.yEnd < segment1.yEnd)) {
                         // Overlap
@@ -177,7 +177,7 @@ public class Util {
     }
 
     // Global debug boolean
-    static boolean debug = true;
+    static boolean debug = false;
 
     /**
      * Check if the solution found by the solver is valid.
@@ -192,7 +192,6 @@ public class Util {
         if (debug) {
             System.out.println(solution);
         }
-
 
         if (sweepline(solution)) {
             if (debug) System.err.println("There are overlapping rectangles");

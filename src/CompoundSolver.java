@@ -57,6 +57,13 @@ public class CompoundSolver extends AbstractSolver {
                     continue;
                 }
                 Solution solution = solver.pack(initialParameters.copy());
+
+                // Overflow
+                if (solution.getRate() < 0) {
+                    if (Util.debug) System.err.println("Negative rate");
+                    continue;
+                }
+
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
 
