@@ -21,6 +21,8 @@ public class PackingSolver {
         Solution solution = compoundSolver.getSolution(params);
         if (Util.debug) System.err.println(solution.solvedBy);
         Output.output(solution.parameters, inputOrder);
+        System.err.println(solution.solvedBy);
+        System.err.println(solution.getArea(true));
     }
 
     static class Output {

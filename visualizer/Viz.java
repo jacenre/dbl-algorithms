@@ -38,6 +38,7 @@ public class Viz extends PApplet {
             solvers.add(new ReverseFitSolver());
             solvers.add(new SimpleTopLeftSolver());
             solvers.add(new BottomUpSolver());
+        solvers.add(new CompoundSolver().addSolver(new FirstFitSolver()));
 
         range = (int) (Math.random() * 180);
 

@@ -11,10 +11,10 @@ public class FreeHeightUtil {
      */
     private AbstractSolver subSolver;
 
-    /**
-     * Solution object containing the best solution found.
-     */
-    private Solution bestSolution = null;
+//    /**
+//     * Solution object containing the best solution found.
+//     */
+//    private Solution bestSolution = null;
 
     /**
      * Constructor that sets the {@code subSolver}
@@ -57,7 +57,7 @@ public class FreeHeightUtil {
             double solves = Util.sumHeight(parameters) - Util.largestRect(parameters);
             samplingRate = MAX_SOLVE_COUNT / solves;
         }
-        bestSolution = localMinimaFinder(parameters, samplingRate);
+        Solution bestSolution = localMinimaFinder(parameters, samplingRate);
 
         Util.animate(parameters, subSolver);
 
@@ -82,10 +82,10 @@ public class FreeHeightUtil {
         double searchSize = 1 / samplingRate;
 
         // set current bests with the maximum possible height
-        double currentBestHeight = maximumHeight;
+        double currentBestHeight = maximumHeight / 2;
         parameters.heightVariant = Util.HeightSupport.FIXED;
         parameters.height = (int) currentBestHeight;
-        bestSolution = subSolver.pack(parameters.copy());
+        Solution bestSolution = subSolver.pack(parameters.copy());
 
         // create empty arrays in which to store data to plot
         int[] chartYData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
@@ -100,12 +100,19 @@ public class FreeHeightUtil {
                 params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
 
+                if (newSolution == null) continue;
+
                 if (firstIteration) { // only plot the data of the first iteration
                     chartXData[chartIndex] = (int) newHeight;
                     chartYData[chartIndex] = newSolution.getArea();
                 }
 
-                if (newSolution.getArea(true) < bestSolution.getArea(true)) {
+                // Check if null (edge cases)
+                if (bestSolution == null) {
+                    // update bestSolution
+                    currentBestHeight = (int) newHeight;
+                    bestSolution = newSolution;
+                } else if (newSolution.getArea(true) < bestSolution.getArea(true)) {
                     // update bestSolution
                     currentBestHeight = (int) newHeight;
                     bestSolution = newSolution;
