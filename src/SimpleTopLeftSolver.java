@@ -47,7 +47,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         Solution bestSolution = trivialSolution;
         Parameters initialParameters = parameters.copy();
 
-        for (int n = 0; n < 50; n++) {
+        for (int n = 0; n < 5; n++) {
             // Put the first rectangle in the top left corner
             parameters.rectangles.get(0).x = 0;
             parameters.rectangles.get(0).y = 0;
