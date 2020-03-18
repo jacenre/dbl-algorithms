@@ -34,11 +34,15 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
      */
     @Override
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
-        rect.y = Math.max(0, rect.y - rect.height);
-        for (Rectangle rectangle : rectangles) {
-            if (rectangle.getId().equals(rect.getId())) break;
-            if (rectangle.isPlaced() && rect.intersects(rectangle)) {
-                rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
+        if (rect.x == 0) {
+            Util.moveUp(rect, rectangles);
+        } else {
+            rect.y = Math.max(0, rect.y - rect.height);
+            for (Rectangle rectangle : rectangles) {
+                if (rectangle.getId().equals(rect.getId())) break;
+                if (rectangle.isPlaced() && rect.intersects(rectangle)) {
+                    rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
+                }
             }
         }
     }
