@@ -88,7 +88,7 @@ public class GeneticSolver extends AbstractSolver {
     }
 
     protected double fitnessFunction(Solution solution) {
-        int areaWidth = solution.getWidth();
+        int areaWidth = (int) solution.getWidth();
 
 //        // Get the rectangle that we can most easily make less wide
 //        // Do this by getting largest area that can be filled by a single rectangle

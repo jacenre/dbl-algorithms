@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * Util that allows any {@code Util.HeightSupport.FIXED} to be turned into a {@code Util.HeightSupport.FREE} solver
  * using local minima finder.
@@ -7,7 +5,7 @@ import java.util.ArrayList;
 public class FreeHeightUtil {
 
     /**
-     * The AbstractSolver used during {@link #localMinimaFinder(Parameters, double)}, by default {@link FirstFitSolver}.
+     * The AbstractSolver used during {@link #localMinimaFinder(Parameters, int)}, by default {@link FirstFitSolver}.
      */
     private AbstractSolver subSolver;
 
@@ -15,7 +13,7 @@ public class FreeHeightUtil {
      * Constructor that sets the {@code subSolver}
      *
      * @param subSolver the AbstractSolver to use
-     * @see #localMinimaFinder(Parameters, double)
+     * @see #localMinimaFinder(Parameters, int)
      */
     FreeHeightUtil(AbstractSolver subSolver) {
         this.subSolver = subSolver;
@@ -38,13 +36,48 @@ public class FreeHeightUtil {
 
         Util.animate(parameters, subSolver);
 
+        final int ALLOWED_TIME = 7500;
+        final int CHECK_INCREMENT = 25;
+        final double APPROX_FACTOR = 1.25;
+
+        int numChecks = 100;
+
         // TODO Find something less dumb, like basing the sampling rate on the HEIGHT.
         // TODO Find the maximum number solves that is < 30 sec runtime.
 
-        // Set the amount of checks to be done
-        final int numChecks = 100;
+        long startTime = System.nanoTime();
         Solution bestSolution = localMinimaFinder(parameters, numChecks);
+        long endTime = System.nanoTime();
 
+        numChecks += CHECK_INCREMENT;
+
+        long duration = (endTime - startTime) / 1000000;
+        long timer = duration;
+        long previousDuration = duration;
+
+        while (timer + previousDuration*APPROX_FACTOR < ALLOWED_TIME) {
+            startTime = System.nanoTime();
+            Solution solution = localMinimaFinder(parameters, numChecks);
+            endTime = System.nanoTime();
+
+            duration = (endTime - startTime) / 1000000;
+            timer += duration;
+
+            previousDuration = duration;
+
+            if (solution == null) continue;
+
+            // Check if null (edge cases)
+            if (bestSolution == null) {
+                bestSolution = solution;
+            } else if (solution.getArea() < bestSolution.getArea(true)) {
+                bestSolution = solution;
+            }
+
+            numChecks += CHECK_INCREMENT;
+        }
+
+        // Set the amount of checks to be done
         Util.animate(parameters, subSolver);
 
         bestSolution.parameters.freeHeightUtil = false; // change as if not processed by freeHeightUtil
@@ -99,9 +132,7 @@ public class FreeHeightUtil {
             // update stepSize
             stepSize = Math.max((int) ((stopRange - startRange)/checksPerIteration), 1);
 
-            if (Util.debug) {
-                System.out.println("Stepsize: " + stepSize);
-            }
+            if (Util.debug) System.out.println("Stepsize: " + stepSize);
 
             for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
                 Parameters params = parameters.copy();
@@ -130,10 +161,7 @@ public class FreeHeightUtil {
 
         } while (stepSize > 1);
 
-        if (Util.debug) {
-            System.out.println("Solves: " + solves);
-        }
-
+        if (Util.debug) System.out.println("Solves: " + solves);
         return bestSolution;
     }
 }

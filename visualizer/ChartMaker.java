@@ -158,7 +158,7 @@ public class ChartMaker {
                 int[] bestScoreX = chartData[0];
                 int[] bestScoreY = chartData[1];
                 for (int i = 0; i < bestScoreY.length; i++) {
-                    bestScoreY[i] = solution.getArea();
+                    bestScoreY[i] = (int) solution.getArea();
                 }
                 chart.addSeries("Best Score", bestScoreX, bestScoreY).setMarker(SeriesMarkers.NONE);
             } else {

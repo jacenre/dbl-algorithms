@@ -136,8 +136,8 @@ public class Viz extends PApplet {
         }
 
         private void updateSizes() {
-            this.solutionHeight = this.solution.getHeight();
-            this.solutionWidth = this.solution.getWidth();
+            this.solutionHeight = (int) this.solution.getHeight();
+            this.solutionWidth = (int) this.solution.getWidth();
 
             if (this.solutionWidth > this.solutionHeight) {
                 drawWidth = maxSize;

@@ -66,8 +66,8 @@ public class Util {
         long startTime = System.nanoTime();
 
         Solution solution = solver.getSolution(parameters);
-
         long endTime = System.nanoTime();
+
 
         //divide by 1000000 to get milliseconds
         long duration = (endTime - startTime) / 1000000;

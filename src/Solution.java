@@ -34,7 +34,7 @@ public class Solution {
      *
      * @return the Area of the {@code Solution}.
      */
-    public int getArea() {
+    public long getArea() {
         return this.getWidth() * this.getHeight();
     }
 
@@ -49,7 +49,7 @@ public class Solution {
      *
      * @see Util.HeightSupport
      */
-    public int getArea(boolean ignoreHeightVariant) {
+    public long getArea(boolean ignoreHeightVariant) {
         return this.getWidth() * this.getHeight(ignoreHeightVariant);
     }
 
@@ -62,13 +62,13 @@ public class Solution {
      *
      * @return the height of the {@code Solution}.
      */
-    public int getHeight() {
+    public long getHeight() {
         // If height is fixed return the fix height
         if (parameters.heightVariant == Util.HeightSupport.FIXED) {
             return parameters.height;
         }
 
-        int maxHeight = 0;
+        long maxHeight = 0;
 
         for (Rectangle rectangle :
                 this.parameters.rectangles) {
@@ -88,10 +88,10 @@ public class Solution {
      * @param ignoreHeightVariant a boolean representing if the height variant should be ignored or not
      * @return the height of the {@code Solution}
      */
-    public int getHeight(boolean ignoreHeightVariant) {
-        if (!ignoreHeightVariant) return getHeight();
+    public long getHeight(boolean ignoreHeightVariant) {
+        if (!ignoreHeightVariant) return (long) getHeight();
 
-        int maxHeight = 0;
+        long maxHeight = 0;
 
         for (Rectangle rectangle :
                 this.parameters.rectangles) {
@@ -106,8 +106,8 @@ public class Solution {
      *
      * @return the width of the {@code Solution}.
      */
-    public int getWidth() {
-        int maxWidth = 0;
+    public long getWidth() {
+        long maxWidth = 0;
 
         for (Rectangle rectangle :
                 this.parameters.rectangles) {
@@ -125,6 +125,7 @@ public class Solution {
     public Solution(Parameters parameters) {
         this.parameters = parameters;
     }
+
 
     /**
      * Constructs a new {@code Solution} whose {@link #solvedBy} is known.
@@ -151,8 +152,8 @@ public class Solution {
      *
      * @return the sum of the area of all rectangles
      */
-    public int getMinimumArea() {
-        int minimumArea = 0;
+    public long getMinimumArea() {
+        long minimumArea = 0L;
         for (Rectangle rectangle :
                 parameters.rectangles) {
             minimumArea += (rectangle.height * rectangle.width);
