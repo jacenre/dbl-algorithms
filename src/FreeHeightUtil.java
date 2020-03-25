@@ -42,7 +42,7 @@ public class FreeHeightUtil {
         // TODO Find the maximum number solves that is < 30 sec runtime.
 
         // Set the amount of checks to be done
-        final int numChecks = 300;
+        final int numChecks = 100;
         Solution bestSolution = localMinimaFinder(parameters, numChecks);
 
         Util.animate(parameters, subSolver);
@@ -108,6 +108,8 @@ public class FreeHeightUtil {
                 params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
                 solves++;
+
+                if (newSolution == null) continue;
 
                 // Check if null (edge cases)
                 if (bestSolution == null) {
