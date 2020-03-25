@@ -79,11 +79,17 @@ public class Rectangle extends java.awt.Rectangle {
         this.rotated = !this.rotated;
     }
 
-    /**
-     * Returns a deep copy of this Rectangle object.
-     *
-     * @return a deep copy of this Rectangle.
-     */
+    public void rotate(boolean rotated) {
+        if (this.rotated != rotated) {
+            rotate();
+        }
+    }
+
+        /**
+         * Returns a deep copy of this Rectangle object.
+         *
+         * @return a deep copy of this Rectangle.
+         */
     public Rectangle copy() {
         Rectangle rectangle = new Rectangle(this);
         rectangle.rotated = this.rotated;

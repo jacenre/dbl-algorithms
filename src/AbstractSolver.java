@@ -15,6 +15,18 @@ import java.util.Set;
  * </p>
  */
 public abstract class AbstractSolver {
+    boolean allowInputSorting;
+
+    /**
+     * @param allowInputSorting allow/disallow the input to be sorted by the solver based on the context
+     */
+    public AbstractSolver(boolean allowInputSorting) {
+        this.allowInputSorting = allowInputSorting;
+    }
+
+    protected AbstractSolver() {
+        this.allowInputSorting = true;
+    }
 
     /**
      * Gets all the supported height variants.

@@ -18,6 +18,7 @@ public class Solution {
      */
     public int[][] chartData = new int[][]{};
 
+    private double score;
 
     /**
      * Returns the chartData, which is a double int array containing the x and y axis data.
@@ -166,6 +167,20 @@ public class Solution {
      */
     public double getRate() {
         return (double) this.getArea() / (double) this.getMinimumArea();
+    }
+
+    /**
+     * Set a double calculated by an external fitness function as a score for the solution.
+     */
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    /**
+     * Get a double calculated by an external fitness function as a score for the solution.
+     */
+    public double getScore() {
+        return score;
     }
 
     /**

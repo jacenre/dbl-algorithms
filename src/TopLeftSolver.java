@@ -5,6 +5,13 @@ import java.util.*;
  */
 public class TopLeftSolver extends SimpleTopLeftSolver {
 
+    public TopLeftSolver(boolean allowInputSorting) {
+        super(allowInputSorting);
+    }
+    public TopLeftSolver() {
+        super();
+    }
+
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
         return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));

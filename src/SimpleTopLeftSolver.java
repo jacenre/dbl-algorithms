@@ -7,6 +7,13 @@ import java.util.*;
 public class SimpleTopLeftSolver extends AbstractSolver {
     int binWidth = 0;
 
+    public SimpleTopLeftSolver(boolean allowInputSorting) {
+        super(allowInputSorting);
+    }
+    public SimpleTopLeftSolver() {
+        super();
+    }
+
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
         return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE, Util.HeightSupport.FIXED));
@@ -18,7 +25,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         if (!superResult) return false;
         if (parameters.rectangles.size() > 500 && (
                 parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
-        return parameters.rectangles.size() <= 800;
+        return parameters.rectangles.size() <= 900;
     }
 
     /**
@@ -41,7 +48,9 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         Util.animate(parameters, this);
 
         // Sort the array from large to small
-        parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
+        if (allowInputSorting) {
+            parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
+        }
 
         // Get 50 solutions based on rotating differently
         Solution bestSolution = trivialSolution;

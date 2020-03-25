@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -6,10 +7,9 @@ import java.util.Set;
  * First runs FFT and then TLS to 'compress' the first result.
  */
 public class CompressionSolver extends AbstractSolver {
-
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));
     }
 
     @Override
