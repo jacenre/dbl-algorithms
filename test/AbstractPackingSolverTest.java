@@ -24,13 +24,13 @@ abstract class AbstractPackingSolverTest {
     /**
      * Test the solver against the gigantic library.
      */
-//    @TestFactory
+    @TestFactory
     @DisplayName("Solver Test Factory")
     @Tag("library")
     Stream<DynamicTest> dynamicSolverTests() throws IOException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        String path = "./test/input/selection";
+        String path = "./test/input/Non-perfect fit/Bortfeldt, 2006";
 
         ArrayList<Double> average = new ArrayList<>();
         File folder = new File(path);
@@ -103,7 +103,7 @@ abstract class AbstractPackingSolverTest {
     @Test
     public void benchmark() throws FileNotFoundException {
         // Use the hardest file as benchmark
-        String path = "./test/momotor/extra.in";
+        String path = "./test/momotor/benchmark_r1000-h1000-ry.in";
         File file = new File(path);
         Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
 
@@ -116,8 +116,10 @@ abstract class AbstractPackingSolverTest {
         long endTime = System.nanoTime();
 
         while (duration < 30000) {
-            Solution solution = solver.getSolution(params);
-            count++;
+            if (solver.canSolveParameters(params)) {
+                solver.getSolution(params);
+                count++;
+            }
             endTime = System.nanoTime();
             duration = (endTime - startTime) / 1000000;
         }
