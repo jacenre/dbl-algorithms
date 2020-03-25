@@ -74,12 +74,14 @@ public class FreeHeightUtil {
 
         // number of possible heights that could be used to solve
         int numPossibleHeights = maximumHeight - minimumHeight;
+        System.out.println("Possible outputs: " + numPossibleHeights);
 
 
         // For the math behind this, refer to Tristan Trouwen (or maybe the report in a later stage)
         final double L1 = Math.log((float) 1/numPossibleHeights); // for simplification of expression of checksPerIteration
         //final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks))); // approximate number of recursions that will be made
         final double checksPerIteration = (numChecks * MathUtil.LambertMinusOne(L1/numChecks)/L1);
+        System.out.println("Checks per iteration: " + checksPerIteration);
 
         // set initial stepSize such that #checksPerIteration are done (larger means less precise)
         int stepSize = (int) (numPossibleHeights/checksPerIteration);
@@ -90,25 +92,17 @@ public class FreeHeightUtil {
         parameters.height = (int) currentBestHeight;
         bestSolution = subSolver.pack(parameters.copy());
 
-        // create empty arrays in which to store data to plot
-        int[] chartYData = new int[(int) ((stopRange - startRange) * stepSize) + 1];
-        int[] chartXData = new int[(int) ((stopRange - startRange) * stepSize) + 1];
-        int chartIndex = 0; // determines where to place data in chart arrays
-
+        int solves = 0;
         boolean firstIteration = true; // used to determine whether to record to chart or not
 
         do {
-            System.out.println(stepSize);
+            System.out.println("Stepsize: " + stepSize);
             for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
                 Parameters params = parameters.copy();
                 params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
+                solves++;
 
-                if (firstIteration) { // only plot the data of the first iteration
-                    chartXData[chartIndex] = (int) newHeight;
-                    chartYData[chartIndex] = newSolution.getArea();
-                    chartIndex++;
-                }
 
                 if (newSolution.getArea(true) < bestSolution.getArea(true)) {
                     // update bestSolution
@@ -117,17 +111,16 @@ public class FreeHeightUtil {
                 }
 
             }
-            firstIteration = false; // stop recording values for chart
 
             // update ranges around the best found value
             startRange = (int) Math.max(minimumHeight, currentBestHeight - stepSize);
             stopRange = (int) Math.min(maximumHeight, currentBestHeight + stepSize);
 
             // update stepSize
-            stepSize = (int) ((stopRange - startRange)/checksPerIteration);
+            stepSize = Math.max((int) ((stopRange - startRange)/checksPerIteration), 1);
         } while (stepSize > 1);
+        System.out.println("Solves: " + solves);
 
-        bestSolution.chartData = new int[][]{chartXData, chartYData};
         return bestSolution;
     }
 }
