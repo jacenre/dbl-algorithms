@@ -43,7 +43,7 @@ public class FreeHeightUtil {
 
         // Set the amount of checks to be done
         final int numChecks = 300;
-        bestSolution = localMinimaFinder(parameters, numChecks);
+        Solution bestSolution = localMinimaFinder(parameters, numChecks);
 
         Util.animate(parameters, subSolver);
 
