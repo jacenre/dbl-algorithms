@@ -8,6 +8,14 @@ public class FirstFitSolver extends AbstractSolver {
 
     boolean animate = true;
 
+
+    public FirstFitSolver(boolean allowInputSorting) {
+        super(allowInputSorting);
+    }
+    public FirstFitSolver() {
+        super();
+    }
+
     /**
      * Find the pack value for the parameters without doing any other output.
      *

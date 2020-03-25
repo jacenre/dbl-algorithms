@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Global Util class for commonly used function and constants.
@@ -10,7 +11,7 @@ public class Util {
      * <p>
      *     Here {@code FIXED} represents the fixed height problem and {@code FREE} represents the free height problem.
      *     Mostly used in checking if a parameter is applicable to a certain solver, like {@link AbstractSolver#canSolveParameters(Parameters)}
-     *     @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1"> Height Formats</a>
+     *     @see <a href="https://canvas.tue.nl/files/1978093/download?download_frd=1">Height Formats</a>
      * </p>
      */
     public enum HeightSupport {
@@ -33,25 +34,24 @@ public class Util {
         return rectangles;
     }
 
-    // Global switch if the solution should be animated.
-    private static boolean animate = true;
+
 
     /**
      * Used for animating the current parameters.
      *
      * @param parameters Parameters to animate.
      * @param solver     Solver that called the animation.
-     *                   TODO COMMENT OUT BEFORE HANDING IN.
+     * TODO: Comment out before submission
      */
     public static void animate(Parameters parameters, AbstractSolver solver) {
-//        if (animate && Animator.getInstance() != null){
+//        if (Animator.getInstance() != null){
 //            Animator.getInstance().draw();
 //            Animator.getInstance().drawParameter(parameters, solver);
 //        }
     }
 
     public static void animate() {
-//        if (animate && Animator.getInstance() != null) {
+//        if (Animator.getInstance() != null) {
 //            Animator.getInstance().draw();
 //        }
     }
@@ -116,11 +116,11 @@ public class Util {
                 segments) {
             // Left side of rectangle
             if (segment.type == Type.START) {
-                // If the interval is already in the tree there is overlap.
-                if (active.contains(segment)) return true;
 
                 for (Segment segment1 :
                         active) {
+                    // If the interval is already in the tree there is overlap.
+                    if (segment1.equals(segment)) return true;
                     if ((segment.yStart > segment1.yStart && segment.yStart < segment1.yEnd)
                             || (segment.yEnd > segment1.yStart && segment.yEnd < segment1.yEnd)) {
                         // Overlap
@@ -186,14 +186,12 @@ public class Util {
      * @return a boolean that is true if the solution is valid.
      */
     public static boolean isValidSolution(Solution solution) {
-        Double rate;
-        rate = solution.getRate();
+        double rate = solution.getRate();
 
         // Test report
         if (debug) {
             System.out.println(solution);
         }
-
 
         if (sweepline(solution)) {
             if (debug) System.err.println("There are overlapping rectangles");
@@ -202,6 +200,12 @@ public class Util {
 
         for (Rectangle rectangle :
                 solution.parameters.rectangles) {
+            // Rotation without rotation variant.
+            if (rectangle.isRotated() && !solution.parameters.rotationVariant) {
+                if (debug) System.err.println("Illegal rotation found");
+                return false;
+            }
+
             if (rectangle.x < 0 || rectangle.y < 0) {
                 if (debug) System.err.println("Negative coordinates found");
                 return false;
@@ -312,4 +316,32 @@ public class Util {
         return sum;
     }
 
+    /**
+     * Move up until there is a possibility to move left.
+     */
+    public static void moveUp(Rectangle rect, List<Rectangle> rectangles) {
+        Rectangle path = new Rectangle(rect.x, 0, rect.width, rect.y);
+        rect.y = 0;
+        for (Rectangle rectangle : rectangles) {
+            if (rectangle.getId().equals(rect.getId())) break;
+            if (path.intersects(rectangle)) {
+                rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
+            }
+        }
+    }
+
+    /**
+     * Instead of going step by step, this method looks at what rectangles are
+     * blocking it from going all the way to the left, and move to just the right side of them.
+     */
+    public static void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
+        Rectangle path = new Rectangle(0, rect.y, rect.x, rect.height);
+        rect.x = 0;
+        for (Rectangle rectangle : rectangles) {
+            if (rectangle.getId().equals(rect.getId())) break;
+            if (path.intersects(rectangle)) {
+                rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
+            }
+        }
+    }
 }

@@ -7,59 +7,89 @@ import java.util.*;
 public class SimpleTopLeftSolver extends AbstractSolver {
     int binWidth = 0;
 
+    public SimpleTopLeftSolver(boolean allowInputSorting) {
+        super(allowInputSorting);
+    }
+    public SimpleTopLeftSolver() {
+        super();
+    }
+
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FREE, Util.HeightSupport.FIXED));
     }
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-        if (parameters.rectangles.size() > 2000 && (
+        if (parameters.rectangles.size() > 500 && (
                 parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
-        return parameters.rectangles.size() <= 5000;
+        return parameters.rectangles.size() <= 900;
     }
 
     /**
      * Find the pack value for the parameters without doing any other output.
      *
-     * @param parameters The parameters to be used by the solver.
+     * @param parameters The parameters to be used by the solver.|
      * @return Returns the associated {@link Solution} object
      */
     @Override
     Solution pack(Parameters parameters) throws IllegalArgumentException {
-        Util.animate(parameters, this);
-        // Put the first rectangle in the top left corner
-        parameters.rectangles.get(0).x = 0;
-        parameters.rectangles.get(0).y = 0;
-        parameters.rectangles.get(0).place(true);
-        binWidth = parameters.rectangles.get(0).width;
+        // Get a trivial solution
+        int x = 0;
+        for (Rectangle rectangle: parameters.rectangles ) {
+            rectangle.x = x;
+            x += rectangle.width;
+            rectangle.place(true);
+        }
+        Solution trivialSolution = new Solution(parameters, this);
 
-        for (int i = 1; i < parameters.rectangles.size(); i++) {
-            // Put the rectangle in the bottom right corner
-            Rectangle rect = parameters.rectangles.get(i);
-            rect.place(true);
-            Util.animate();
-            rect.x = binWidth;
-            if (parameters.rotationVariant) {
-                if (rect.height > parameters.height) {
-                    rect.rotate();
-                }
-            }
-            rect.y = parameters.height - rect.height;
-            move(rect, parameters.rectangles.subList(0, i));
-            binWidth = Math.max(binWidth, rect.x + rect.width);
+        Util.animate(parameters, this);
+
+        // Sort the array from large to small
+        if (allowInputSorting) {
+            parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
         }
 
-        return new Solution(parameters, this);
+        // Get 50 solutions based on rotating differently
+        Solution bestSolution = trivialSolution;
+        Parameters initialParameters = parameters.copy();
+
+        for (int n = 0; n < 5; n++) {
+            // Put the first rectangle in the top left corner
+            parameters.rectangles.get(0).x = 0;
+            parameters.rectangles.get(0).y = 0;
+            parameters.rectangles.get(0).place(true);
+            binWidth = parameters.rectangles.get(0).width;
+
+            for (int i = 1; i < parameters.rectangles.size(); i++) {
+                // Put the rectangle in the bottom right corner
+                Rectangle rect = parameters.rectangles.get(i);
+                rect.place(true);
+                Util.animate();
+                if (parameters.rotationVariant && (new Random()).nextBoolean() && rect.width < parameters.height) {
+                    rect.rotate();
+                }
+                rect.x = binWidth;
+                rect.y = parameters.height - rect.height;
+                move(rect, parameters.rectangles);
+                binWidth = Math.max(binWidth, rect.x + rect.width);
+            }
+            Solution sol = new Solution(parameters, this);
+            bestSolution = sol.getArea() < bestSolution.getArea() ? sol : bestSolution;
+            parameters = initialParameters.copy();
+        }
+
+
+        return bestSolution;
     }
 
     protected void move(Rectangle rect, List<Rectangle> rectangles) {
         if (!canMoveLeft(rect, rectangles) && !canMoveUp(rect, rectangles)) {
             return;
         }
-        while (canMoveLeft(rect, rectangles)) {
+        if (canMoveLeft(rect, rectangles)) {
             moveLeft(rect, rectangles);
         }
         while (canMoveUp(rect, rectangles)) {
@@ -68,6 +98,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
                 moveLeft(rect, rectangles);
             }
         }
+        rect.place(true);
     }
 
     /**
@@ -75,32 +106,14 @@ public class SimpleTopLeftSolver extends AbstractSolver {
      * blocking it from going all the way to the left, and move to just the right side of them.
      */
     protected void moveLeft(Rectangle rect, List<Rectangle> rectangles) {
-        rect.x = 0;
-        boolean intersects;
-        // Check intersection with all placed rectangles
-        do {
-            intersects = false;
-            for (Rectangle rectangle : rectangles) {
-                if (rect.intersects(rectangle)) {
-                    intersects = true;
-                    rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
-                }
-            }
-        } while (intersects);
+        Util.moveLeft(rect, rectangles);
     }
 
     /**
      * Move up until there is a possibility to move left.
      */
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
-        Rectangle path = new Rectangle(rect.x, 0, rect.width, rect.y);
-        rect.y = 0;
-        for (Rectangle rectangle : rectangles) {
-            if (rectangle.getId().equals(rect.getId())) break;
-            if (path.intersects(rectangle)) {
-                rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
-            }
-        }
+        Util.moveUp(rect, rectangles);
     }
 
     /** Check if the rectangle can move to its left */
@@ -109,6 +122,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         rect.x--;
         // Check intersection with all placed rectangles
         for (Rectangle rectangle : rectangles) {
+            if (rect.getId().equals(rectangle.getId())) break;
             if (rect.intersects(rectangle)) {
                 rect.x++;
                 return false;
@@ -124,6 +138,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         rect.y--;
         // Check intersection with all placed rectangles
         for (Rectangle rectangle : rectangles) {
+            if (rect.getId().equals(rectangle.getId())) break;
             if (rect.intersects(rectangle)) {
                 rect.y++;
                 return false;
@@ -131,16 +146,5 @@ public class SimpleTopLeftSolver extends AbstractSolver {
         }
         rect.y++;
         return true;
-    }
-
-    /** Check intersection of rect with all placed rectangles. */
-    protected List<Rectangle> findIntersections(Rectangle rect, List<Rectangle> rectangles) {
-        List<Rectangle> rects = new ArrayList<>();
-        for (Rectangle rectangle : rectangles) {
-            if (rect.intersects(rectangle)) {
-                rects.add(rectangle);
-            }
-        }
-        return rects;
     }
 }

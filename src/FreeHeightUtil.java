@@ -12,11 +12,6 @@ public class FreeHeightUtil {
     private AbstractSolver subSolver;
 
     /**
-     * Solution object containing the best solution found.
-     */
-    private Solution bestSolution = null;
-
-    /**
      * Constructor that sets the {@code subSolver}
      *
      * @param subSolver the AbstractSolver to use
@@ -92,10 +87,10 @@ public class FreeHeightUtil {
         int stepSize = Math.max((int) (numPossibleHeights/checksPerIteration), 1);
 
         // set current bests with the maximum possible height
-        double currentBestHeight = maximumHeight;
+        double currentBestHeight = maximumHeight / 2;
         parameters.heightVariant = Util.HeightSupport.FIXED;
         parameters.height = (int) currentBestHeight;
-        bestSolution = subSolver.pack(parameters.copy());
+        Solution bestSolution = subSolver.pack(parameters.copy());
 
         int solves = 0;
         boolean firstIteration = true; // used to determine whether to record to chart or not
@@ -114,8 +109,12 @@ public class FreeHeightUtil {
                 Solution newSolution = subSolver.pack(params);
                 solves++;
 
-
-                if (newSolution.getArea(true) < bestSolution.getArea(true)) {
+                // Check if null (edge cases)
+                if (bestSolution == null) {
+                    // update bestSolution
+                    currentBestHeight = (int) newHeight;
+                    bestSolution = newSolution;
+                } else if (newSolution.getArea(true) < bestSolution.getArea(true)) {
                     // update bestSolution
                     currentBestHeight = (int) newHeight;
                     bestSolution = newSolution;

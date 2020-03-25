@@ -14,12 +14,12 @@ import java.util.Arrays;
 public class ChartMaker {
     public void charts() throws IOException {
         ArrayList<AbstractSolver> solvers = new ArrayList<>();
-        solvers.add(new FirstFitSolver());
-        solvers.add(new TopLeftSolver());
+//        solvers.add(new FirstFitSolver());
+//        solvers.add(new TopLeftSolver());
         solvers.add(new CompressionSolver());
         solvers.add(new ReverseFitSolver());
-        solvers.add(new SimpleTopLeftSolver());
-        solvers.add(new BottomUpSolver());
+//        solvers.add(new SimpleTopLeftSolver());
+//        solvers.add(new BottomUpSolver());
 
         //String path = "./test/input/Non-perfect fit/Bortfeldt, 2006";
         //String path = "./test/input/ChartSelection";
@@ -35,9 +35,22 @@ public class ChartMaker {
                 .filter(file -> file.getName().substring(file.getName().lastIndexOf(".") + 1).equals("in"))
                 .toArray(File[]::new);
 
-        XYChart chart = new XYChartBuilder().xAxisTitle("Height").yAxisTitle("Area").theme(Styler.ChartTheme.Matlab).width(1600).height(900).build();
+        XYChart chart = new XYChartBuilder().xAxisTitle("TestCases").yAxisTitle("Area").theme(Styler.ChartTheme.Matlab).width(1600).height(900).build();
         chart.getStyler().setYAxisMin(0.0);
         chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideSE);
+        chart.getStyler().setXAxisTickMarkSpacingHint(1);
+
+        Map<Object, Object> customXAxisTickLabelsMap = new HashMap<>();
+        customXAxisTickLabelsMap.put(0, "first test case");
+        customXAxisTickLabelsMap.put(1, "second test case");
+        customXAxisTickLabelsMap.put(2, "third test case");
+        customXAxisTickLabelsMap.put(3, "fourth test case");
+        customXAxisTickLabelsMap.put(4, "fifth test case");
+        customXAxisTickLabelsMap.put(5, "sixth test case");
+        customXAxisTickLabelsMap.put(6, "seventh test case");
+        customXAxisTickLabelsMap.put(7, "eigth test case");
+        chart.setCustomXAxisTickLabelsMap(customXAxisTickLabelsMap);
+        //chart.getStyler().
 
         double[] xData;
         double[] yData;
@@ -50,61 +63,54 @@ public class ChartMaker {
         double[] globalDataY = new double[files.length];
 
         // Fill in the actual data
-        try {
-            for (AbstractSolver solver : solvers) {
+        for (AbstractSolver solver : solvers) {
 
-                for (int j = 0; j < files.length; j++) {
-                    globalDataX[j] = j;
-                    globalDataY[j] = 0;
-                }
-
-                size = 1;
-                xData = new double[size];
-                yData = new double[size];
-
-                xData[0] = 0;
-                yData[0] = 0;
-
-                chart.addSeries(solver.toString(), xData, yData);
-                sw.repaintChart();
-
-
-                for (File file : files) {
-                    // xData fill up
-                    xData = new double[size];
-                    xData = copyData(xData, globalDataX);
-
-                    // yData fill up
-                    yData = new double[size];
-                    yData = copyData(yData, globalDataY);
-
-                    // yData last entry
-                    try {
-                        Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
-                        Solution solution = solver.getSolution(params.copy());
-                        yData[size - 1] = (double) solution.getArea();
-                        globalDataY[size - 1] = (double) solution.getArea();
-                    } catch (Exception e) {
-                        // ignore, y will be 0
-                    }
-
-                    chart.updateXYSeries(solver.toString(), xData, yData, null);
-                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-
-                            sw.repaintChart();
-                        }
-                    });
-
-                    size++;
-                }
-                System.out.println(solver.toString());
+            for (int j = 0; j < files.length; j++) {
+                globalDataX[j] = j;
+                globalDataY[j] = 0;
             }
-        } catch (Exception e ) {
-            System.out.println(e);
+
+            size = 1;
+            xData = new double[size];
+            yData = new double[size];
+
+            xData[0] = 0;
+            yData[0] = 0;
+
+            XYSeries series = chart.addSeries(solver.getName(), xData, yData);
+            series.setMarker(SeriesMarkers.NONE);
+            sw.repaintChart();
+
+
+            for (File file : files) {
+                // xData fill up
+                xData = new double[size];
+                xData = copyData(xData, globalDataX);
+
+                // yData fill up
+                yData = new double[size];
+                yData = copyData(yData, globalDataY);
+
+                // yData last entry
+                Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+                if (solver.canSolveParameters(params)) {
+                    Solution solution = solver.getSolution(params.copy());
+                    yData[size - 1] = (double) solution.getArea();
+                    globalDataY[size - 1] = (double) solution.getArea();
+                }
+
+                chart.updateXYSeries(solver.getName(), xData, yData, null);
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        sw.repaintChart();
+                    }
+                });
+
+                size++;
+            }
+            System.out.println(solver.toString());
         }
     }
 

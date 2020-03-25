@@ -8,7 +8,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));
     }
 
     @Override
@@ -17,7 +17,7 @@ public class ReverseFitSolver extends AbstractSolver {
         if (!superResult) return false;
         if (parameters.rectangles.size() > 2000 && (
                 parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
-        return parameters.rectangles.size() <= 5000;
+        return parameters.rectangles.size() <= 10000;
     }
 
     /**
@@ -150,14 +150,10 @@ public class ReverseFitSolver extends AbstractSolver {
             int x_third_level = lastButOneOnReverse.x + lastButOneOnReverse.width;
             if (H_2 <= lastOnReverse.width) { // what had to be done when H_2 < lastOnReverse.width was not in the paper but Wikipedia said the same as when equal
                 // Push up the last rectangle in the reverse row
-                while (canPushRectangleUp(firstRow, lastOnReverse)) {
-                    lastOnReverse.translate(0, -1);
-                }
+                Util.moveUp(lastOnReverse, firstRow);
             } else { // (H_2 > lastOnReverse.width) {
                 lastOnReverse.setLocation(x_third_level, parameters.height);
-                while (canPushRectangleUp(firstRow, lastOnReverse)) {
-                    lastOnReverse.translate(0, -1);
-                }
+                Util.moveUp(lastOnReverse, firstRow);
             }
 
             nextLevel = x_third_level;
@@ -177,9 +173,7 @@ public class ReverseFitSolver extends AbstractSolver {
     void firstFit(ArrayList<Rectangle> remainingRectangles, int level, Parameters parameters, ArrayList<Rectangle> firstRow) {
         while (!remainingRectangles.isEmpty()) {
             remainingRectangles.get(0).setLocation(level, parameters.height);
-            while (canPushRectangleUp(firstRow, remainingRectangles.get(0))) { // Still sorted by width
-                remainingRectangles.get(0).translate(0, -1);
-            }
+            Util.moveUp(remainingRectangles.get(0), firstRow);
             if (remainingRectangles.get(0).y + remainingRectangles.get(0).height >= parameters.height) { //   TODO: SEE IF THIS SHOULD BE > OR >=
                 // it doesnt fit unfortunately, so we simply make a new level at the right of the fathest block to the right
                 int new_level = findNewLevel(firstRow); // Just search for ride side of most right block

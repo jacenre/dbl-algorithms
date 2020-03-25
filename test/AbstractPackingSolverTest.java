@@ -48,7 +48,7 @@ abstract class AbstractPackingSolverTest {
             Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
 
             AbstractSolver solver = this.getSolver();
-            if (!solver.getHeightSupport().contains(params.heightVariant)) {
+            if (!solver.canSolveParameters(params)) {
                 continue;
             }
 
@@ -85,7 +85,7 @@ abstract class AbstractPackingSolverTest {
                 Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
 
                 AbstractSolver solver = this.getSolver();
-                if (!solver.getHeightSupport().contains(params.heightVariant)) {
+                if (!solver.canSolveParameters(params)) {
                     continue;
                 }
 
@@ -113,7 +113,7 @@ abstract class AbstractPackingSolverTest {
 
         long duration = 0L;
         long startTime = System.nanoTime();
-        long endTime = System.nanoTime();
+        long endTime;
 
         while (duration < 30000) {
             if (solver.canSolveParameters(params)) {

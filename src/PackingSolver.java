@@ -12,6 +12,7 @@ public class PackingSolver {
         // Different solutions
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
+        compoundSolver.addSolver(new GeneticSolver(new TopLeftSolver(false), true));
         compoundSolver.addSolver(new TopLeftSolver());
         compoundSolver.addSolver(new BottomUpSolver());
         compoundSolver.addSolver(new CompressionSolver());
@@ -19,6 +20,7 @@ public class PackingSolver {
         compoundSolver.addSolver(new SimpleTopLeftSolver());
 
         Solution solution = compoundSolver.getSolution(params);
+        if (Util.debug) System.err.println(solution.solvedBy);
         Output.output(solution.parameters, inputOrder);
     }
 

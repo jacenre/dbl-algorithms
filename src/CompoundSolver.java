@@ -58,11 +58,18 @@ public class CompoundSolver extends AbstractSolver {
                 }
                 Solution solution = solver.pack(initialParameters.copy());
 
+                // Overflow
+                if (solution.getRate() < 0) {
+                    if (Util.debug) System.err.println("Negative rate");
+                    continue;
+                }
+
+                if (Util.debug) System.err.println(solver.getClass().getSimpleName() + " is not better with " + solution.getArea());
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
 
                     // Disable debug output and check if valid
-                    if (!Util.isValidSolution(solution, false)) {
+                    if (!Util.isValidSolution(solution)) {
                         if (Util.debug) System.err.println("Error from " + solver.getClass().getSimpleName());
                         continue;
                     }

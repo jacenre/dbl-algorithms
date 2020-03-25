@@ -15,6 +15,18 @@ import java.util.Set;
  * </p>
  */
 public abstract class AbstractSolver {
+    boolean allowInputSorting;
+
+    /**
+     * @param allowInputSorting allow/disallow the input to be sorted by the solver based on the context
+     */
+    public AbstractSolver(boolean allowInputSorting) {
+        this.allowInputSorting = allowInputSorting;
+    }
+
+    protected AbstractSolver() {
+        this.allowInputSorting = true;
+    }
 
     /**
      * Gets all the supported height variants.
@@ -30,7 +42,7 @@ public abstract class AbstractSolver {
     }
 
     /**
-     * Returns a boolean that is true if {@code this} AbstractSolver can handle the parameter object.
+     * Returns a boolean that is true if {@code this} AbstractSolver can solve the parameter object.
      * <p>
      *     This was added since all the {@code IllegalArgumentException} were having seriously horrendous performance
      *     impact on the {@link FreeHeightUtil} since it would throw in the order of 10k errors in a single solve.

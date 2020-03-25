@@ -38,6 +38,7 @@ public class Viz extends PApplet {
             solvers.add(new ReverseFitSolver());
             solvers.add(new SimpleTopLeftSolver());
             solvers.add(new BottomUpSolver());
+        solvers.add(new CompoundSolver().addSolver(new FirstFitSolver()));
 
         range = (int) (Math.random() * 180);
 
@@ -46,12 +47,10 @@ public class Viz extends PApplet {
 
         for (AbstractSolver solver :
                 solvers) {
-            try {
+            if (solver.canSolveParameters(params)) {
                 Solution solution = solver.getSolution(params.copy());
                 if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE))ChartMaker.addSeries(chart, solver, solution);
                 viewports.add(new Viewport(solution));
-            } catch (Exception e) {
-                System.out.println(e);
             }
         }
 
