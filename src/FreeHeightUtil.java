@@ -11,11 +11,6 @@ public class FreeHeightUtil {
      */
     private AbstractSolver subSolver;
 
-//    /**
-//     * Solution object containing the best solution found.
-//     */
-//    private Solution bestSolution = null;
-
     /**
      * Constructor that sets the {@code subSolver}
      *
