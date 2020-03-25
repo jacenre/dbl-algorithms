@@ -42,7 +42,7 @@ public abstract class AbstractSolver {
     }
 
     /**
-     * Returns a boolean that is true if {@code this} AbstractSolver can handle the parameter object.
+     * Returns a boolean that is true if {@code this} AbstractSolver can solve the parameter object.
      * <p>
      *     This was added since all the {@code IllegalArgumentException} were having seriously horrendous performance
      *     impact on the {@link FreeHeightUtil} since it would throw in the order of 10k errors in a single solve.

@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Testing class using {@link ReverseFitSolver}
+ * Testing class using {@link BottomUpSolverTest}
  */
 @DisplayName("Bottom-up Solver")
 public class BottomUpSolverTest extends AbstractPackingSolverTest {

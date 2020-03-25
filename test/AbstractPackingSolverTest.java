@@ -103,7 +103,7 @@ abstract class AbstractPackingSolverTest {
     @Test
     public void benchmark() throws FileNotFoundException {
         // Use the hardest file as benchmark
-        String path = "./test/momotor/extra.in";
+        String path = "./test/momotor/benchmark_r1000-h1000-ry.in";
         File file = new File(path);
         Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
 

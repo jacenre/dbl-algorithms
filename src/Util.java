@@ -330,8 +330,6 @@ public class Util {
         }
     }
 
-
-
     /**
      * Instead of going step by step, this method looks at what rectangles are
      * blocking it from going all the way to the left, and move to just the right side of them.
