@@ -98,7 +98,11 @@ public class FreeHeightUtil {
         boolean firstIteration = true; // used to determine whether to record to chart or not
 
         do {
+            // update stepSize
+            stepSize = Math.max((int) ((stopRange - startRange)/checksPerIteration), 1);
+
             System.out.println("Stepsize: " + stepSize);
+
             for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
                 Parameters params = parameters.copy();
                 params.height = (int) newHeight;
@@ -118,8 +122,6 @@ public class FreeHeightUtil {
             startRange = (int) Math.max(minimumHeight, currentBestHeight - stepSize);
             stopRange = (int) Math.min(maximumHeight, currentBestHeight + stepSize);
 
-            // update stepSize
-            stepSize = Math.max((int) ((stopRange - startRange)/checksPerIteration), 1);
         } while (stepSize > 1);
         System.out.println("Solves: " + solves);
 
