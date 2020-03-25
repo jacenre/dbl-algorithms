@@ -44,11 +44,12 @@ public class GeneticSolver extends AbstractSolver {
         }
 
         // Create the first permutations of rectangles
-        int[][] permutations = shuffle(a, 5);
+        int nPermutations = 10;
+        int[][] permutations = shuffle(a, nPermutations);
         Solution bestSolution = null;
 
         // Run 5 generations
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             // Each permutation generates {crossoverN} new permutations
             int crossoverN = 3;
             permutations = crossover(permutations, crossoverN);
@@ -71,13 +72,14 @@ public class GeneticSolver extends AbstractSolver {
 
             // Sort the solutions by their score
             List<Map.Entry<int[], Solution>> solutions = new ArrayList<>(results.entrySet());
-            solutions.sort((r1, r2) -> Double.compare(r1.getValue().getRate(), r2.getValue().getRate()));
+            solutions.sort((r1, r2) -> Double.compare(r2.getValue().getScore(), r1.getValue().getScore()));
             if (bestSolution == null || solutions.get(0).getValue().getRate() < bestSolution.getRate()) {
                 bestSolution = solutions.get(0).getValue();
             }
 
             // The permutations we will go on with are the best ones
-            for (int j = 0; j < solutions.size() / crossoverN; j++) {
+            permutations = new int[nPermutations][permutations[0].length];
+            for (int j = 0; j < nPermutations; j++) {
                 permutations[j] = solutions.get(j).getKey();
             }
         }
@@ -88,34 +90,34 @@ public class GeneticSolver extends AbstractSolver {
     protected double fitnessFunction(Solution solution) {
         int areaWidth = solution.getWidth();
 
-        // Get the rectangle that we can most easily make less wide
-        // Do this by getting largest area that can be filled by a single rectangle
-        // that is below the current rectangles
-        ArrayList<Util.Segment> segments = getSegments(solution);
-
-        // We sweep from right to left
-        segments.sort((o1, o2) -> {
-            // If same X, then from bottom to top
-            if (o1.x == o2.x) {
-                return o2.yEnd - o1.yEnd;
-            }
-            // Else sort on x
-            return o2.x - o1.x;
-        });
-
-        // Calculate the reusableTrimLoss by the maximal rectangle that can be made
-        // from the remaining space to the bottom right of the box
-        int y = segments.get(0).yEnd;
-        double reusableTrimLoss = 0;
-        for (Util.Segment seg: segments) {
-            if (seg.yEnd >= y) {
-                reusableTrimLoss = Math.max(reusableTrimLoss, (parameters.height - y) * (areaWidth - seg.x));
-                y = seg.yEnd;
-            }
-        }
+//        // Get the rectangle that we can most easily make less wide
+//        // Do this by getting largest area that can be filled by a single rectangle
+//        // that is below the current rectangles
+//        ArrayList<Util.Segment> segments = getSegments(solution);
+//
+//        // We sweep from right to left
+//        segments.sort((o1, o2) -> {
+//            // If same X, then from bottom to top
+//            if (o1.x == o2.x) {
+//                return o2.yEnd - o1.yEnd;
+//            }
+//            // Else sort on x
+//            return o2.x - o1.x;
+//        });
+//
+//        // Calculate the reusableTrimLoss by the maximal rectangle that can be made
+//        // from the remaining space to the bottom right of the box
+//        int y = segments.get(0).yEnd;
+//        double reusableTrimLoss = 0;
+//        for (Util.Segment seg: segments) {
+//            if (seg.yEnd >= y) {
+//                reusableTrimLoss = Math.max(reusableTrimLoss, (parameters.height - y) * (areaWidth - seg.x));
+//                y = seg.yEnd;
+//            }
+//        }
 
         double boxArea = (areaWidth * parameters.height);
-        return reusableTrimLoss / boxArea;
+        return 1 / boxArea;
     }
 
     private int[][] crossover(int[][] permutations, int n) {
