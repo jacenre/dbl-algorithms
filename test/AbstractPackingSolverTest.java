@@ -24,13 +24,13 @@ abstract class AbstractPackingSolverTest {
     /**
      * Test the solver against the gigantic library.
      */
-//    @TestFactory
+    @TestFactory
     @DisplayName("Solver Test Factory")
     @Tag("library")
     Stream<DynamicTest> dynamicSolverTests() throws IOException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        String path = "./test/input/selection";
+        String path = "./test/input/Non-perfect fit/Bortfeldt, 2006";
 
         ArrayList<Double> average = new ArrayList<>();
         File folder = new File(path);
@@ -116,7 +116,7 @@ abstract class AbstractPackingSolverTest {
         long endTime;
 
         while (duration < 30000) {
-            if (!solver.canSolveParameters(params)) {
+            if (solver.canSolveParameters(params)) {
                 solver.getSolution(params);
                 count++;
             }

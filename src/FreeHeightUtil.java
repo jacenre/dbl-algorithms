@@ -34,29 +34,20 @@ public class FreeHeightUtil {
             throw new IllegalArgumentException("Doesn't support free height");
         }
 
-        // fixed the compound solver
-        parameters.freeHeightUtil = true; // TODO properly document what this does
+        parameters.freeHeightUtil = true; // make sure that (compound solver)
 
         Util.animate(parameters, subSolver);
-
-        int MAX_SOLVE_COUNT = 150; // TODO find metric to base this number on
 
         // TODO Find something less dumb, like basing the sampling rate on the HEIGHT.
         // TODO Find the maximum number solves that is < 30 sec runtime.
 
-        // set samplingRate
-        double samplingRate;
-        if (parameters.rectangles.size() < 100) {
-            samplingRate = 1;
-        } else {
-            double solves = Util.sumHeight(parameters) - Util.largestRect(parameters);
-            samplingRate = MAX_SOLVE_COUNT / solves;
-        }
-        Solution bestSolution = localMinimaFinder(parameters, samplingRate);
+        // Set the amount of checks to be done
+        final int numChecks = 300;
+        bestSolution = localMinimaFinder(parameters, numChecks);
 
         Util.animate(parameters, subSolver);
 
-        bestSolution.parameters.freeHeightUtil = false; // TODO properly document what his does
+        bestSolution.parameters.freeHeightUtil = false; // change as if not processed by freeHeightUtil
         bestSolution.parameters.heightVariant = Util.HeightSupport.FREE;
         return bestSolution;
     }
@@ -64,17 +55,36 @@ public class FreeHeightUtil {
     /**
      * Return best solution dependent on the height.
      * @param parameters of the problem
-     * @param samplingRate // TODO replace with an explainable number
+     * @param numChecks number of checks to do at most
      * @return best Solution found
      */
-    Solution localMinimaFinder(Parameters parameters, double samplingRate) {
+    Solution localMinimaFinder(Parameters parameters, int numChecks) {
         // Starting conditions
-        double minimumHeight = Util.largestRect(parameters);
-        double maximumHeight = Util.sumHeight(parameters);
+        final int minimumHeight = Util.largestRect(parameters);
+        final int maximumHeight = Util.sumHeight(parameters);
 
-        double startRange = minimumHeight;
-        double stopRange = maximumHeight;
-        double searchSize = 1 / samplingRate;
+        // range over which to check for best solution (will get smaller each recursion)
+        int startRange = minimumHeight;
+        int stopRange = maximumHeight;
+
+        // number of possible heights that could be used to solve
+        int numPossibleHeights = maximumHeight - minimumHeight;
+
+
+        // For the math behind this, refer to Tristan Trouwen (or maybe the report in a later stage)
+        final double L1 = Math.log((float) 1/numPossibleHeights); // for simplification of expression of checksPerIteration
+        final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks))); // approximate number of recursions that will be made
+
+        final double checksPerIteration = (numChecks * MathUtil.LambertMinusOne(L1/numChecks)/L1);
+
+        if (Util.debug) {
+            System.out.println("Possible outputs: " + numPossibleHeights);
+            System.out.println("Approximate number of recursions: " + numRecursions);
+            System.out.println("Checks per iteration: " + checksPerIteration);
+        }
+
+        // set initial stepSize such that #checksPerIteration are done (larger means less precise)
+        int stepSize = Math.max((int) (numPossibleHeights/checksPerIteration), 1);
 
         // set current bests with the maximum possible height
         double currentBestHeight = maximumHeight / 2;
@@ -82,25 +92,22 @@ public class FreeHeightUtil {
         parameters.height = (int) currentBestHeight;
         Solution bestSolution = subSolver.pack(parameters.copy());
 
-        // create empty arrays in which to store data to plot
-        int[] chartYData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
-        int[] chartXData = new int[(int) ((stopRange - startRange) / searchSize) + 1];
-        int chartIndex = 0; // determines where to place data in chart arrays
+        int solves = 0;
+        boolean firstIteration = true; // used to determine whether to record to chart or not
 
-        boolean firstIteration = true;
+        do {
+            // update stepSize
+            stepSize = Math.max((int) ((stopRange - startRange)/checksPerIteration), 1);
 
-        while (stopRange - startRange > 1) {
-            for (double newHeight = startRange + searchSize; newHeight < stopRange; newHeight += searchSize) {
+            if (Util.debug) {
+                System.out.println("Stepsize: " + stepSize);
+            }
+
+            for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
                 Parameters params = parameters.copy();
                 params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
-
-                if (newSolution == null) continue;
-
-                if (firstIteration) { // only plot the data of the first iteration
-                    chartXData[chartIndex] = (int) newHeight;
-                    chartYData[chartIndex] = newSolution.getArea();
-                }
+                solves++;
 
                 // Check if null (edge cases)
                 if (bestSolution == null) {
@@ -112,19 +119,19 @@ public class FreeHeightUtil {
                     currentBestHeight = (int) newHeight;
                     bestSolution = newSolution;
                 }
-                chartIndex++;
 
             }
-            firstIteration = false;
 
             // update ranges around the best found value
-            startRange = (int) Math.max(minimumHeight, currentBestHeight - searchSize);
-            stopRange = (int) Math.min(maximumHeight, currentBestHeight + searchSize);
-            // TODO do'nt just use half of the search size above (or do, it might be oke)
-            searchSize = Math.max(searchSize / 2, 0);
+            startRange = (int) Math.max(minimumHeight, currentBestHeight - stepSize);
+            stopRange = (int) Math.min(maximumHeight, currentBestHeight + stepSize);
+
+        } while (stepSize > 1);
+
+        if (Util.debug) {
+            System.out.println("Solves: " + solves);
         }
 
-        bestSolution.chartData = new int[][]{chartXData, chartYData};
         return bestSolution;
     }
 }
