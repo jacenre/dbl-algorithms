@@ -79,12 +79,14 @@ public class FreeHeightUtil {
 
         // For the math behind this, refer to Tristan Trouwen (or maybe the report in a later stage)
         final double L1 = Math.log((float) 1/numPossibleHeights); // for simplification of expression of checksPerIteration
-        //final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks))); // approximate number of recursions that will be made
+        final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks))); // approximate number of recursions that will be made
+        System.out.println("Approximate number of recursions: " + numRecursions);
+
         final double checksPerIteration = (numChecks * MathUtil.LambertMinusOne(L1/numChecks)/L1);
         System.out.println("Checks per iteration: " + checksPerIteration);
 
         // set initial stepSize such that #checksPerIteration are done (larger means less precise)
-        int stepSize = (int) (numPossibleHeights/checksPerIteration);
+        int stepSize = Math.max((int) (numPossibleHeights/checksPerIteration), 1);
 
         // set current bests with the maximum possible height
         double currentBestHeight = maximumHeight;
