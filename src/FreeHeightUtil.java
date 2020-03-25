@@ -47,7 +47,7 @@ public class FreeHeightUtil {
         // TODO Find the maximum number solves that is < 30 sec runtime.
 
         // Set the amount of checks to be done
-        final int numChecks = 500;
+        final int numChecks = 300;
         bestSolution = localMinimaFinder(parameters, numChecks);
 
         Util.animate(parameters, subSolver);
@@ -74,16 +74,19 @@ public class FreeHeightUtil {
 
         // number of possible heights that could be used to solve
         int numPossibleHeights = maximumHeight - minimumHeight;
-        System.out.println("Possible outputs: " + numPossibleHeights);
 
 
         // For the math behind this, refer to Tristan Trouwen (or maybe the report in a later stage)
         final double L1 = Math.log((float) 1/numPossibleHeights); // for simplification of expression of checksPerIteration
         final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks))); // approximate number of recursions that will be made
-        System.out.println("Approximate number of recursions: " + numRecursions);
 
         final double checksPerIteration = (numChecks * MathUtil.LambertMinusOne(L1/numChecks)/L1);
-        System.out.println("Checks per iteration: " + checksPerIteration);
+
+        if (Util.debug) {
+            System.out.println("Possible outputs: " + numPossibleHeights);
+            System.out.println("Approximate number of recursions: " + numRecursions);
+            System.out.println("Checks per iteration: " + checksPerIteration);
+        }
 
         // set initial stepSize such that #checksPerIteration are done (larger means less precise)
         int stepSize = Math.max((int) (numPossibleHeights/checksPerIteration), 1);
@@ -101,7 +104,9 @@ public class FreeHeightUtil {
             // update stepSize
             stepSize = Math.max((int) ((stopRange - startRange)/checksPerIteration), 1);
 
-            System.out.println("Stepsize: " + stepSize);
+            if (Util.debug) {
+                System.out.println("Stepsize: " + stepSize);
+            }
 
             for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
                 Parameters params = parameters.copy();
@@ -123,7 +128,10 @@ public class FreeHeightUtil {
             stopRange = (int) Math.min(maximumHeight, currentBestHeight + stepSize);
 
         } while (stepSize > 1);
-        System.out.println("Solves: " + solves);
+
+        if (Util.debug) {
+            System.out.println("Solves: " + solves);
+        }
 
         return bestSolution;
     }
