@@ -64,6 +64,7 @@ public class CompoundSolver extends AbstractSolver {
                     continue;
                 }
 
+                if (Util.debug) System.err.println(solver.getClass().getSimpleName() + " is not better with " + solution.getArea());
                 // If we found a better solution.
                 if (bestSolution == null || solution.getArea() < bestSolution.getArea()) {
 

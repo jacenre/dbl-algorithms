@@ -71,8 +71,8 @@ public class GeneticSolver extends AbstractSolver {
 
             // Sort the solutions by their score
             List<Map.Entry<int[], Solution>> solutions = new ArrayList<>(results.entrySet());
-            solutions.sort((r1, r2) -> Double.compare(r2.getValue().getScore(), r1.getValue().getScore()));
-            if (bestSolution == null || solutions.get(0).getValue().getScore() > bestSolution.getScore()) {
+            solutions.sort((r1, r2) -> Double.compare(r1.getValue().getRate(), r2.getValue().getRate()));
+            if (bestSolution == null || solutions.get(0).getValue().getRate() < bestSolution.getRate()) {
                 bestSolution = solutions.get(0).getValue();
             }
 
@@ -82,9 +82,7 @@ public class GeneticSolver extends AbstractSolver {
             }
         }
 
-        System.err.println((new Solution(parameters)).getRate());
-
-        return new Solution(parameters, this);
+        return new Solution(bestSolution.parameters, this);
     }
 
     protected double fitnessFunction(Solution solution) {
