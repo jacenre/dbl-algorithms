@@ -54,7 +54,7 @@ public class FreeHeightUtil {
         long duration = Math.max((endTime - startTime) / 1000000, 1); // duration of subSolver.pack or 1 if too fast
 
         // Time allowed in milliseconds
-        final int ALLOWED_TIME = 25000/5; // 25 seconds divided by 5 (since 5 solvers)
+        final int ALLOWED_TIME = 25000; // 25 seconds which leaves 5 seconds for other stuff
 
         int numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
         //if (Util.debug)
@@ -107,11 +107,6 @@ public class FreeHeightUtil {
             stepSizePrecision = numPossibleHeights*Math.exp(-numChecks/(2*Math.exp(1)))+1;
 
             L1 = Math.log((float) stepSizePrecision/numPossibleHeights); // recompute with legal term
-
-
-            System.out.println("diff: " + Math.abs(L1 - (-1/Math.exp(1))));
-            System.out.println("numChecks: " + numChecks);
-            System.out.println("StepSize precision: " + stepSizePrecision);
         }
 
         // approximate number of recursions that will be made
