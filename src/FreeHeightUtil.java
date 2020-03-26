@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Util that allows any {@code Util.HeightSupport.FIXED} to be turned into a {@code Util.HeightSupport.FREE} solver
  * using local minima finder.
@@ -33,57 +35,36 @@ public class FreeHeightUtil {
         }
 
         parameters.freeHeightUtil = true; // make sure that (compound solver)
-
         Util.animate(parameters, subSolver);
 
-        // Allowed runtime in MS
-        final int ALLOWED_TIME = 7500;
+        // Calculate the total number of possible heights
+        final int minimumHeight = Util.largestRect(parameters);
+        final int maximumHeight = Util.sumHeight(parameters);
+        int numPossibleHeights = maximumHeight - minimumHeight;
 
-        // Amount of checks to add each run
-        final int CHECK_INCREMENT = 10;
-
-        // APPROX_FACTOR such that EstimatedRuntime = PreviousRuntime * APPROX_FACTOR
-        final double APPROX_FACTOR = 1.15;
-
-        // Initial number of checks to do
-        int numChecks = 100;
-
-        // Set a baseline time for solving #100
+        // Find how much time Solve takes
         long startTime = System.nanoTime();
-        Solution bestSolution = localMinimaFinder(parameters, numChecks);
+        double currentBestHeight = maximumHeight / 2;
+        // perform a solve
+        parameters.heightVariant = Util.HeightSupport.FIXED;
+        parameters.height = (int) currentBestHeight;
+        Solution bestSolution = subSolver.pack(parameters.copy());
         long endTime = System.nanoTime();
 
-        // Increase the number of checks.
-        numChecks += CHECK_INCREMENT;
+        long duration = Math.max((endTime - startTime) / 1000000, 1); // duration of subSolver.pack or 1 if too fast
 
-        // Calculate the duration of the first run.
-        long duration = (endTime - startTime) / 1000000;
-        long timer = duration;
-        long previousDuration = duration;
+        // Time allowed in milliseconds
+        final int ALLOWED_TIME = 25000/5; // 25 seconds divided by 5 (since 5 solvers)
 
-        // Whilst elapsed time + estimated time < allowed time...
-        while (timer + previousDuration*APPROX_FACTOR < ALLOWED_TIME) {
-            // Time the new duration.
-            long innerTimer = System.nanoTime();
-            Solution solution = localMinimaFinder(parameters, numChecks);
-            endTime = System.nanoTime();
+        int numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
+        //if (Util.debug)
+            System.out.println("numChecks: " + numChecks);
 
-            // Update time variables.
-            previousDuration = (endTime - innerTimer) / 1000000;
-            timer = (endTime - startTime) / 1000000;
-
-            // No valid solution found.
-            if (solution == null) continue;
-
-            // Update best solution if applicable.
-            if (bestSolution == null) {
-                bestSolution = solution;
-            } else if (solution.getArea() < bestSolution.getArea(true)) {
-                bestSolution = solution;
-            }
-
-            // Increment checks
-            numChecks += CHECK_INCREMENT;
+        // find best heights
+        if (numChecks >= numPossibleHeights) { // if more checks can be done than the max needed
+            bestSolution = tryAllHeightsFinder(parameters);
+        } else {
+            bestSolution = localMinimaFinder(parameters, numChecks);
         }
 
         // Set the amount of checks to be done
@@ -101,6 +82,7 @@ public class FreeHeightUtil {
      * @return best Solution found
      */
     Solution localMinimaFinder(Parameters parameters, int numChecks) {
+
         // Starting conditions
         final int minimumHeight = Util.largestRect(parameters);
         final int maximumHeight = Util.sumHeight(parameters);
@@ -112,21 +94,38 @@ public class FreeHeightUtil {
         // number of possible heights that could be used to solve
         int numPossibleHeights = maximumHeight - minimumHeight;
 
+        // smallest stepSize to reach before stopping (smaller is more precise)
+        double stepSizePrecision = 1;
 
         // For the math behind this, refer to Tristan Trouwen (or maybe the report in a later stage)
-        final double L1 = Math.log((float) 1/numPossibleHeights); // for simplification of expression of checksPerIteration
-        final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks))); // approximate number of recursions that will be made
+        // for simplification of expression of checksPerIteration
+        double L1 = Math.log((float) stepSizePrecision/numPossibleHeights);
 
-        final double checksPerIteration = (numChecks * MathUtil.LambertMinusOne(L1/numChecks)/L1);
+        // check if legal
+        if (2*L1/numChecks < -1/Math.exp(1) || 2*L1/numChecks >= 0) {
+           // numChecks = - (int) (Math.log((float)1/numPossibleHeights)*2*Math.exp(1))+2; // amount of checks that should be needed
+            stepSizePrecision = numPossibleHeights*Math.exp(-numChecks/(2*Math.exp(1)))+1;
 
-        if (Util.debug ) {
-            System.out.println("Possible outputs: " + numPossibleHeights);
-            System.out.println("Approximate number of recursions: " + numRecursions);
-            System.out.println("Checks per iteration: " + checksPerIteration);
+            L1 = Math.log((float) stepSizePrecision/numPossibleHeights); // recompute with legal term
+
+
+            System.out.println("diff: " + Math.abs(L1 - (-1/Math.exp(1))));
+            System.out.println("numChecks: " + numChecks);
+            System.out.println("StepSize precision: " + stepSizePrecision);
         }
 
-        // set initial stepSize such that #checksPerIteration are done (larger means less precise)
-        int stepSize = Math.max((int) (numPossibleHeights/checksPerIteration), 1);
+        // approximate number of recursions that will be made
+        final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks)));
+
+        final double checksPerIteration = numChecks * MathUtil.LambertMinusOne(2*L1/numChecks) / L1;
+
+        if (Util.debug) {
+            System.out.println("Possible heights to try (H): " + numPossibleHeights);
+            System.out.println("Approximate number of recursions (M): " + numRecursions);
+            System.out.println("Checks per iteration (m): " + checksPerIteration);
+            System.out.println("M*m: " + checksPerIteration *numRecursions);
+            System.out.println("StepSize precision: " + stepSizePrecision);
+        }
 
         // set current bests with the maximum possible height
         double currentBestHeight = maximumHeight / 2;
@@ -134,8 +133,14 @@ public class FreeHeightUtil {
         parameters.height = (int) currentBestHeight;
         Solution bestSolution = subSolver.pack(parameters.copy());
 
-        int solves = 0;
+        int solves = 0; // used to record the number of solves for debug purposes
         boolean firstIteration = true; // used to determine whether to record to chart or not
+
+        // stepSize such that #checksPerIteration are done (larger means less precise) is made smaller each iteration
+        int stepSize;
+
+        // record heights that were tried already
+        ArrayList<Double> triedHeights = new ArrayList<>();
 
         do {
             // update stepSize
@@ -144,6 +149,7 @@ public class FreeHeightUtil {
             if (Util.debug) System.out.println("Stepsize: " + stepSize);
 
             for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
+                if (triedHeights.contains(newHeight)) continue; // skip if already tried
                 Parameters params = parameters.copy();
                 params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
@@ -151,26 +157,47 @@ public class FreeHeightUtil {
 
                 if (newSolution == null) continue;
 
-                // Check if null (edge cases)
-                if (bestSolution == null) {
-                    // update bestSolution
-                    currentBestHeight = (int) newHeight;
-                    bestSolution = newSolution;
-                } else if (newSolution.getArea(true) < bestSolution.getArea(true)) {
+                if (newSolution.isBetter(bestSolution)) {
                     // update bestSolution
                     currentBestHeight = (int) newHeight;
                     bestSolution = newSolution;
                 }
-
+                triedHeights.add(newHeight);
             }
 
             // update ranges around the best found value
             startRange = (int) Math.max(minimumHeight, currentBestHeight - stepSize);
             stopRange = (int) Math.min(maximumHeight, currentBestHeight + stepSize);
-
-        } while (stepSize > 1);
+        } while (stepSize > stepSizePrecision);
 
         if (Util.debug) System.out.println("Solves: " + solves);
+        return bestSolution;
+    }
+
+    /**
+     * Tries to find a solution with all height parameters and returns best solution found.
+     * @param parameters of the problem
+     * @return best Solution found
+     */
+    Solution tryAllHeightsFinder(Parameters parameters) {
+        // Starting conditions
+        final int minimumHeight = Util.largestRect(parameters);
+        final int maximumHeight = Util.sumHeight(parameters);
+
+        Solution bestSolution = null; // holds best solution found so far
+
+        for (int newHeight = minimumHeight; newHeight <= maximumHeight; newHeight++) {
+            Parameters params = parameters.copy();
+            params.height = (int) newHeight;
+            Solution newSolution = subSolver.pack(params);
+
+            if (newSolution == null) continue; // not a good solution, skip
+
+            if (newSolution.isBetter(bestSolution)) {
+                // update bestSolution
+                bestSolution = newSolution;
+            }
+        }
         return bestSolution;
     }
 }
