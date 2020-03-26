@@ -77,7 +77,7 @@ public class CompoundSolver extends AbstractSolver {
 
                         bestSolution = solution.copy();
                     }
-                } else if (solution.getArea() < bestSolution.getArea()) {
+                } else if (solution.isBetter(bestSolution)) {
                     // Disable debug output and check if valid
                     if (!Util.isValidSolution(solution)) {
                         if (Util.debug) System.err.println("Error from " + solver.getClass().getSimpleName());
