@@ -213,4 +213,16 @@ public class Solution {
         solution.solvedBy = this.solvedBy;
         return solution;
     }
+
+    /**
+     * Checks is a solution is better than another solution object.
+     *
+     * @param solution2 the solution to compare to
+     * @return true if better, otherwise false
+     */
+    public boolean isBetter(Solution solution2) {
+        // Check if null (edge cases)
+        if (solution2 == null) return true;
+        else return this.getArea(true) < solution2.getArea(true);
+    }
 }
