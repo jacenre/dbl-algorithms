@@ -57,7 +57,7 @@ public class FreeHeightUtil {
         final int ALLOWED_TIME = 25000; // 25 seconds which leaves 5 seconds for other stuff
 
         int numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
-        //if (Util.debug)
+        if (Util.debug)
             System.out.println("numChecks: " + numChecks);
 
         // find best heights
