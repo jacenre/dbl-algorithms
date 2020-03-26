@@ -36,44 +36,53 @@ public class FreeHeightUtil {
 
         Util.animate(parameters, subSolver);
 
+        // Allowed runtime in MS
         final int ALLOWED_TIME = 7500;
-        final int CHECK_INCREMENT = 25;
-        final double APPROX_FACTOR = 1.25;
 
+        // Amount of checks to add each run
+        final int CHECK_INCREMENT = 10;
+
+        // APPROX_FACTOR such that EstimatedRuntime = PreviousRuntime * APPROX_FACTOR
+        final double APPROX_FACTOR = 1.15;
+
+        // Initial number of checks to do
         int numChecks = 100;
 
-        // TODO Find something less dumb, like basing the sampling rate on the HEIGHT.
-        // TODO Find the maximum number solves that is < 30 sec runtime.
-
+        // Set a baseline time for solving #100
         long startTime = System.nanoTime();
         Solution bestSolution = localMinimaFinder(parameters, numChecks);
         long endTime = System.nanoTime();
 
+        // Increase the number of checks.
         numChecks += CHECK_INCREMENT;
 
+        // Calculate the duration of the first run.
         long duration = (endTime - startTime) / 1000000;
         long timer = duration;
         long previousDuration = duration;
 
+        // Whilst elapsed time + estimated time < allowed time...
         while (timer + previousDuration*APPROX_FACTOR < ALLOWED_TIME) {
-            startTime = System.nanoTime();
+            // Time the new duration.
+            long innerTimer = System.nanoTime();
             Solution solution = localMinimaFinder(parameters, numChecks);
             endTime = System.nanoTime();
 
-            duration = (endTime - startTime) / 1000000;
-            timer += duration;
+            // Update time variables.
+            previousDuration = (endTime - innerTimer) / 1000000;
+            timer = (endTime - startTime) / 1000000;
 
-            previousDuration = duration;
-
+            // No valid solution found.
             if (solution == null) continue;
 
-            // Check if null (edge cases)
+            // Update best solution if applicable.
             if (bestSolution == null) {
                 bestSolution = solution;
             } else if (solution.getArea() < bestSolution.getArea(true)) {
                 bestSolution = solution;
             }
 
+            // Increment checks
             numChecks += CHECK_INCREMENT;
         }
 
@@ -110,7 +119,7 @@ public class FreeHeightUtil {
 
         final double checksPerIteration = (numChecks * MathUtil.LambertMinusOne(L1/numChecks)/L1);
 
-        if (Util.debug) {
+        if (Util.debug ) {
             System.out.println("Possible outputs: " + numPossibleHeights);
             System.out.println("Approximate number of recursions: " + numRecursions);
             System.out.println("Checks per iteration: " + checksPerIteration);
