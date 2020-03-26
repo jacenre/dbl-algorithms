@@ -14,12 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChartMaker {
-    public void charts() throws IOException {
+    public void areaAndTimeCharts() throws IOException {
         ArrayList<AbstractSolver> solvers = new ArrayList<>();
-//        solvers.add(new FirstFitSolver());
-//        solvers.add(new TopLeftSolver());
+        solvers.add(new FirstFitSolver());
+        solvers.add(new TopLeftSolver());
         solvers.add(new CompressionSolver());
-        solvers.add(new ReverseFitSolver());
+//        solvers.add(new ReverseFitSolver());
 //        solvers.add(new SimpleTopLeftSolver());
 //        solvers.add(new BottomUpSolver());
 
@@ -37,115 +37,44 @@ public class ChartMaker {
                 .filter(file -> file.getName().substring(file.getName().lastIndexOf(".") + 1).equals("in"))
                 .toArray(File[]::new);
 
-        XYChart chart = new XYChartBuilder().xAxisTitle("TestCases").yAxisTitle("Area").theme(Styler.ChartTheme.Matlab).width(1600).height(900).build();
-        chart.getStyler().setYAxisMin(0.0);
-        chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideSE);
-        chart.getStyler().setXAxisTickMarkSpacingHint(1);
+        XYChart areaChart = new XYChartBuilder().xAxisTitle("TestCases").yAxisTitle("Area").theme(Styler.ChartTheme.Matlab).width(1600).height(900).build();
+        areaChart.getStyler().setYAxisMin(0.0);
+        areaChart.getStyler().setLegendPosition(Styler.LegendPosition.InsideSE);
+        areaChart.getStyler().setXAxisTickMarkSpacingHint(1);
 
-        Map<Object, Object> customXAxisTickLabelsMap = new HashMap<>();
-        customXAxisTickLabelsMap.put(0, "first test case");
-        customXAxisTickLabelsMap.put(1, "second test case");
-        customXAxisTickLabelsMap.put(2, "third test case");
-        customXAxisTickLabelsMap.put(3, "fourth test case");
-        customXAxisTickLabelsMap.put(4, "fifth test case");
-        customXAxisTickLabelsMap.put(5, "sixth test case");
-        customXAxisTickLabelsMap.put(6, "seventh test case");
-        customXAxisTickLabelsMap.put(7, "eigth test case");
-        chart.setCustomXAxisTickLabelsMap(customXAxisTickLabelsMap);
-        //chart.getStyler().
-
-        double[] xData;
-        double[] yData;
-        int size;
-
-        // Show the graph
-        final SwingWrapper<XYChart> sw = new SwingWrapper<>(chart);
-        sw.displayChart();
-        double[] globalDataX = new double[files.length];
-        double[] globalDataY = new double[files.length];
+        XYChart timeChart = new XYChartBuilder().xAxisTitle("TestCases").yAxisTitle("Duration [ms]").theme(Styler.ChartTheme.Matlab).width(1600).height(900).build();
+        timeChart.getStyler().setYAxisMin(0.0);
+        timeChart.getStyler().setLegendPosition(Styler.LegendPosition.InsideSE);
+        timeChart.getStyler().setXAxisTickMarkSpacingHint(1);
 
         // Fill in the actual data
         for (AbstractSolver solver : solvers) {
-
-            for (int j = 0; j < files.length; j++) {
-                globalDataX[j] = j;
-                globalDataY[j] = 0;
-            }
-
-            size = 1;
-            xData = new double[size];
-            yData = new double[size];
-
-            xData[0] = 0;
-            yData[0] = 0;
-
-            XYSeries series = chart.addSeries(solver.getName(), xData, yData);
-            series.setMarker(SeriesMarkers.NONE);
-            sw.repaintChart();
-
-
+            int i = 0;
+            double[] xData = new double[files.length];
+            double[] areaData = new double[files.length];
+            double[] timeData = new double[files.length];
             for (File file : files) {
-                // xData fill up
-                xData = new double[size];
-                xData = copyData(xData, globalDataX);
-
-                // yData fill up
-                yData = new double[size];
-                yData = copyData(yData, globalDataY);
-
                 // yData last entry
                 Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
                 if (solver.canSolveParameters(params)) {
+                    double startTime = System.nanoTime();
                     Solution solution = solver.getSolution(params.copy());
-                    yData[size - 1] = (double) solution.getArea();
-                    globalDataY[size - 1] = (double) solution.getArea();
+                    double endTime = System.nanoTime();
+                    double duration = (endTime - startTime) / 1000000;
+                    areaData[i] = (double) solution.getArea();
+                    timeData[i] = duration;
+                } else {
+                    areaData[i] = 0;
+                    timeData[i] = 0;
                 }
-
-                chart.updateXYSeries(solver.getName(), xData, yData, null);
-                javax.swing.SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        sw.repaintChart();
-                    }
-                });
-
-                size++;
+                xData[i] = i;
+                i++;
             }
-            System.out.println(solver.toString());
+            timeChart.addSeries(solver.getName(), xData, timeData);
+            areaChart.addSeries(solver.getName(), xData, areaData);
         }
-    }
-
-    double[] copyData(double[] data, double[] globalData) {
-        for (int j = 0; j < data.length; j++) {
-            data[j] = globalData[j];
-        }
-        return data;
-    }
-
-    double[] removeZeroValues(double[] input) {
-        int n = 0;
-        // Get number of non-zero entries
-        for (int i = 0; i < input.length; i++) {
-            if (input[i] != 0) {
-                n++;
-            }
-        }
-        // Fill in new array with all the nonzero entries
-        double[] result = new double[n];
-        for (int i = 0; i < n; i++) {
-            double nextVal = 0;
-            // Find next nonzero entry. If found, fill in the result array and change in input array to zero.
-            for (int j = 0; j < input.length; j++) {
-                if (input[j] != 0) {
-                    nextVal = input[j];
-                    input[j] = 0;
-                    break;
-                }
-            }
-            result[i] = nextVal;
-        }
-        return result;
+        new SwingWrapper<XYChart>(timeChart).displayChart();
+        new SwingWrapper<XYChart>(areaChart).displayChart();
     }
 
     static public void addSeries(XYChart chart, AbstractSolver solver, Solution solution) {
@@ -170,7 +99,7 @@ public class ChartMaker {
 
     public static void main(String[] args) {
         try {
-            (new ChartMaker()).charts();
+            (new ChartMaker()).areaAndTimeCharts();
         } catch (Exception e) {
             System.out.println(e);
         }
