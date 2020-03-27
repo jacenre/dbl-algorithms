@@ -68,6 +68,26 @@ public class ArrayListSkyline extends AbstractSkyline {
         return mostLeftPoint;
     }
 
+    @Override
+    public boolean testSpreadConstraint(Rectangle rectangle) {
+        return false;
+    }
+
+    @Override
+    public int getFitnessNumber(Rectangle rectangle) {
+        return 0;
+    }
+
+    @Override
+    public boolean onlyFit(Rectangle rectangle) {
+        return false;
+    }
+
+    @Override
+    public int getLocalWaste(Rectangle rectangle) {
+        return 0;
+    }
+
     /**
      * Places a rectangle and modifies the skyline accordingly.
      *
