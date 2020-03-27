@@ -1,3 +1,5 @@
+import org.junit.jupiter.params.shadow.com.univocity.parsers.common.record.Record;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -80,7 +82,15 @@ public class SkylineSolver extends AbstractSolver {
         return false;
     }
 
+    class PositionRectanglePair {
+        Rectangle rectangle;
+        SegPoint position;
 
+        PositionRectanglePair(Rectangle rec, SegPoint pnt) {
+            this.rectangle = rec;
+            this.position = pnt;
+        }
+    }
 
     /**
      * Goes through the heuristics and places the sequence of rectangles in the box while maintaining a skyline view of
@@ -95,12 +105,53 @@ public class SkylineSolver extends AbstractSolver {
     boolean heuristicPacking(ArrayList<Rectangle> sequence, int width, int maximumSpread) {
         // Test all the candidate positions - rectangle combos
         ArrayListSkyline skyline = new ArrayListSkyline(globalHeight, width, maximumSpread);
+        ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
+        ArrayList<PositionRectanglePair> perfectFit = new ArrayList<>();
 
-        for (SegPoint segPoint : skyline.getCandidatePoints()) {
-            for (Rectangle rectangle : sequence) {
+        while (!sequence.isEmpty()) {
+            int minimumLocalSpaceWaste = Integer.MAX_VALUE;
+            minimumLocalSpaceWasteRectangles.clear();
+            perfectFit.clear();
+            PositionRectanglePair toBePlaced = null;
+
+            for (SegPoint segPoint : skyline.getCandidatePoints()) {
+                for (Rectangle rectangle : sequence) {
+                    if (skyline.testSpreadConstraint(rectangle, segPoint)) { // spread constraint
+                        continue;
+                    }
+                    int localSpaceWaste = skyline.getLocalWaste(rectangle, segPoint);
+                    if (localSpaceWaste < minimumLocalSpaceWaste) {
+                        minimumLocalSpaceWasteRectangles.clear();
+                        minimumLocalSpaceWaste = localSpaceWaste;
+                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
+                    } else if (localSpaceWaste == minimumLocalSpaceWaste) {
+                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
+                    }
+                    if (localSpaceWaste == 0) {
+                        perfectFit.add(new PositionRectanglePair(rectangle, segPoint));
+                    }
+                }
+            }
+            if (perfectFit.size() == 1) { // only fit
+                toBePlaced = perfectFit.get(0);
+            } else if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
+                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
+            } else if (minimumLocalSpaceWasteRectangles.size() >= 2){ // maximum fitness number and earliest in sequence
+                int highestFitness = 0;
+                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
+                for (PositionRectanglePair pair : minimumLocalSpaceWasteRectangles) {
+                    if (skyline.getFitnessNumber(pair.rectangle, pair.position) > highestFitness) {
+                        toBePlaced = pair;
+                    }
+                }
+            }
+            if (toBePlaced != null) {
+                skyline.addRectangle(toBePlaced.rectangle, toBePlaced.position);
+            } else {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
 
