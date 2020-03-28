@@ -1,9 +1,4 @@
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.record.Record;
-
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Vector;
-
 
 
 /**
@@ -82,16 +77,6 @@ public class SkylineSolver extends AbstractSolver {
         return false;
     }
 
-    class PositionRectanglePair {
-        Rectangle rectangle;
-        SegPoint position;
-
-        PositionRectanglePair(Rectangle rec, SegPoint pnt) {
-            this.rectangle = rec;
-            this.position = pnt;
-        }
-    }
-
     /**
      * Goes through the heuristics and places the sequence of rectangles in the box while maintaining a skyline view of
      * the whole ordeal. Returns if a solution was able to be found with the given maximumSpread and width.
@@ -107,17 +92,22 @@ public class SkylineSolver extends AbstractSolver {
         ArrayListSkyline skyline = new ArrayListSkyline(globalHeight, width, maximumSpread);
         ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
 
+        ArrayList<Rectangle> originalSequence = skyline.deepCopyRectangles(sequence);
         while (!sequence.isEmpty()) {
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
             minimumLocalSpaceWasteRectangles.clear();
-            PositionRectanglePair toBePlaced = null;
+            PositionRectanglePair toBePlaced = skyline.anyOnlyFit(sequence);
 
-           // if (skyline.anyOnlyFit(sequence)) {
-           //     continue;
-           // }
+            if (!(toBePlaced == null)) {
+                System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
+                skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
+                toBePlaced.rectangle.place(true);
+                sequence.remove(toBePlaced.rectangle);
+                continue;
+            }
             for (SegPoint segPoint : skyline.getCandidatePoints()) {
                 for (Rectangle rectangle : sequence) {
-                    if (skyline.testSpreadConstraint(rectangle, segPoint)) { // spread constraint
+                    if (skyline.testSpreadConstraint(rectangle, segPoint) || hasOverlap(rectangle, segPoint, originalSequence)) { // spread constraint
                         continue;
                     }
                     int localSpaceWaste = skyline.getLocalWaste(rectangle, segPoint, sequence);
@@ -130,6 +120,7 @@ public class SkylineSolver extends AbstractSolver {
                     }
                 }
             }
+
             if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
                 toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
             } else if (minimumLocalSpaceWasteRectangles.size() >= 2){ // maximum fitness number and earliest in sequence
@@ -141,13 +132,58 @@ public class SkylineSolver extends AbstractSolver {
                     }
                 }
             }
+
             if (toBePlaced != null) {
-                skyline.addRectangle(toBePlaced.rectangle, toBePlaced.position);
+                /* Placement of rectangle */
+                if (toBePlaced.position.start) {
+                    toBePlaced.rectangle.x = toBePlaced.position.x;
+                    toBePlaced.rectangle.y = toBePlaced.position.y;
+                } else if (!toBePlaced.position.start) {
+                    toBePlaced.rectangle.x = toBePlaced.position.x;
+                    toBePlaced.rectangle.y = toBePlaced.position.y - toBePlaced.rectangle.height;
+                }
+                System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
+                toBePlaced.rectangle.place(true);
+                sequence.remove(toBePlaced.rectangle);
+                skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
             } else {
+                System.out.println("kon niet plaatsen");
                 return false;
             }
         }
+        System.out.println("nice");
         return true;
+    }
+
+    public boolean hasOverlap(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence) {
+        if (position.start) {
+            rectangle.x = position.x;
+            rectangle.y = position.y;
+        } else {
+            rectangle.x = position.x;
+            rectangle.y = position.y - rectangle.height;
+        }
+
+        rectangle.place(true);
+        ArrayList<Rectangle> placedRecs = new ArrayList<>();
+        for (Rectangle rec : sequence) {
+            if (rec.isPlaced()) {
+                placedRecs.add(rec);
+            }
+        }
+
+        Rectangle extraRec = new Rectangle(0, 10, 10, 1);
+        extraRec.place(true);
+        placedRecs.add(extraRec);
+        Parameters parameters = new Parameters();
+        parameters.rectangles = placedRecs;
+
+        if (Util.sweepline(new Solution(parameters))) {
+            rectangle.place(false);
+            return true;
+        }
+        rectangle.place(false);
+        return false;
     }
 
 }

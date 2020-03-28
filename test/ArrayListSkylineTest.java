@@ -2,7 +2,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 class ArrayListSkylineTest {
@@ -23,39 +22,49 @@ class ArrayListSkylineTest {
         Assertions.assertFalse(points.get(1).start);
     }
 
-//    @Test
-//    void testOnlyFitFunctionality() {
-//        // Wel een only fit
-//        Rectangle onlyFitRectangle = new Rectangle(3, 10);
-//        ArrayList<Rectangle> sequence = new ArrayList<>();
-//        sequence.add(onlyFitRectangle);
-//        Assertions.assertTrue(skylineDataStructure.anyOnlyFit(sequence));
-//
-//        // Geen only fit
-//        Rectangle notOnlyFitRectangle = new Rectangle(3, 5);
-//        sequence.add(notOnlyFitRectangle);
-//        Assertions.assertFalse(skylineDataStructure.anyOnlyFit(sequence));
-//        skylineDataStructure.addRectangle(notOnlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
-//
-//        // Geen only fit want geen unieke segment-rectangle combi
-//        Rectangle unUnique1 = new Rectangle(3, 5);
-//        sequence.add(unUnique1);
-//        Rectangle unUnique2 = new Rectangle(3, 5);
-//        sequence.add(unUnique2);
-//
-//        Assertions.assertFalse(skylineDataStructure.anyOnlyFit(sequence));
-//    }
+    @Test
+    void testOnlyFitFunctionality() {
+        // Wel een only fit
+        Rectangle onlyFitRectangle = new Rectangle(3, 10);
+        ArrayList<Rectangle> sequence = new ArrayList<>();
+        sequence.add(onlyFitRectangle);
+        PositionRectanglePair pair = skylineDataStructure.anyOnlyFit(sequence);
+        Assertions.assertTrue(pair != null);
+    }
+
+    @Test
+    void testOnlyFitFunctionality2() {
+        // Geen only fit
+        Rectangle notOnlyFitRectangle = new Rectangle(3, 5);
+        ArrayList<Rectangle> sequence = new ArrayList<>();
+        sequence.add(notOnlyFitRectangle);
+        PositionRectanglePair pair2 = skylineDataStructure.anyOnlyFit(sequence);
+        Assertions.assertTrue(pair2 == null);
+    }
+
+    @Test
+    void testOnlyFitFunctionality3() {
+        ArrayList<Rectangle> sequence = new ArrayList<>();
+        // Geen only fit want geen unieke segment-rectangle combi
+        Rectangle unUnique1 = new Rectangle(3, 5);
+        sequence.add(unUnique1);
+        Rectangle unUnique2 = new Rectangle(3, 5);
+        sequence.add(unUnique2);
+
+        PositionRectanglePair pair3 = skylineDataStructure.anyOnlyFit(sequence);
+        Assertions.assertTrue(pair3 == null);
+    }
 
     @Test
     void testGetAreaOfSkyline1() {
         Rectangle notOnlyFitRectangle = new Rectangle(3, 5);
-        skylineDataStructure.addRectangle(notOnlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
+        skylineDataStructure.adjustSkyline(notOnlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
 
         Assertions.assertEquals(skylineDataStructure.getAreaOfSkyline(skylineDataStructure.skyline), 15);
         Assertions.assertEquals(skylineDataStructure.getMostLeftPoint(), 0);
 
         Rectangle onlyFitRectangle = new Rectangle(3, 10);
-        skylineDataStructure.addRectangle(onlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
+        skylineDataStructure.adjustSkyline(onlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
 
         Assertions.assertEquals(skylineDataStructure.getAreaOfSkyline(skylineDataStructure.skyline), 6 * 10);
         Assertions.assertEquals(skylineDataStructure.getMostLeftPoint(), 6);
@@ -64,13 +73,13 @@ class ArrayListSkylineTest {
     @Test
     void testGetAreaOfSkyline2() {
         Rectangle onlyFitRectangle = new Rectangle(3, 10);
-        skylineDataStructure.addRectangle(onlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
+        skylineDataStructure.adjustSkyline(onlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
 
         Assertions.assertEquals(skylineDataStructure.getAreaOfSkyline(skylineDataStructure.skyline), 30);
         Assertions.assertEquals(skylineDataStructure.getMostLeftPoint(), 3);
 
         Rectangle notOnlyFitRectangle = new Rectangle(3, 5);
-        skylineDataStructure.addRectangle(notOnlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
+        skylineDataStructure.adjustSkyline(notOnlyFitRectangle, skylineDataStructure.getCandidatePoints().get(0));
 
         Assertions.assertEquals(skylineDataStructure.getAreaOfSkyline(skylineDataStructure.skyline), 45);
         Assertions.assertEquals(skylineDataStructure.getMostLeftPoint(), 3);
@@ -128,7 +137,7 @@ class ArrayListSkylineTest {
         sequence.add(firstRec);
         sequence.add(secondRec);
 
-        skylineDataStructure.addRectangle(firstRec, skylineDataStructure.getCandidatePoints().get(0));
+        skylineDataStructure.adjustSkyline(firstRec, skylineDataStructure.getCandidatePoints().get(0));
         firstRec.place(true);
         sequence.remove(firstRec);
         Assertions.assertTrue(firstRec.isPlaced());
@@ -148,100 +157,15 @@ class ArrayListSkylineTest {
     }
 
 
-
     @Test
     void firstElaborateExample() {
         ArrayList<Rectangle> sequence = new ArrayList<>();
         sequence.add(new Rectangle(4, 4));
-        sequence.add(new Rectangle(3,  4));
-        sequence.add(new Rectangle(4 ,3));
-        sequence.add(new Rectangle(6, 2));
-        sequence.add(new Rectangle(3, 3));
-        sequence.add(new Rectangle(5, 1));
-        sequence.add(new Rectangle(2, 2));
-        sequence.add(new Rectangle(2, 2));
-        sequence.add(new Rectangle(2, 2));
-        sequence.add(new Rectangle(4, 1));
-
-        int totalArea = 0;
-        for (Rectangle rec : sequence) {
-            totalArea += rec.height * rec.width;
-        }
-        System.out.println("Total area: " + totalArea);
-
-        ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
-
-        ArrayList<Rectangle> originalSequence = skylineDataStructure.deepCopyRectangles(sequence);
-        //while (!sequence.isEmpty()) {
-       for (int k = 0; k < 5; k++) {
-            int minimumLocalSpaceWaste = Integer.MAX_VALUE;
-            minimumLocalSpaceWasteRectangles.clear();
-            PositionRectanglePair toBePlaced = null;
-
-//            if (skylineDataStructure.anyOnlyFit(sequence)) {
-//                continue;
-//            }
-            for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
-                for (Rectangle rectangle : sequence) {
-                    if (skylineDataStructure.testSpreadConstraint(rectangle, segPoint)) { // spread constraint
-                        continue;
-                    }
-                    if (hasOverlap(rectangle, segPoint, sequence)) {
-                        continue;
-                    }
-                    int localSpaceWaste = skylineDataStructure.getLocalWaste(rectangle, segPoint, originalSequence);
-                    if (localSpaceWaste < minimumLocalSpaceWaste) {
-                        minimumLocalSpaceWasteRectangles.clear();
-                        minimumLocalSpaceWaste = localSpaceWaste;
-                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
-                    } else if (localSpaceWaste == minimumLocalSpaceWaste) {
-                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
-                    }
-                }
-            }
-
-            if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
-                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
-            } else if (minimumLocalSpaceWasteRectangles.size() >= 2){ // maximum fitness number and earliest in sequence
-                int highestFitness = 0;
-                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
-                for (PositionRectanglePair pair : minimumLocalSpaceWasteRectangles) {
-                    if (skylineDataStructure.getFitnessNumber(pair.rectangle, pair.position) > highestFitness) {
-                        toBePlaced = pair;
-                    }
-                }
-            }
-            /** debug */
-            for (Segment segment : skylineDataStructure.skyline) {
-                System.out.println("up" + segment.start);
-                System.out.println("down"+ segment.end);
-            }
-            if (toBePlaced != null) {
-                /* Placement of rectangle */
-                if (toBePlaced.position.start) {
-                    toBePlaced.rectangle.x = toBePlaced.position.x;
-                    toBePlaced.rectangle.x = toBePlaced.position.y;
-                } else if (!toBePlaced.position.start) {
-                    toBePlaced.rectangle.x = toBePlaced.position.x;
-                    toBePlaced.rectangle.x = toBePlaced.position.y - toBePlaced.rectangle.height;
-                }
-                System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
-                toBePlaced.rectangle.place(true);
-                sequence.remove(toBePlaced.rectangle);
-                skylineDataStructure.addRectangle(toBePlaced.rectangle, toBePlaced.position);
-            } else {
-                //System.out.println("oh shit");
-            }
-        }
-        System.out.println("nice");
-    }
-
-    @Test
-    void secondElaborateExample() {
-        ArrayList<Rectangle> sequence = new ArrayList<>();
-        sequence.add(new Rectangle(4, 4));
         sequence.add(new Rectangle(4,  4));
         sequence.add(new Rectangle(4 ,2));
+        sequence.add(new Rectangle(3, 5));
+        sequence.add(new Rectangle(3, 5));
+        sequence.add(new Rectangle(5,5));
 
         int totalArea = 0;
         for (Rectangle rec : sequence) {
@@ -258,10 +182,12 @@ class ArrayListSkylineTest {
             PositionRectanglePair toBePlaced = skylineDataStructure.anyOnlyFit(sequence);
 
             if (!(toBePlaced == null)) {
-                System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
-                skylineDataStructure.addRectangle(toBePlaced.rectangle, toBePlaced.position);
+                toBePlaced.rectangle.x = toBePlaced.position.x;
+                toBePlaced.rectangle.y = toBePlaced.position.y;
+                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
                 toBePlaced.rectangle.place(true);
                 sequence.remove(toBePlaced.rectangle);
+                System.out.println("Placed special rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
                 continue;
             }
             for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
@@ -304,9 +230,8 @@ class ArrayListSkylineTest {
                 System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
                 toBePlaced.rectangle.place(true);
                 sequence.remove(toBePlaced.rectangle);
-                skylineDataStructure.addRectangle(toBePlaced.rectangle, toBePlaced.position);
+                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
             } else {
-                System.out.println("kon niet plaatsen");
             }
         }
         System.out.println("nice");
