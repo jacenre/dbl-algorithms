@@ -18,7 +18,7 @@ class Segment {
     }
 
     int getLength() {
-        return start.y - end.y;
+        return end.y - start.y;
     }
 
 

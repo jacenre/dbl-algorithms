@@ -4,10 +4,10 @@ import java.util.HashMap;
 
 public class ArrayListSkyline extends AbstractSkyline {
 
-    ArrayList<Segment> skyline;
-    int globalHeight;
-    int globalWidth;
-    int maximumSpread;
+    public ArrayList<Segment> skyline;
+    public int globalHeight;
+    public int globalWidth;
+    public int maximumSpread;
 
     public ArrayListSkyline(int height, int width, int maximumSpread) {
         this.globalHeight = height;
@@ -172,6 +172,7 @@ public class ArrayListSkyline extends AbstractSkyline {
     @Override
     public int getMostLeftPoint() {
         int mostLeftPoint = Integer.MAX_VALUE;
+
         for (Segment segment : skyline) {
             if (segment.start.x < mostLeftPoint) {
                 mostLeftPoint = segment.start.x;
@@ -203,11 +204,11 @@ public class ArrayListSkyline extends AbstractSkyline {
                 skyline.remove(segmentOnWhichIsPlaced);
                 skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)),
                         new SegPoint(false, new Point(rectangle.x + rectangle.width, position.y + rectangle.height))));
-                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(endPoint.x, position.y + rectangle.height + 1)), endPoint));
+                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(endPoint.x, position.y + rectangle.height)), endPoint));
             } else if (!position.start) {// Bottom left corner of rectangle is placed on lower candidate position of segment
                 SegPoint beginPoint = segmentOnWhichIsPlaced.start;
                 skyline.remove(segmentOnWhichIsPlaced);
-                skyline.add(index, new Segment(beginPoint, new SegPoint(false, new Point(beginPoint.x, position.y - rectangle.height - 1))));
+                skyline.add(index, new Segment(beginPoint, new SegPoint(false, new Point(beginPoint.x, position.y - rectangle.height))));
                 skyline.add(index + 1, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y - rectangle.height)),
                         new SegPoint(false, new Point(position.x + rectangle.width, position.y))));
             }
@@ -228,23 +229,27 @@ public class ArrayListSkyline extends AbstractSkyline {
                 skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)),
                         new SegPoint(false, new Point(position.x + rectangle.width, upToThisY))));
 
-                for (int i = index + 1; i < skyline.size() - 1; i++) {
+                // delete segments that are completely overshadowed
+                for (int i = index + 1; i < skyline.size(); i++) {
                     if (skyline.get(i).end.y < upToThisY) {
                         skyline.remove(skyline.get(i));
                     }
                 }
 
-                // From here we only need to cut a segment in half
+                // From here we only need to cut a segment in half or delete it
                 Segment segmentToCut = skyline.get(index + 1);
                 SegPoint upToSegPoint = segmentToCut.end;
                 skyline.remove(segmentToCut);
-                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(upToSegPoint.x, position.y + rectangle.height + 1)), upToSegPoint));
+                if (upToSegPoint.y > upToThisY) {
+                    skyline.add(index + 1, new Segment(new SegPoint(true, new Point(upToSegPoint.x, position.y + rectangle.height)), upToSegPoint));
+                }
             } else if (!position.start) {
                 skyline.remove(segmentOnWhichIsPlaced);
                 int upToThisY = position.y - rectangle.height;
                 skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, upToThisY)),
                         new SegPoint(false, new Point(position.x + rectangle.width, position.y))));
 
+                // delete segments that are completely overshadowed
                 for (int i = index - 1; i > - 1; i--) {
                     if (skyline.get(i).start.y > upToThisY) {
                         skyline.remove(skyline.get(i));
@@ -252,12 +257,13 @@ public class ArrayListSkyline extends AbstractSkyline {
                     }
                 }
 
-                // From here we only need to cut a segment in half
+                // From here we only need to cut a segment in half or delete it
                 Segment segmentToCut = skyline.get(index - 1);
-
                 SegPoint upToSegPoint = segmentToCut.start;
                 skyline.remove(segmentToCut);
-                skyline.add(index - 1, new Segment(upToSegPoint, new SegPoint(false, new Point(upToSegPoint.x, position.y - rectangle.height - 1))));
+                if (upToSegPoint.y < upToThisY) {
+                    skyline.add(index - 1, new Segment(upToSegPoint, new SegPoint(false, new Point(upToSegPoint.x, position.y - rectangle.height))));
+                }
             }
         }
 
@@ -275,7 +281,7 @@ public class ArrayListSkyline extends AbstractSkyline {
     public boolean anyOnlyFit(ArrayList<Rectangle> sequence) {
         int[] perfectFits = new int[skyline.size()];
 
-        for (int i = 0; i < skyline.size() - 1; i++) {
+        for (int i = 0; i < skyline.size(); i++) {
             Rectangle rectangleThatMightBeTheOnlyFittingOne = null;
             for (Rectangle rec : sequence) {
                 if (!rec.isPlaced() && skyline.get(i).getLength() == rec.height) {
