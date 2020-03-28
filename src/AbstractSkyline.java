@@ -11,21 +11,16 @@ public abstract class AbstractSkyline {
      */
     public abstract boolean testSpreadConstraint(Rectangle rectangle, SegPoint position);
 
-    // done
     public abstract int getLocalWaste(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence);
 
-    // done
     public abstract int getFitnessNumber(Rectangle rectangle, SegPoint position);
 
-    // done
     public abstract void addRectangle(Rectangle rectangle, SegPoint position);
 
-    public abstract boolean anyOnlyFit(ArrayList<Rectangle> sequence);
+    public abstract PositionRectanglePair anyOnlyFit(ArrayList<Rectangle> sequence);
 
-    // done
     public abstract ArrayList<SegPoint> getCandidatePoints();
 
 
-    // done
     public abstract int getMostLeftPoint();
 }

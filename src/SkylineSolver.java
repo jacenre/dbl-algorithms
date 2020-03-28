@@ -106,17 +106,15 @@ public class SkylineSolver extends AbstractSolver {
         // Test all the candidate positions - rectangle combos
         ArrayListSkyline skyline = new ArrayListSkyline(globalHeight, width, maximumSpread);
         ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
-        ArrayList<PositionRectanglePair> perfectFit = new ArrayList<>();
 
         while (!sequence.isEmpty()) {
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
             minimumLocalSpaceWasteRectangles.clear();
-            perfectFit.clear();
             PositionRectanglePair toBePlaced = null;
 
-            if (skyline.anyOnlyFit(sequence)) {
-                continue;
-            }
+           // if (skyline.anyOnlyFit(sequence)) {
+           //     continue;
+           // }
             for (SegPoint segPoint : skyline.getCandidatePoints()) {
                 for (Rectangle rectangle : sequence) {
                     if (skyline.testSpreadConstraint(rectangle, segPoint)) { // spread constraint
@@ -151,4 +149,5 @@ public class SkylineSolver extends AbstractSolver {
         }
         return true;
     }
+
 }
