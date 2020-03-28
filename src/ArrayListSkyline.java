@@ -197,11 +197,6 @@ public class ArrayListSkyline extends AbstractSkyline {
         return mostLeftPoint;
     }
 
-    /**
-     * Places a rectangle and modifies the skyline accordingly.
-     *
-     * @param rectangle the Rectangle to place
-     */
     public void adjustSkyline(Rectangle rectangle, SegPoint position) {
         // Note that a rectangle is always placed with the origin matching a skyline point.
         Segment segmentOnWhichIsToBePlaced = null;

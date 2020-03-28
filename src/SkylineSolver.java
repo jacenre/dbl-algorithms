@@ -10,11 +10,16 @@ public class SkylineSolver extends AbstractSolver {
 
     Solution globalSolution;
     int globalHeight;
+    int globalWidth;
 
     // Algorithm 2 in the paper
     @Override
     Solution pack(Parameters parameters) {
-        int globalHeight = parameters.height;
+        globalWidth = 100;
+        if (heuristicSolve(parameters.rectangles, globalWidth, 100)) {
+            return new Solution(parameters);
+        }
+        globalHeight = parameters.height;
         int lowerBound = getLowerBound(parameters);
         int upperBound = (int) (lowerBound * 1.1);
         int iter = 1;
@@ -87,30 +92,32 @@ public class SkylineSolver extends AbstractSolver {
      * @param maximumSpread The given maximumSpread to which to adhere
      * @return true or false whether the heuristic was able to pack all the rectangles given the restrictions
      */
-    boolean heuristicPacking(ArrayList<Rectangle> sequence, int width, int maximumSpread) {
+    boolean heuristicSolve(ArrayList<Rectangle> sequence, int width, int maximumSpread) {
         // Test all the candidate positions - rectangle combos
-        ArrayListSkyline skyline = new ArrayListSkyline(globalHeight, width, maximumSpread);
+        ArrayListSkyline skylineDataStructure = new ArrayListSkyline(globalHeight, width, maximumSpread);
         ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
 
-        ArrayList<Rectangle> originalSequence = skyline.deepCopyRectangles(sequence);
+        ArrayList<Rectangle> originalSequence = skylineDataStructure.deepCopyRectangles(sequence);
         while (!sequence.isEmpty()) {
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
             minimumLocalSpaceWasteRectangles.clear();
-            PositionRectanglePair toBePlaced = skyline.anyOnlyFit(sequence);
+            PositionRectanglePair toBePlaced = skylineDataStructure.anyOnlyFit(sequence);
 
             if (!(toBePlaced == null)) {
-                System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
-                skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
+                toBePlaced.rectangle.x = toBePlaced.position.x;
+                toBePlaced.rectangle.y = toBePlaced.position.y;
+                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
                 toBePlaced.rectangle.place(true);
                 sequence.remove(toBePlaced.rectangle);
+                System.out.println("Placed special rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
                 continue;
             }
-            for (SegPoint segPoint : skyline.getCandidatePoints()) {
+            for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
                 for (Rectangle rectangle : sequence) {
-                    if (skyline.testSpreadConstraint(rectangle, segPoint) || hasOverlap(rectangle, segPoint, originalSequence)) { // spread constraint
+                    if (skylineDataStructure.testSpreadConstraint(rectangle, segPoint) || hasOverlap(rectangle, segPoint, originalSequence)) { // spread constraint
                         continue;
                     }
-                    int localSpaceWaste = skyline.getLocalWaste(rectangle, segPoint, sequence);
+                    int localSpaceWaste = skylineDataStructure.getLocalWaste(rectangle, segPoint, sequence);
                     if (localSpaceWaste < minimumLocalSpaceWaste) {
                         minimumLocalSpaceWasteRectangles.clear();
                         minimumLocalSpaceWaste = localSpaceWaste;
@@ -127,7 +134,7 @@ public class SkylineSolver extends AbstractSolver {
                 int highestFitness = 0;
                 toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
                 for (PositionRectanglePair pair : minimumLocalSpaceWasteRectangles) {
-                    if (skyline.getFitnessNumber(pair.rectangle, pair.position) > highestFitness) {
+                    if (skylineDataStructure.getFitnessNumber(pair.rectangle, pair.position) > highestFitness) {
                         toBePlaced = pair;
                     }
                 }
@@ -145,9 +152,8 @@ public class SkylineSolver extends AbstractSolver {
                 System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
                 toBePlaced.rectangle.place(true);
                 sequence.remove(toBePlaced.rectangle);
-                skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
+                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
             } else {
-                System.out.println("kon niet plaatsen");
                 return false;
             }
         }
@@ -172,7 +178,7 @@ public class SkylineSolver extends AbstractSolver {
             }
         }
 
-        Rectangle extraRec = new Rectangle(0, 10, 10, 1);
+        Rectangle extraRec = new Rectangle(0, globalHeight, globalWidth, 1);
         extraRec.place(true);
         placedRecs.add(extraRec);
         Parameters parameters = new Parameters();
