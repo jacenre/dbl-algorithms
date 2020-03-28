@@ -84,7 +84,7 @@ public class SkylineSolver extends AbstractSolver {
     boolean solve(Parameters parameters, int W, int iter) {
         for (ArrayList<Rectangle> seq : new RectangleSorter(parameters.rectangles)) {
             for (float ms : new SpreadValues(seq)) {
-                if (heuristicPacking(seq, W, (int) ms)) {
+                if (heuristicSolve(seq, W, (int) ms)) {
                     return true;
                 }
                 for (int i = 0; i < iter; i++) {
@@ -191,17 +191,6 @@ public class SkylineSolver extends AbstractSolver {
         @Override
         public Iterator<Float> iterator() {
             return spreadValues.iterator();
-        }
-    }
-
-
-    class PositionRectanglePair {
-        Rectangle rectangle;
-        SegPoint position;
-
-        PositionRectanglePair(Rectangle rec, SegPoint pnt) {
-            this.rectangle = rec;
-            this.position = pnt;
         }
     }
 
