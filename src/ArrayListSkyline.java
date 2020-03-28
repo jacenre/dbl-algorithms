@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ArrayListSkyline extends AbstractSkyline {
 
@@ -46,7 +45,7 @@ public class ArrayListSkyline extends AbstractSkyline {
 
         // Compute wasted space left
         int areaBefore = getAreaOfSkyline(skyline);
-        addRectangle(rectangle, position);
+        adjustSkyline(rectangle, position);
         int areaAfter = getAreaOfSkyline(skyline);
         int wastedSpaceLeft = areaAfter - areaBefore - rectangle.height * rectangle.width;
 
@@ -198,12 +197,7 @@ public class ArrayListSkyline extends AbstractSkyline {
         return mostLeftPoint;
     }
 
-    /**
-     * Places a rectangle and modifies the skyline accordingly.
-     *
-     * @param rectangle the Rectangle to place
-     */
-    public void addRectangle(Rectangle rectangle, SegPoint position) {
+    public void adjustSkyline(Rectangle rectangle, SegPoint position) {
         // Note that a rectangle is always placed with the origin matching a skyline point.
         Segment segmentOnWhichIsToBePlaced = null;
         int index = 0;
