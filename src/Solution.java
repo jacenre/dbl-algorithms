@@ -221,8 +221,9 @@ public class Solution {
      * @return true if better, otherwise false
      */
     public boolean isBetter(Solution solution2) {
+        boolean ignoreHeightVariant = this.parameters.heightVariant == Util.HeightSupport.FREE;
         // Check if null (edge cases)
         if (solution2 == null) return true;
-        else return this.getArea(true) < solution2.getArea(true);
+        else return this.getArea(ignoreHeightVariant) < solution2.getArea(ignoreHeightVariant);
     }
 }

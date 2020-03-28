@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing class using {@link SkylineSolverTest}

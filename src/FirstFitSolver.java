@@ -55,14 +55,14 @@ public class FirstFitSolver extends AbstractSolver {
                 // If the rectangle doesn't fit we create a new box.
                 if (!fitRectangle(boxes, rectangle, parameters.height)) {
 
-                    int maxX = 0;
+                    long maxX = 0;
                     for (Box box : boxes) {
                         if (box.y == 0) {
                             maxX = Math.max(box.x + box.width, maxX);
                         }
                     }
 
-                    rectangle.x = maxX;
+                    rectangle.x = (int) maxX;
                     rectangle.y = 0;
 
                     Box newBox = new Box(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
@@ -83,18 +83,18 @@ public class FirstFitSolver extends AbstractSolver {
      *
      * @return {@code true} if it fits in any of the boxes, else {@code false}
      */
-    private boolean fitRectangle(ArrayList<Box> boxes, Rectangle rectangle, int height) {
+    private boolean fitRectangle(ArrayList<Box> boxes, Rectangle rectangle, long height) {
         for (Box box : boxes) {
             // If adding the box respects the height limit and isn't to wide...
             if (rectangle.height + box.height + box.y <= height && rectangle.width <= box.width) {
-                rectangle.x = box.x;
-                rectangle.y = box.y + box.height;
+                rectangle.x = (int) box.x;
+                rectangle.y = (int) (box.y + box.height);
                 box.add(rectangle);
 
                 // Create a new box to the right of the rectangle
                 if (box.rectangles.size() > 1) {
                     Rectangle previousRect = box.rectangles.get(box.rectangles.size() - 2);
-                    int boundX = previousRect.width - rectangle.width;
+                    long boundX = previousRect.width - rectangle.width;
 
                     Box recursiveBox = new Box(rectangle.x + rectangle.width, rectangle.y, boundX, 0);
                     boxes.add(recursiveBox);
@@ -115,15 +115,15 @@ public class FirstFitSolver extends AbstractSolver {
         ArrayList<Rectangle> rectangles = new ArrayList<>();
 
         // Top left coordinates of the box.
-        int x;
-        int y;
+        long x;
+        long y;
 
         // Size of the Box.
-        int width;
-        int height;
+        long width;
+        long height;
 
         // The width and height are soft wrap, meaning that adding a bigger rectangle overwrites these.
-        Box(int x, int y, int width, int height) {
+        Box(long x, long y, long width, long height) {
             this.x = x;
             this.y = y;
             this.width = width;

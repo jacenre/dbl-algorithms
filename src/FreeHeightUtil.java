@@ -51,11 +51,10 @@ public class FreeHeightUtil {
         Solution bestSolution = subSolver.pack(parameters.copy());
         long endTime = System.nanoTime();
 
-        long duration = Math.max((endTime - startTime) / 1000000, 1); // duration of subSolver.pack or 1 if too fast
+        long duration = Math.max((endTime - startTime) / 1000000, 15); // duration of subSolver.pack or 1 if too fast
 
         // Time allowed in milliseconds
         final int ALLOWED_TIME = 25000; // 25 seconds which leaves 5 seconds for other stuff
-
         int numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
         if (Util.debug)
             System.out.println("numChecks: " + numChecks);
@@ -84,15 +83,15 @@ public class FreeHeightUtil {
     Solution localMinimaFinder(Parameters parameters, int numChecks) {
 
         // Starting conditions
-        final int minimumHeight = Util.largestRect(parameters);
-        final int maximumHeight = Util.sumHeight(parameters);
+        final long minimumHeight = Util.largestRect(parameters);
+        final long maximumHeight = Util.sumHeight(parameters);
 
         // range over which to check for best solution (will get smaller each recursion)
-        int startRange = minimumHeight;
-        int stopRange = maximumHeight;
+        long startRange = minimumHeight;
+        long stopRange = maximumHeight;
 
         // number of possible heights that could be used to solve
-        int numPossibleHeights = maximumHeight - minimumHeight;
+        long numPossibleHeights = maximumHeight - minimumHeight;
 
         // smallest stepSize to reach before stopping (smaller is more precise)
         double stepSizePrecision = 1;

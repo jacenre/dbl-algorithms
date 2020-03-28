@@ -61,11 +61,12 @@ public class GeneticSolver extends AbstractSolver {
                 for (int j = 0; j < parameters.rectangles.size(); j++) {
                     boolean rotated = perm[j] < 0;
                     this.parameters.rectangles.set(j, parameters.rectangles.get(Math.abs(perm[j])));
-                    this.parameters.rectangles.get(j).rotate(perm[j] < 0);
+                    if (this.parameters.rotationVariant) this.parameters.rectangles.get(j).rotate(perm[j] < 0);
                 }
 
                 // Calculate the solution and the solution score
                 Solution pack = this.solver.pack(this.parameters);
+                // TODO Solve the negative coords error and remove this.
                 pack.setScore(fitnessFunction(pack));
                 results.put(perm, pack);
             }

@@ -23,6 +23,19 @@ class ArrayListSkylineTest {
         Assertions.assertFalse(points.get(1).start);
     }
 
+    @Test
+    void rectangleSorter() {
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
+        rectangles.add(new Rectangle(1,2 ));
+        rectangles.add(new Rectangle(4,3 ));
+        rectangles.add(new Rectangle(4,5 ));
+        rectangles.add(new Rectangle(7,6 ));
+        for (ArrayList<Rectangle> rectangles1:
+             new SkylineSolver.RectangleSorter(rectangles)) {
+            System.out.println(rectangles1.hashCode() + ", " + rectangles1);
+        }
+    }
+
 //    @Test
 //    void testOnlyFitFunctionality() {
 //        // Wel een only fit
