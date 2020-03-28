@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ArrayListSkyline extends AbstractSkyline {
 
@@ -18,8 +19,119 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
     @Override
-    public void removeRectangle(Rectangle rectangle) {
+    public boolean testSpreadConstraint(Rectangle rectangle, SegPoint position) {
+        return position.x + rectangle.width - getMostLeftPoint() > maximumSpread;
+    }
 
+    @Override
+    public int getLocalWaste(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence) {
+        ArrayList<Segment> skylineBefore = skyline;
+
+        // Compute wasted space below
+        int areaBefore = getAreaOfSkyline(skyline);
+        addRectangle(rectangle, position);
+        int areaAfter = getAreaOfSkyline(skyline);
+        int wastedSpaceLeft = areaAfter - areaBefore - rectangle.height * rectangle.width;
+
+        // wasted space right
+        int wastedSpaceRight = 0;
+        int[] minMax = getMinWidthHeightOtherRectangles(rectangle, sequence);
+        int spaceLeftRight = globalWidth - rectangle.x - rectangle.width;
+        if (minMax[0] > spaceLeftRight) {
+            wastedSpaceRight = spaceLeftRight * rectangle.height;
+        }
+
+        // Get segment corresponding to right side of rectangle
+        Segment segmentInQuestion = null;
+        for (Segment segment : skyline) {
+            if (segment.start.y == rectangle.y || segment.end.y == rectangle.y + rectangle.height) {
+                segmentInQuestion = segment;
+            }
+        }
+        int index = skyline.indexOf(segmentInQuestion);
+
+        // Wasted space above
+        // TODO: dit klopt nog niet helemaal
+        int wastedSpaceAbove = 0;
+        while (index > 0) {
+            index--;
+            Segment toCheck = skyline.get(index);
+            if (toCheck.start.x < segmentInQuestion.start.x && toCheck.getLength() < minMax[1]) {
+                wastedSpaceAbove += segmentInQuestion.start.x - toCheck.start.x * toCheck.getLength();
+            }
+        }
+
+        // Wasted space below
+        int wastedSpaceBelow = 0;
+        while (index < skyline.size() - 1) {
+            index++;
+            Segment toCheck = skyline.get(index);
+            if (toCheck.start.x < segmentInQuestion.start.x && toCheck.getLength() < minMax[1]) {
+                wastedSpaceBelow += segmentInQuestion.start.x - toCheck.start.x * toCheck.getLength();
+            }
+        }
+
+        skyline = skylineBefore;
+        rectangle.place(false);
+
+        return  wastedSpaceLeft + wastedSpaceBelow + wastedSpaceRight + wastedSpaceAbove;
+    }
+
+    public int[] getMinWidthHeightOtherRectangles(Rectangle rectangle, ArrayList<Rectangle> sequence) {
+        int minWidth = Integer.MAX_VALUE;
+        int minHeight = Integer.MAX_VALUE;
+        for (Rectangle rec : sequence) {
+            if (!rec.isPlaced()) {
+                if (rec.width < minWidth) {
+                    minWidth = rec.width;
+                }
+                if (rec.height < minHeight) {
+                    minHeight = rec.height;
+                }
+            }
+        }
+        return new int[] {minWidth, minHeight};
+    }
+
+    @Override
+    public int getFitnessNumber(Rectangle rectangle, SegPoint position) {
+        int fitnessNumber = 0;
+
+        // Touching Right side?
+        if (position.x + rectangle.width == globalWidth) {
+            fitnessNumber++;
+        }
+
+        Segment segmentInQuestion = null;
+
+        for (Segment segment : skyline) {
+            if (segment.start == position || segment.end == position) {
+                segmentInQuestion = segment;
+            }
+        }
+        int index = 0;
+        index = skyline.indexOf(segmentInQuestion);
+
+        // Same as left Segment
+        if (segmentInQuestion.getLength() == rectangle.height) {
+            fitnessNumber++;
+        }
+
+        // Same as above
+        if (index > 0 && (skyline.get(index - 1).start.x - segmentInQuestion.start.x) == rectangle.width) {
+            fitnessNumber++;
+        } else if (index == 0 && (globalWidth - segmentInQuestion.start.x) == rectangle.width) {
+            fitnessNumber++;
+        }
+
+        //Same as below
+        if (index < skyline.size() - 1 && (skyline.get(index + 1).start.x - segmentInQuestion.start.x) == rectangle.width) {
+            fitnessNumber++;
+        } else if (index == skyline.size() - 1 && (globalWidth - segmentInQuestion.start.x) == rectangle.width) {
+            fitnessNumber++;
+        }
+
+        return fitnessNumber;
     }
 
     /**
@@ -68,37 +180,17 @@ public class ArrayListSkyline extends AbstractSkyline {
         return mostLeftPoint;
     }
 
-    @Override
-    public boolean testSpreadConstraint(Rectangle rectangle) {
-        return false;
-    }
-
-    @Override
-    public int getFitnessNumber(Rectangle rectangle) {
-        return 0;
-    }
-
-    @Override
-    public boolean onlyFit(Rectangle rectangle) {
-        return false;
-    }
-
-    @Override
-    public int getLocalWaste(Rectangle rectangle) {
-        return 0;
-    }
-
     /**
      * Places a rectangle and modifies the skyline accordingly.
      *
      * @param rectangle the Rectangle to place
      */
-    public void addRectangle(Rectangle rectangle) {
+    public void addRectangle(Rectangle rectangle, SegPoint position) {
         // Note that a rectangle is always placed with the origin matching a skyline point.
         Segment segmentOnWhichIsPlaced = null;
         int index = 0;
         for (Segment segment : skyline) {
-            if (segment.start.equals(rectangle) || segment.end.equals(rectangle)) {
+            if (segment.start.equals(position) || segment.end.equals(position)) {
                 segmentOnWhichIsPlaced = segment;
                 index = skyline.indexOf(segment);
             }
@@ -106,30 +198,35 @@ public class ArrayListSkyline extends AbstractSkyline {
 
         // Case 1: rectangle to be placed is smaller than segment on which is to be placed
         if (segmentOnWhichIsPlaced.getLength() > rectangle.height) {
-            // Top left corner of rectangle is placed on upper candidate position of segment
-            if (segmentOnWhichIsPlaced.start.equals(new Point(rectangle.x, rectangle.y))) {
+            if (position.start) {// Top left corner of rectangle is placed on upper candidate position of segment
                 SegPoint endPoint = segmentOnWhichIsPlaced.end;
                 skyline.remove(segmentOnWhichIsPlaced);
-                skyline.add(index, new Segment(new SegPoint(true, new Point(rectangle.x + rectangle.width, rectangle.y)),
-                        new SegPoint(false, new Point(rectangle.x + rectangle.width, rectangle.y + rectangle.height))));
-                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(endPoint.x, rectangle.y + rectangle.height + 1)), endPoint));
-            } else if (segmentOnWhichIsPlaced.end.equals((new Point(rectangle.x, rectangle.y + rectangle.height)))) {
+                skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)),
+                        new SegPoint(false, new Point(rectangle.x + rectangle.width, position.y + rectangle.height))));
+                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(endPoint.x, position.y + rectangle.height + 1)), endPoint));
+            } else if (!position.start) {// Bottom left corner of rectangle is placed on lower candidate position of segment
                 SegPoint beginPoint = segmentOnWhichIsPlaced.start;
                 skyline.remove(segmentOnWhichIsPlaced);
-                skyline.add(index, new Segment(beginPoint, new SegPoint(false, new Point(beginPoint.x, rectangle.y - 1))));
-                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(rectangle.x + rectangle.width, rectangle.y)),
-                        new SegPoint(false, new Point(rectangle.x + rectangle.width, rectangle.y + rectangle.height))));
+                skyline.add(index, new Segment(beginPoint, new SegPoint(false, new Point(beginPoint.x, position.y - rectangle.height - 1))));
+                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y - rectangle.height)),
+                        new SegPoint(false, new Point(position.x + rectangle.width, position.y))));
             }
         } else if (segmentOnWhichIsPlaced.getLength() == rectangle.height) { // Case 2: rectangle to placed is exactly as big as the segment on which it is placed
-            skyline.remove(segmentOnWhichIsPlaced);
-            skyline.add(index, new Segment(new SegPoint(true, new Point(rectangle.x + rectangle.width, rectangle.y)), new SegPoint(false,
-                    new Point(rectangle.x + rectangle.width, rectangle.y + rectangle.height))));
-        } else { // Case 3 : rectangle to be placed is longer than the segment on which it is placed
-            if (segmentOnWhichIsPlaced.start.equals(new Point(rectangle.x, rectangle.y))) {
+            if (position.start) {
                 skyline.remove(segmentOnWhichIsPlaced);
-                int upToThisY = rectangle.y + rectangle.height;
-                skyline.add(index, new Segment(new SegPoint(true, new Point(rectangle.x + rectangle.width, rectangle.y)),
-                        new SegPoint(false, new Point(rectangle.x + rectangle.width, upToThisY))));
+                skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)), new SegPoint(false,
+                        new Point(position.x + rectangle.width, position.y + rectangle.height))));
+            } else if (!position.start) {
+                skyline.remove(segmentOnWhichIsPlaced);
+                skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y - rectangle.height)), new SegPoint(false,
+                        new Point(position.x + rectangle.width, position.y))));
+            }
+        } else { // Case 3 : rectangle to be placed is longer than the segment on which it is placed
+            if (position.start) {
+                skyline.remove(segmentOnWhichIsPlaced);
+                int upToThisY = position.y + rectangle.height;
+                skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)),
+                        new SegPoint(false, new Point(position.x + rectangle.width, upToThisY))));
 
                 for (int i = index + 1; i < skyline.size() - 1; i++) {
                     if (skyline.get(i).end.y < upToThisY) {
@@ -141,32 +238,64 @@ public class ArrayListSkyline extends AbstractSkyline {
                 Segment segmentToCut = skyline.get(index + 1);
                 SegPoint upToSegPoint = segmentToCut.end;
                 skyline.remove(segmentToCut);
-                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(upToSegPoint.x, rectangle.y + rectangle.height + 1)), upToSegPoint));
-            } else if (segmentOnWhichIsPlaced.end.equals((new Point(rectangle.x, rectangle.y + rectangle.height)))) {
+                skyline.add(index + 1, new Segment(new SegPoint(true, new Point(upToSegPoint.x, position.y + rectangle.height + 1)), upToSegPoint));
+            } else if (!position.start) {
                 skyline.remove(segmentOnWhichIsPlaced);
-                int upToThisY = rectangle.y;
-                skyline.add(index, new Segment(new SegPoint(true, new Point(rectangle.x + rectangle.width, upToThisY)),
-                        new SegPoint(false, new Point(rectangle.x + rectangle.width, rectangle.y + rectangle.height))));
+                int upToThisY = position.y - rectangle.height;
+                skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, upToThisY)),
+                        new SegPoint(false, new Point(position.x + rectangle.width, position.y))));
 
                 for (int i = index - 1; i > - 1; i--) {
                     if (skyline.get(i).start.y > upToThisY) {
                         skyline.remove(skyline.get(i));
+                        index--;
                     }
                 }
 
                 // From here we only need to cut a segment in half
-                Segment segmentToCut = null;
-
-                for (Segment segment : skyline) {
-                    if (segment.start.y < upToThisY && segment.end.y > upToThisY) {
-                        segmentToCut = segment;
-                    }
-                }
+                Segment segmentToCut = skyline.get(index - 1);
 
                 SegPoint upToSegPoint = segmentToCut.start;
                 skyline.remove(segmentToCut);
-                skyline.add(skyline.indexOf(segmentToCut), new Segment(upToSegPoint, new SegPoint(false, new Point(upToSegPoint.x, rectangle.y - 1))));
+                skyline.add(index - 1, new Segment(upToSegPoint, new SegPoint(false, new Point(upToSegPoint.x, position.y - rectangle.height - 1))));
             }
         }
+
+        if (position.start) {
+            rectangle.x = position.x;
+            rectangle.y = position.y;
+        } else if (!position.start) {
+            rectangle.x = position.x;
+            rectangle.y = position.y - rectangle.height;
+        }
+        rectangle.place(true);
+    }
+
+    @Override
+    public boolean anyOnlyFit(ArrayList<Rectangle> sequence) {
+        int[] perfectFits = new int[skyline.size()];
+
+        for (int i = 0; i < skyline.size() - 1; i++) {
+            Rectangle rectangleThatMightBeTheOnlyFittingOne = null;
+            for (Rectangle rec : sequence) {
+                if (!rec.isPlaced() && skyline.get(i).getLength() == rec.height) {
+                    perfectFits[i]++;
+                    rectangleThatMightBeTheOnlyFittingOne = rec;
+                }
+            }
+            if (perfectFits[i] == 1 && !testSpreadConstraint(rectangleThatMightBeTheOnlyFittingOne, skyline.get(i).start)) {
+                addRectangle(rectangleThatMightBeTheOnlyFittingOne, skyline.get(i).start);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    int getAreaOfSkyline(ArrayList<Segment> skyline) {
+        int total = 0;
+        for (Segment segment : skyline) {
+            total += segment.getLength() * segment.start.x;
+        }
+        return total;
     }
 }

@@ -114,12 +114,15 @@ public class SkylineSolver extends AbstractSolver {
             perfectFit.clear();
             PositionRectanglePair toBePlaced = null;
 
+            if (skyline.anyOnlyFit(sequence)) {
+                continue;
+            }
             for (SegPoint segPoint : skyline.getCandidatePoints()) {
                 for (Rectangle rectangle : sequence) {
                     if (skyline.testSpreadConstraint(rectangle, segPoint)) { // spread constraint
                         continue;
                     }
-                    int localSpaceWaste = skyline.getLocalWaste(rectangle, segPoint);
+                    int localSpaceWaste = skyline.getLocalWaste(rectangle, segPoint, sequence);
                     if (localSpaceWaste < minimumLocalSpaceWaste) {
                         minimumLocalSpaceWasteRectangles.clear();
                         minimumLocalSpaceWaste = localSpaceWaste;
@@ -127,14 +130,9 @@ public class SkylineSolver extends AbstractSolver {
                     } else if (localSpaceWaste == minimumLocalSpaceWaste) {
                         minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
                     }
-                    if (localSpaceWaste == 0) {
-                        perfectFit.add(new PositionRectanglePair(rectangle, segPoint));
-                    }
                 }
             }
-            if (perfectFit.size() == 1) { // only fit
-                toBePlaced = perfectFit.get(0);
-            } else if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
+            if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
                 toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
             } else if (minimumLocalSpaceWasteRectangles.size() >= 2){ // maximum fitness number and earliest in sequence
                 int highestFitness = 0;
@@ -153,6 +151,4 @@ public class SkylineSolver extends AbstractSolver {
         }
         return true;
     }
-
-
 }
