@@ -64,14 +64,12 @@ public class CompoundSolver extends AbstractSolver {
                     continue;
                 }
 
-                if (Util.debug) System.err.println(solver.getClass().getSimpleName() + " is not better with " + solution.getArea());
-
                 // If we found a better solution.
                 if (bestSolution == null) {
                     if (solution.getRate() >= 1) {
                         bestSolution = solution.copy();
                     }
-//                    if (Util.debug) System.err.println(solver.getClass().getSimpleName() + " is improved with " + solution.getArea());
+                    if (Util.debug) System.err.println(solver.getClass().getSimpleName() + " is improved with " + solution.getArea());
 
                 } else if (solution.isBetter(bestSolution)) {
                     bestSolution = solution.copy();
