@@ -18,9 +18,7 @@ public class GeneticSolver extends AbstractSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-        if (parameters.rectangles.size() > 500 && (
-                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
-        return parameters.rectangles.size() <= 800;
+        return parameters.rectangles.size() <= 500;
     }
 
     public GeneticSolver(AbstractSolver solver, boolean allowInputSorting) {
@@ -33,7 +31,7 @@ public class GeneticSolver extends AbstractSolver {
         this.parameters = parameters.copy();
 
         if (!this.allowInputSorting && !parameters.rotationVariant) {
-            return this.solver.pack(parameters);
+            return this.solver.pack(this.parameters);
         }
 
         // Array {a} holds the indexes of the rectangles list.
@@ -49,33 +47,49 @@ public class GeneticSolver extends AbstractSolver {
         Solution bestSolution = null;
 
         // Run 5 generations
-        for (int i = 0; i < 10; i++) {
-            // Each permutation generates {crossoverN} new permutations
-            int crossoverN = 3;
-            permutations = crossover(permutations, crossoverN);
+        int nGenerations;
+        // Each crossover will generate 3 new permutations per permutation
+        int nRectangles = parameters.rectangles.size();
+        if (nRectangles <= 6) {
+            nGenerations = 10;
+        } else if (nRectangles <= 15) {
+            nGenerations = 100;
+        } else if (nRectangles <= 100) {
+            nGenerations = 50;
+        } else {
+            nGenerations = 10;
+        }
+        for (int i = 0; i < nGenerations; i++) {
+            // Each permutation generates 2 new permutations
+            permutations = crossover(permutations);
 
             // Solve for all crossovers
             Map<int[], Solution> results = new HashMap<>();
             for (int[] perm : permutations) {
                 // Set the order of the rectangles as described by the permutation
-                for (int j = 0; j < parameters.rectangles.size(); j++) {
-                    boolean rotated = perm[j] < 0;
+                for (int j = 0; j < nRectangles; j++) {
                     this.parameters.rectangles.set(j, parameters.rectangles.get(Math.abs(perm[j])));
                     if (this.parameters.rotationVariant) this.parameters.rectangles.get(j).rotate(perm[j] < 0);
                 }
 
                 // Calculate the solution and the solution score
                 Solution pack = this.solver.pack(this.parameters);
-                // TODO Solve the negative coords error and remove this.
                 pack.setScore(fitnessFunction(pack));
                 results.put(perm, pack);
             }
 
-            // Sort the solutions by their score
+            // Sort the solutions by their score and pick the new contender
             List<Map.Entry<int[], Solution>> solutions = new ArrayList<>(results.entrySet());
             solutions.sort((r1, r2) -> Double.compare(r2.getValue().getScore(), r1.getValue().getScore()));
-            if (bestSolution == null || solutions.get(0).getValue().getRate() < bestSolution.getRate()) {
-                bestSolution = solutions.get(0).getValue();
+            int x = 0;
+            Solution contenderSolution = solutions.get(x).getValue();
+            while (this.parameters.heightVariant == Util.HeightSupport.FIXED && contenderSolution.getHeight() > this.parameters.height || x == solutions.size()) {
+                contenderSolution = solutions.get(x).getValue();
+            }
+
+            // Compare the contender to the best solution yet
+            if (bestSolution == null || contenderSolution.getRate() < bestSolution.getRate()) {
+                bestSolution = solutions.get(0).getValue().copy();
             }
 
             // The permutations we will go on with are the best ones
@@ -91,45 +105,60 @@ public class GeneticSolver extends AbstractSolver {
     protected double fitnessFunction(Solution solution) {
         int areaWidth = (int) solution.getWidth();
 
-//        // Get the rectangle that we can most easily make less wide
-//        // Do this by getting largest area that can be filled by a single rectangle
-//        // that is below the current rectangles
-//        ArrayList<Util.Segment> segments = getSegments(solution);
-//
-//        // We sweep from right to left
-//        segments.sort((o1, o2) -> {
-//            // If same X, then from bottom to top
-//            if (o1.x == o2.x) {
-//                return o2.yEnd - o1.yEnd;
-//            }
-//            // Else sort on x
-//            return o2.x - o1.x;
-//        });
-//
-//        // Calculate the reusableTrimLoss by the maximal rectangle that can be made
-//        // from the remaining space to the bottom right of the box
-//        int y = segments.get(0).yEnd;
-//        double reusableTrimLoss = 0;
-//        for (Util.Segment seg: segments) {
-//            if (seg.yEnd >= y) {
-//                reusableTrimLoss = Math.max(reusableTrimLoss, (parameters.height - y) * (areaWidth - seg.x));
-//                y = seg.yEnd;
-//            }
-//        }
+        // Get the rectangle that we can most easily make less wide
+        // Do this by getting largest area that can be filled by a single rectangle
+        // that is below the current rectangles
+        ArrayList<Util.Segment> segments = getSegments(solution);
 
-        double boxArea = (areaWidth * parameters.height);
-        return 1 / boxArea;
-    }
+        // We sweep from right to left
+        segments.sort((o1, o2) -> {
+            // If same X, then from bottom to top
+            if (o1.x == o2.x) {
+                return o2.yEnd - o1.yEnd;
+            }
+            // Else sort on x
+            return o2.x - o1.x;
+        });
 
-    private int[][] crossover(int[][] permutations, int n) {
-        int[][] newPermutations = new int[permutations.length * n][permutations[0].length];
-        for (int i = 0; i < permutations.length; i++) {
-            newPermutations[n*i] = permutations[i];
-            for (int j = 1; j < n; j++) {
-                newPermutations[n*i + j] = shuffle(permutations[i], 1)[0];
+        // Calculate the reusableTrimLoss by the maximal rectangle that can be made
+        // from the remaining space to the bottom right of the box
+        int y = segments.get(0).yEnd;
+        double reusableTrimLoss = 0;
+        for (Util.Segment seg: segments) {
+            if (seg.yEnd >= y) {
+                reusableTrimLoss = Math.max(reusableTrimLoss, (parameters.height - y) * (areaWidth - seg.x));
+                y = seg.yEnd;
             }
         }
+
+        double boxArea = (areaWidth * parameters.height);
+        return solution.getRate();
+//        return areaWidth + reusableTrimLoss / boxArea;
+    }
+
+    private int[][] crossover(int[][] permutations) {
+        int[][] newPermutations = new int[permutations.length * 2][permutations[0].length];
+        for (int i = 0; i < permutations.length; i++) {
+            int[] perm_i = permutations[i];
+            int[] perm_i1 = permutations[(i + 1) % permutations.length];
+            int p = getRandomNumberInRange(1, perm_i.length - 1), q = getRandomNumberInRange(1, perm_i.length - p);
+
+            int[] newPerm1 = actualCrossover(perm_i, p, q);
+            int[] newPerm2 = actualCrossover(perm_i1, p, q);
+
+            // Shuffle the new permutations
+            newPermutations[2 * i] = shuffle(newPerm1, 2)[1];
+            newPermutations[2 * i + 1] = shuffle(newPerm2, 2)[1];
+        }
         return newPermutations;
+    }
+
+    private int[] actualCrossover(int[] perm_1, int p, int q) {
+        int[] newPerm = new int[perm_1.length];
+        System.arraycopy(perm_1, p, newPerm, 0, q);
+        System.arraycopy(perm_1, 0, newPerm, q, p);
+        System.arraycopy(perm_1, q + p, newPerm, q + p, newPerm.length - p - q);
+        return newPerm;
     }
 
     private ArrayList<Util.Segment> getSegments(Solution solution) {
@@ -154,11 +183,12 @@ public class GeneticSolver extends AbstractSolver {
      */
     int[][] shuffle(int[] a, int n) {
         int[][] permutations = new int[n][a.length];
-        for (int i = 0; i < n; i++) {
+        permutations[0] = a.clone();
+        for (int i = 1; i < n; i++) {
             // Generate a new permutation of a
             int[] b = a.clone();
-            for (int j = 0; j < getRandomNumberInRange(1, 4); j++) {
-                int p = getRandomNumberInRange(0, a.length), q = getRandomNumberInRange(0, a.length);
+            for (int j = 0; j < getRandomNumberInRange(a.length/16 + 1, a.length/5 + 3); j++) {
+                int p = getRandomNumberInRange(0, a.length - 1), q = getRandomNumberInRange(0, a.length - 1);
                 if (this.allowInputSorting) {
                     // Get two random indexes and swap them
                     int temp = b[p];
@@ -167,10 +197,10 @@ public class GeneticSolver extends AbstractSolver {
                 }
 
                 // Possibly rotate them
-                if (parameters.rotationVariant && Math.random() < 0.2) {
+                if (parameters.rotationVariant && Math.random() < 0.4) {
                     b[p] = -1 * b[p];
                 }
-                if (parameters.rotationVariant && Math.random() < 0.2) {
+                if (parameters.rotationVariant && Math.random() < 0.4) {
                     b[q] = -1 * b[q];
                 }
             }
@@ -181,6 +211,6 @@ public class GeneticSolver extends AbstractSolver {
 
     private int getRandomNumberInRange(int min, int max) {
         Random r = new Random();
-        return r.nextInt(max - min) + min;
+        return r.nextInt((max - min) + 1) + min;
     }
 }

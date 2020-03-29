@@ -41,7 +41,7 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
      */
     @Override
     protected void moveUp(Rectangle rect, List<Rectangle> rectangles) {
-        if (rect.x <= 0) {
+        if (rect.y <= 0) {
             Util.moveUp(rect, rectangles);
         } else {
             rect.y = Math.max(0, rect.y - rect.height);
