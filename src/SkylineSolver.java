@@ -11,17 +11,12 @@ import java.util.*;
 public class SkylineSolver extends AbstractSolver {
 
     Solution globalSolution;
-    int globalHeight;
-    int globalWidth;
+    Parameters parameters;
 
     // Algorithm 2 in the paper
     @Override
     Solution pack(Parameters parameters) {
-        globalWidth = 100;
-        if (heuristicSolve(parameters.rectangles, globalWidth, 100)) {
-            return new Solution(parameters);
-        }
-        globalHeight = parameters.height;
+        this.parameters = parameters;
         int lowerBound = getLowerBound(parameters);
         int upperBound = (int) (lowerBound * 1.1);
         int iter = 1;
@@ -30,6 +25,7 @@ public class SkylineSolver extends AbstractSolver {
         while (/*time limit not reached and */ lowerBound != upperBound) {
             int tempLowerBound = lowerBound;
             while (tempLowerBound < upperBound) {
+                // Binary search
                 int width = ((tempLowerBound + upperBound) / 2);
                 if (solve(parameters, width, iter)) {
                     /* record this solution */
@@ -95,6 +91,7 @@ public class SkylineSolver extends AbstractSolver {
         return false;
     }
 
+
     /**
      * Iterable that returns deep copies of the given rectangle ArrayList following the sorting rules.
      */
@@ -147,7 +144,7 @@ public class SkylineSolver extends AbstractSolver {
         }
 
         /**
-         * Returns an iterator over elements of type {@code Rectangle}.
+         * Returns an iterator over elements of type {@code ArrayList<Rectangle>}.
          *
          * @return an Iterator.
          */
@@ -178,9 +175,9 @@ public class SkylineSolver extends AbstractSolver {
 
             // {mh, mh + (H - mh) * 1/3, mh + (H - mh) * 2/3, H}
             spreadValues.add(mh);
-            spreadValues.add(mh + (globalHeight - mh) * (1f / 3f));
-            spreadValues.add(mh + (globalHeight - mh) * (2f / 3f));
-            spreadValues.add((float) globalHeight);
+            spreadValues.add(mh + (parameters.height - mh) * (1f / 3f));
+            spreadValues.add(mh + (parameters.height - mh) * (2f / 3f));
+            spreadValues.add((float) parameters.height);
         }
 
         /**
@@ -194,22 +191,30 @@ public class SkylineSolver extends AbstractSolver {
         }
     }
 
+    public void resetRecs(ArrayList<Rectangle> sequence) {
+        for (Rectangle rec : sequence) {
+            rec.place(false);
+        }
+    }
+
     /**
      * Goes through the heuristics and places the sequence of rectangles in the box while maintaining a skyline view of
      * the whole ordeal. Returns if a solution was able to be found with the given maximumSpread and width.
      *
-     * @param sequence      The sequence of rectangles, which can be very different according to different sorting and
+     * @param originalSequence      The sequence of rectangles, which can be very different according to different sorting and
      *                      the random permutations made by the tabu search algorithm
      * @param width         The given width to which to adhere
      * @param maximumSpread The given maximumSpread to which to adhere
      * @return true or false whether the heuristic was able to pack all the rectangles given the restrictions
      */
-    boolean heuristicSolve(ArrayList<Rectangle> sequence, int width, int maximumSpread) {
+    boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
+        resetRecs(originalSequence);
+        System.out.println("height : " + parameters.height + " width : " + width + " maximum spread: " + maximumSpread);
         // Test all the candidate positions - rectangle combos
-        ArrayListSkyline skylineDataStructure = new ArrayListSkyline(globalHeight, width, maximumSpread);
+        ArrayListSkyline skylineDataStructure = new ArrayListSkyline(parameters.height, width, maximumSpread);
         ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
+        ArrayList<Rectangle> sequence = skylineDataStructure.deepCopyRectangles(originalSequence);
 
-        ArrayList<Rectangle> originalSequence = skylineDataStructure.deepCopyRectangles(sequence);
         while (!sequence.isEmpty()) {
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
             minimumLocalSpaceWasteRectangles.clear();
@@ -221,7 +226,6 @@ public class SkylineSolver extends AbstractSolver {
                 skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
                 toBePlaced.rectangle.place(true);
                 sequence.remove(toBePlaced.rectangle);
-                System.out.println("Placed special rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
                 continue;
             }
             for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
@@ -261,7 +265,6 @@ public class SkylineSolver extends AbstractSolver {
                     toBePlaced.rectangle.x = toBePlaced.position.x;
                     toBePlaced.rectangle.y = toBePlaced.position.y - toBePlaced.rectangle.height;
                 }
-                System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
                 toBePlaced.rectangle.place(true);
                 sequence.remove(toBePlaced.rectangle);
                 skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
@@ -269,7 +272,12 @@ public class SkylineSolver extends AbstractSolver {
                 return false;
             }
         }
-        System.out.println("nice");
+        parameters.rectangles = originalSequence;
+        Solution currentSolution = new Solution(parameters, this);
+        if (globalSolution == null || currentSolution.getArea() < globalSolution.getArea()) {
+            System.out.println("global Solution updated to one with area " + currentSolution.getArea());
+            globalSolution = currentSolution;
+        }
         return true;
     }
 
@@ -282,6 +290,14 @@ public class SkylineSolver extends AbstractSolver {
             rectangle.y = position.y - rectangle.height;
         }
 
+        if (rectangle.y + rectangle.height > parameters.height) {
+            //System.out.println("reaches bottom");
+            return true;
+        } else if (rectangle.y < 0) {
+            //System.out.println("reaches top");
+            return true;
+        }
+
         rectangle.place(true);
         ArrayList<Rectangle> placedRecs = new ArrayList<>();
         for (Rectangle rec : sequence) {
@@ -290,13 +306,11 @@ public class SkylineSolver extends AbstractSolver {
             }
         }
 
-        Rectangle extraRec = new Rectangle(0, globalHeight, globalWidth, 1);
-        extraRec.place(true);
-        placedRecs.add(extraRec);
         Parameters parameters = new Parameters();
         parameters.rectangles = placedRecs;
 
         if (Util.sweepline(new Solution(parameters))) {
+            //System.out.println("sweepline detected collision");
             rectangle.place(false);
             return true;
         }

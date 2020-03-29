@@ -308,9 +308,4 @@ public class ArrayListSkyline extends AbstractSkyline {
         }
         return total;
     }
-
-
-
-
-
 }

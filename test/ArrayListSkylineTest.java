@@ -7,7 +7,7 @@ import java.util.ArrayList;
 class ArrayListSkylineTest {
     ArrayListSkyline skylineDataStructure;
     @BeforeEach
-    void setUp() {skylineDataStructure = new ArrayListSkyline(10, 10, 5);
+    void setUp() {skylineDataStructure = new ArrayListSkyline(22, 22, 16);
     }
 
     @Test
@@ -160,12 +160,12 @@ class ArrayListSkylineTest {
     @Test
     void firstElaborateExample() {
         ArrayList<Rectangle> sequence = new ArrayList<>();
-        sequence.add(new Rectangle(4, 4));
-        sequence.add(new Rectangle(4,  4));
-        sequence.add(new Rectangle(4 ,2));
-        sequence.add(new Rectangle(3, 5));
-        sequence.add(new Rectangle(3, 5));
-        sequence.add(new Rectangle(5,5));
+        sequence.add(new Rectangle(12, 8));
+        sequence.add(new Rectangle(10,  9));
+        sequence.add(new Rectangle(8,12));
+        sequence.add(new Rectangle(16, 3));
+        sequence.add(new Rectangle(4, 16));
+        sequence.add(new Rectangle(10,6));
 
         int totalArea = 0;
         for (Rectangle rec : sequence) {
@@ -187,7 +187,6 @@ class ArrayListSkylineTest {
                 skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
                 toBePlaced.rectangle.place(true);
                 sequence.remove(toBePlaced.rectangle);
-                System.out.println("Placed special rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
                 continue;
             }
             for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
@@ -237,6 +236,8 @@ class ArrayListSkylineTest {
         System.out.println("nice");
     }
 
+    int globalHeight;
+
 
     public boolean hasOverlap(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence) {
         if (position.start) {
@@ -247,6 +248,14 @@ class ArrayListSkylineTest {
             rectangle.y = position.y - rectangle.height;
         }
 
+        if (rectangle.y + rectangle.height > globalHeight) {
+            //System.out.println("reaches bottom");
+            return true;
+        } else if (rectangle.y < 0) {
+            //System.out.println("reaches top");
+            return true;
+        }
+
         rectangle.place(true);
         ArrayList<Rectangle> placedRecs = new ArrayList<>();
         for (Rectangle rec : sequence) {
@@ -255,13 +264,11 @@ class ArrayListSkylineTest {
             }
         }
 
-        Rectangle extraRec = new Rectangle(0, 10, 10, 1);
-        extraRec.place(true);
-        placedRecs.add(extraRec);
         Parameters parameters = new Parameters();
         parameters.rectangles = placedRecs;
 
         if (Util.sweepline(new Solution(parameters))) {
+            //System.out.println("sweepline detected collision");
             rectangle.place(false);
             return true;
         }
