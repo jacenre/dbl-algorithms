@@ -70,6 +70,7 @@ abstract class AbstractPackingSolverTest {
 
         ArrayList<String> paths = new ArrayList<>();
 
+        paths.add("./test/own");
         paths.add("./test/momotor/prototype-1");
         paths.add("./test/momotor/prototype-2");
 
