@@ -1,3 +1,5 @@
+import jdk.swing.interop.SwingInterOpUtils;
+
 import java.util.ArrayList;
 
 import java.lang.reflect.Array;
@@ -13,6 +15,17 @@ public class SkylineSolver extends AbstractSolver {
     Solution globalSolution;
     Parameters parameters;
 
+    @Override
+    Set<Util.HeightSupport> getHeightSupport() {
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+    }
+
+    @Override
+    public boolean canSolveParameters(Parameters parameters) {
+        if (parameters.rectangles.size() > 40) return false;
+        return super.canSolveParameters(parameters);
+    }
+
     // Algorithm 2 in the paper
     @Override
     Solution pack(Parameters parameters) {
@@ -22,7 +35,10 @@ public class SkylineSolver extends AbstractSolver {
         int iter = 1;
         boolean upperBoundFound = false;
 
+        int debug = 0;
+
         while (/*time limit not reached and */ lowerBound != upperBound) {
+            System.out.println(lowerBound + " - " + upperBound + ", " + debug++);
             int tempLowerBound = lowerBound;
             while (tempLowerBound < upperBound) {
                 // Binary search
@@ -31,7 +47,7 @@ public class SkylineSolver extends AbstractSolver {
                     /* record this solution */
                     upperBound = width;
                     upperBoundFound = true;
-                    return globalSolution;
+                    System.out.println("found");
                 } else {
                     tempLowerBound = width + 1;
                 }
@@ -99,20 +115,19 @@ public class SkylineSolver extends AbstractSolver {
                     ArrayList<Rectangle> seqx = null;
                     int highestAreaUtil = 0;
 
-                    HashMap<Integer, Boolean> solved = new HashMap<>();
+                    Collection<Integer> solved = new HashSet<>();
                     for (ArrayList<Rectangle> rectangles : new TabuSearchGenerator(tabu.values(), 10, seq)) {
                         if (heuristicSolve(rectangles, W, (int) ms)) {
-                            solved.put(rectangles.hashCode(), true);
+                            solved.add(rectangles.hashCode());
                         }
 
                         int areaUtil = parameters.height / Util.maxHeight(rectangles);
-
                         if (seqx == null || areaUtil > highestAreaUtil) {
                             seqx = rectangles;
                             highestAreaUtil = areaUtil;
                         }
                     }
-                    if (solved.get(seqx.hashCode())) {
+                    if (solved.contains(seqx.hashCode())) {
                         return true;
                     }
                     tabu.put(i + 3 * parameters.rectangles.size(), seqx.hashCode());
@@ -290,6 +305,9 @@ public class SkylineSolver extends AbstractSolver {
      * @return true or false whether the heuristic was able to pack all the rectangles given the restrictions
      */
     boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
+        Parameters animation = parameters.copy();
+        parameters.rectangles = originalSequence;
+
         resetRecs(originalSequence);
         // Test all the candidate positions - rectangle combos
         ArrayListSkyline skylineDataStructure = new ArrayListSkyline(parameters.height, width, maximumSpread);
@@ -298,6 +316,7 @@ public class SkylineSolver extends AbstractSolver {
 
         // Place a rectangle every time till every rectangle is placed
         while (!sequence.isEmpty()) {
+            Util.animate(animation, this);
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
             minimumLocalSpaceWasteRectangles.clear();
             // Test if there is any perfect place to place the rectangle.
