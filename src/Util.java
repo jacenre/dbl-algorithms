@@ -34,7 +34,17 @@ public class Util {
         return rectangles;
     }
 
-
+    /**
+     * Returns the maximum height of the set w.r.t the y coordinates.
+     * @return maximum height
+     */
+    public static int maxHeight(ArrayList<Rectangle> rectangles) {
+        int max = 0;
+        for (Rectangle rectangle : rectangles) {
+            max = (rectangle.y + rectangle.height > max) ? rectangle.y + rectangle.height : max;
+        }
+        return max;
+    }
 
     /**
      * Used for animating the current parameters.

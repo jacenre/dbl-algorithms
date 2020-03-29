@@ -49,6 +49,14 @@ public class Parameters {
      */
     public boolean rotationVariant;
 
+    public ArrayList<Rectangle> getRectangles() {
+        return rectangles;
+    }
+
+    public void setRectangles(ArrayList<Rectangle> rectangles) {
+        this.rectangles = rectangles;
+    }
+
     /**
      * The ArrayList containing all the rectangles.
      *

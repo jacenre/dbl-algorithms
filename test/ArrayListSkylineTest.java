@@ -3,6 +3,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 class ArrayListSkylineTest {
     ArrayListSkyline skylineDataStructure;
@@ -20,6 +21,67 @@ class ArrayListSkylineTest {
         Assertions.assertEquals(points.get(1).x, 0);
         Assertions.assertEquals(points.get(1).y, 10);
         Assertions.assertFalse(points.get(1).start);
+    }
+
+    @Test
+    void tabuGenerator() {
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
+        rectangles.add(new Rectangle(10, 10));
+        rectangles.add(new Rectangle(5, 1));
+        rectangles.add(new Rectangle(3, 8));
+        rectangles.add(new Rectangle(1, 1));
+        rectangles.add(new Rectangle(2, 5));
+        HashSet<Integer> tabu = new HashSet<>();
+        tabu.add(rectangles.hashCode());
+        ArrayList<Rectangle> wrong = Util.cloneRectangleState(rectangles);
+        Rectangle temp = wrong.get(0).copy();
+        wrong.set(0, wrong.get(1).copy());
+        wrong.set(1, temp);
+        tabu.add(wrong.hashCode());
+        for (ArrayList<Rectangle> list : new SkylineSolver.TabuSearchGenerator(tabu, 10, rectangles)) {
+            Assertions.assertNotEquals(list.hashCode(), rectangles.hashCode());
+            Assertions.assertFalse(tabu.contains(list.hashCode()));
+        }
+    }
+
+    @Test
+    void hashCodeTest() {
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
+        rectangles.add(new Rectangle(10, 10));
+        rectangles.add(new Rectangle(1, 1));
+
+        ArrayList<Rectangle> deepcopy = Util.cloneRectangleState(rectangles);
+        Assertions.assertEquals(rectangles.hashCode(), deepcopy.hashCode());
+
+        rectangles.get(0).place(true);
+        Assertions.assertEquals(rectangles.hashCode(), deepcopy.hashCode());
+
+        rectangles.get(1).rotate();
+        Assertions.assertEquals(rectangles.hashCode(), deepcopy.hashCode());
+    }
+
+    @Test
+    void spreadValues() {
+        ArrayList<Rectangle> rectangles = new ArrayList<>();
+        rectangles.add(new Rectangle(10, 10));
+        rectangles.add(new Rectangle(1, 1));
+
+        ArrayList<Float> spreadValues = new ArrayList<>();
+        spreadValues.add(10f);
+        spreadValues.add(20f);
+        spreadValues.add(30f);
+        spreadValues.add(40f);
+
+        Parameters parameters = new Parameters();
+        parameters.heightVariant = Util.HeightSupport.FIXED;
+        parameters.height = 40;
+
+        for (Float aFloat : new SkylineSolver.SpreadValues(rectangles, parameters)) {
+            Assertions.assertTrue(spreadValues.contains(aFloat));
+            spreadValues.remove(aFloat);
+        }
+
+        Assertions.assertTrue(spreadValues.isEmpty());
     }
 
     @Test
