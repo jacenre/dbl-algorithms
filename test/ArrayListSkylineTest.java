@@ -28,7 +28,7 @@ class ArrayListSkylineTest {
         Rectangle onlyFitRectangle = new Rectangle(3, 10);
         ArrayList<Rectangle> sequence = new ArrayList<>();
         sequence.add(onlyFitRectangle);
-        PositionRectanglePair pair = skylineDataStructure.anyOnlyFit(sequence);
+        PositionRectangleRotationPair pair = skylineDataStructure.anyOnlyFit(sequence);
         Assertions.assertTrue(pair != null);
     }
 
@@ -38,7 +38,7 @@ class ArrayListSkylineTest {
         Rectangle notOnlyFitRectangle = new Rectangle(3, 5);
         ArrayList<Rectangle> sequence = new ArrayList<>();
         sequence.add(notOnlyFitRectangle);
-        PositionRectanglePair pair2 = skylineDataStructure.anyOnlyFit(sequence);
+        PositionRectangleRotationPair pair2 = skylineDataStructure.anyOnlyFit(sequence);
         Assertions.assertTrue(pair2 == null);
     }
 
@@ -51,7 +51,7 @@ class ArrayListSkylineTest {
         Rectangle unUnique2 = new Rectangle(3, 5);
         sequence.add(unUnique2);
 
-        PositionRectanglePair pair3 = skylineDataStructure.anyOnlyFit(sequence);
+        PositionRectangleRotationPair pair3 = skylineDataStructure.anyOnlyFit(sequence);
         Assertions.assertTrue(pair3 == null);
     }
 
@@ -157,122 +157,6 @@ class ArrayListSkylineTest {
     }
 
 
-    @Test
-    void firstElaborateExample() {
-        ArrayList<Rectangle> sequence = new ArrayList<>();
-        sequence.add(new Rectangle(12, 8));
-        sequence.add(new Rectangle(10,  9));
-        sequence.add(new Rectangle(8,12));
-        sequence.add(new Rectangle(16, 3));
-        sequence.add(new Rectangle(4, 16));
-        sequence.add(new Rectangle(10,6));
-
-        int totalArea = 0;
-        for (Rectangle rec : sequence) {
-            totalArea += rec.height * rec.width;
-        }
-        System.out.println("Total area: " + totalArea);
-
-        ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
-
-        ArrayList<Rectangle> originalSequence = skylineDataStructure.deepCopyRectangles(sequence);
-        while (!sequence.isEmpty()) {
-            int minimumLocalSpaceWaste = Integer.MAX_VALUE;
-            minimumLocalSpaceWasteRectangles.clear();
-            PositionRectanglePair toBePlaced = skylineDataStructure.anyOnlyFit(sequence);
-
-            if (!(toBePlaced == null)) {
-                toBePlaced.rectangle.x = toBePlaced.position.x;
-                toBePlaced.rectangle.y = toBePlaced.position.y;
-                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
-                toBePlaced.rectangle.place(true);
-                sequence.remove(toBePlaced.rectangle);
-                continue;
-            }
-            for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
-                for (Rectangle rectangle : sequence) {
-                    if (skylineDataStructure.testSpreadConstraint(rectangle, segPoint) || hasOverlap(rectangle, segPoint, originalSequence)) { // spread constraint
-                        continue;
-                    }
-                    int localSpaceWaste = skylineDataStructure.getLocalWaste(rectangle, segPoint, sequence);
-                    if (localSpaceWaste < minimumLocalSpaceWaste) {
-                        minimumLocalSpaceWasteRectangles.clear();
-                        minimumLocalSpaceWaste = localSpaceWaste;
-                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
-                    } else if (localSpaceWaste == minimumLocalSpaceWaste) {
-                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
-                    }
-                }
-            }
-
-            if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
-                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
-            } else if (minimumLocalSpaceWasteRectangles.size() >= 2){ // maximum fitness number and earliest in sequence
-                int highestFitness = 0;
-                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
-                for (PositionRectanglePair pair : minimumLocalSpaceWasteRectangles) {
-                    if (skylineDataStructure.getFitnessNumber(pair.rectangle, pair.position) > highestFitness) {
-                        toBePlaced = pair;
-                    }
-                }
-            }
-
-            if (toBePlaced != null) {
-                /* Placement of rectangle */
-                if (toBePlaced.position.start) {
-                    toBePlaced.rectangle.x = toBePlaced.position.x;
-                    toBePlaced.rectangle.y = toBePlaced.position.y;
-                } else if (!toBePlaced.position.start) {
-                    toBePlaced.rectangle.x = toBePlaced.position.x;
-                    toBePlaced.rectangle.y = toBePlaced.position.y - toBePlaced.rectangle.height;
-                }
-                System.out.println("Placed rectangle " + toBePlaced.rectangle + " at location " + toBePlaced.position);
-                toBePlaced.rectangle.place(true);
-                sequence.remove(toBePlaced.rectangle);
-                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
-            } else {
-            }
-        }
-        System.out.println("nice");
-    }
-
-    int globalHeight;
 
 
-    public boolean hasOverlap(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence) {
-        if (position.start) {
-            rectangle.x = position.x;
-            rectangle.y = position.y;
-        } else {
-            rectangle.x = position.x;
-            rectangle.y = position.y - rectangle.height;
-        }
-
-        if (rectangle.y + rectangle.height > globalHeight) {
-            //System.out.println("reaches bottom");
-            return true;
-        } else if (rectangle.y < 0) {
-            //System.out.println("reaches top");
-            return true;
-        }
-
-        rectangle.place(true);
-        ArrayList<Rectangle> placedRecs = new ArrayList<>();
-        for (Rectangle rec : sequence) {
-            if (rec.isPlaced()) {
-                placedRecs.add(rec);
-            }
-        }
-
-        Parameters parameters = new Parameters();
-        parameters.rectangles = placedRecs;
-
-        if (Util.sweepline(new Solution(parameters))) {
-            //System.out.println("sweepline detected collision");
-            rectangle.place(false);
-            return true;
-        }
-        rectangle.place(false);
-        return false;
-    }
 }

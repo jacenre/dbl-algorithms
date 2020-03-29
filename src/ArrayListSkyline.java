@@ -77,6 +77,8 @@ public class ArrayListSkyline extends AbstractSkyline {
             }
         }
 
+        index = skyline.indexOf(segmentInQuestion);
+
         // Wasted space below
         int wastedSpaceBelow = 0;
         while (index < skyline.size() - 1) {
@@ -110,18 +112,21 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
     @Override
-    public int getFitnessNumber(Rectangle rectangle, SegPoint position) {
+    public int getFitnessNumber(PositionRectangleRotationPair pair) {
         int fitnessNumber = 0;
 
+        if (pair.rotated) {
+            pair.rectangle.rotate();
+        }
         // Touching Right side?
-        if (position.x + rectangle.width == globalWidth) {
+        if (pair.position.x + pair.rectangle.width == globalWidth) {
             fitnessNumber++;
         }
 
         Segment segmentInQuestion = null;
 
         for (Segment segment : skyline) {
-            if (segment.start == position || segment.end == position) {
+            if (segment.start == pair.position || segment.end == pair.position) {
                 segmentInQuestion = segment;
             }
         }
@@ -129,24 +134,27 @@ public class ArrayListSkyline extends AbstractSkyline {
         index = skyline.indexOf(segmentInQuestion);
 
         // Same as left Segment
-        if (segmentInQuestion.getLength() == rectangle.height) {
+        if (segmentInQuestion.getLength() == pair.rectangle.height) {
             fitnessNumber++;
         }
 
         // Same as above
-        if (index > 0 && (skyline.get(index - 1).start.x - segmentInQuestion.start.x) == rectangle.width) {
+        if (index > 0 && (skyline.get(index - 1).start.x - segmentInQuestion.start.x) == pair.rectangle.width) {
             fitnessNumber++;
-        } else if (index == 0 && (globalWidth - segmentInQuestion.start.x) == rectangle.width) {
+        } else if (index == 0 && (globalWidth - segmentInQuestion.start.x) == pair.rectangle.width) {
             fitnessNumber++;
         }
 
         //Same as below
-        if (index < skyline.size() - 1 && (skyline.get(index + 1).start.x - segmentInQuestion.start.x) == rectangle.width) {
+        if (index < skyline.size() - 1 && (skyline.get(index + 1).start.x - segmentInQuestion.start.x) == pair.rectangle.width) {
             fitnessNumber++;
-        } else if (index == skyline.size() - 1 && (globalWidth - segmentInQuestion.start.x) == rectangle.width) {
+        } else if (index == skyline.size() - 1 && (globalWidth - segmentInQuestion.start.x) == pair.rectangle.width) {
             fitnessNumber++;
         }
 
+        if (pair.rotated) {
+            pair.rectangle.rotate();
+        }
         return fitnessNumber;
     }
 
@@ -282,8 +290,30 @@ public class ArrayListSkyline extends AbstractSkyline {
         }
     }
 
+    public void mergeSegmentsNextToEachOther() {
+        for (int i = 0; i < skyline.size() - 1; i++) {
+            if (skyline.get(i).end.x == skyline.get(i + 1).start.x) {
+                SegPoint newStart = skyline.get(i).start;
+                SegPoint newEnd = skyline.get(i + 1).end;
+                skyline.remove(i); skyline.remove(i);
+                skyline.add(i , new Segment(newStart, newEnd));
+            }
+        }
+        checkSkyline(skyline);
+    }
+
+    public void checkSkyline(ArrayList<Segment> skyline) {
+        int totalLength = 0;
+        for (Segment segment : skyline) {
+            totalLength += segment.getLength();
+        }
+        if (totalLength != globalHeight) {
+            throw new IllegalStateException();
+        }
+    }
+
     @Override
-    public PositionRectanglePair anyOnlyFit(ArrayList<Rectangle> sequence) {
+    public PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> sequence) {
         int[] perfectFits = new int[skyline.size()];
 
         for (int i = 0; i < skyline.size(); i++) {
@@ -295,7 +325,7 @@ public class ArrayListSkyline extends AbstractSkyline {
                 }
             }
             if (perfectFits[i] == 1 && !testSpreadConstraint(rectangleThatMightBeTheOnlyFittingOne, skyline.get(i).start)) {
-                return new PositionRectanglePair(rectangleThatMightBeTheOnlyFittingOne, skyline.get(i).start);
+                return new PositionRectangleRotationPair(rectangleThatMightBeTheOnlyFittingOne, skyline.get(i).start, false);
             }
         }
         return null;

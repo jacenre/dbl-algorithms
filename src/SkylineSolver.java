@@ -18,7 +18,7 @@ public class SkylineSolver extends AbstractSolver {
     Solution pack(Parameters parameters) {
         this.parameters = parameters;
         int lowerBound = getLowerBound(parameters);
-        int upperBound = (int) (lowerBound * 1.1);
+        int upperBound = Math.max(lowerBound + 1, (int) (lowerBound * 1.1));
         int iter = 1;
         boolean upperBoundFound = false;
 
@@ -31,6 +31,7 @@ public class SkylineSolver extends AbstractSolver {
                     /* record this solution */
                     upperBound = width;
                     upperBoundFound = true;
+                    return globalSolution;
                 } else {
                     tempLowerBound = width + 1;
                 }
@@ -78,6 +79,13 @@ public class SkylineSolver extends AbstractSolver {
      * @returns a boolean signalling if a solution could be found with the given attributes
      */
     boolean solve(Parameters parameters, int W, int iter) {
+        // DEBUG
+
+        if (heuristicSolve(parameters.rectangles, W, W)){
+            return true;
+        }
+
+        // DEBUG
         for (ArrayList<Rectangle> seq : new RectangleSorter(parameters.rectangles)) {
             for (float ms : new SpreadValues(seq)) {
                 if (heuristicSolve(seq, W, (int) ms)) {
@@ -209,48 +217,56 @@ public class SkylineSolver extends AbstractSolver {
      */
     boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
         resetRecs(originalSequence);
-        System.out.println("height : " + parameters.height + " width : " + width + " maximum spread: " + maximumSpread);
         // Test all the candidate positions - rectangle combos
         ArrayListSkyline skylineDataStructure = new ArrayListSkyline(parameters.height, width, maximumSpread);
-        ArrayList<PositionRectanglePair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
+        ArrayList<PositionRectangleRotationPair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
         ArrayList<Rectangle> sequence = skylineDataStructure.deepCopyRectangles(originalSequence);
 
+        // Place a rectangle every time till every rectangle is placed
         while (!sequence.isEmpty()) {
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
             minimumLocalSpaceWasteRectangles.clear();
-            PositionRectanglePair toBePlaced = skylineDataStructure.anyOnlyFit(sequence);
+            // Test if there is any perfect place to place the rectangle.
+            PositionRectangleRotationPair toBePlaced = skylineDataStructure.anyOnlyFit(sequence);
 
+            // If there is then place it
             if (!(toBePlaced == null)) {
-                toBePlaced.rectangle.x = toBePlaced.position.x;
-                toBePlaced.rectangle.y = toBePlaced.position.y;
-                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
-                toBePlaced.rectangle.place(true);
-                sequence.remove(toBePlaced.rectangle);
+                placeRectangle(toBePlaced, sequence, skylineDataStructure);
                 continue;
             }
+
+            // Check for every rectangle-position pair the local waste
             for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
                 for (Rectangle rectangle : sequence) {
-                    if (skylineDataStructure.testSpreadConstraint(rectangle, segPoint) || hasOverlap(rectangle, segPoint, originalSequence)) { // spread constraint
-                        continue;
+                    for (int i = 0; i < 2; i++) {
+                        if (i == 1) {
+                            rectangle.rotate();
+                        }
+                        // Checks if the rectangle can be placed
+                        if (skylineDataStructure.testSpreadConstraint(rectangle, segPoint) || hasOverlap(rectangle, segPoint, width, originalSequence)) { // spread constraint
+                            continue;
+                        }
+                        int localSpaceWaste = skylineDataStructure.getLocalWaste(rectangle, segPoint, sequence);
+                        if (localSpaceWaste < minimumLocalSpaceWaste) {
+                            minimumLocalSpaceWasteRectangles.clear();
+                            minimumLocalSpaceWaste = localSpaceWaste;
+                            minimumLocalSpaceWasteRectangles.add(new PositionRectangleRotationPair(rectangle, segPoint, (i == 1)? true: false));
+                        } else if (localSpaceWaste == minimumLocalSpaceWaste) {
+                            minimumLocalSpaceWasteRectangles.add(new PositionRectangleRotationPair(rectangle, segPoint, (i == 1)? true: false));
+                        }
                     }
-                    int localSpaceWaste = skylineDataStructure.getLocalWaste(rectangle, segPoint, sequence);
-                    if (localSpaceWaste < minimumLocalSpaceWaste) {
-                        minimumLocalSpaceWasteRectangles.clear();
-                        minimumLocalSpaceWaste = localSpaceWaste;
-                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
-                    } else if (localSpaceWaste == minimumLocalSpaceWaste) {
-                        minimumLocalSpaceWasteRectangles.add(new PositionRectanglePair(rectangle, segPoint));
-                    }
+                    rectangle.rotate();
                 }
             }
+
 
             if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
                 toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
             } else if (minimumLocalSpaceWasteRectangles.size() >= 2){ // maximum fitness number and earliest in sequence
                 int highestFitness = 0;
                 toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
-                for (PositionRectanglePair pair : minimumLocalSpaceWasteRectangles) {
-                    if (skylineDataStructure.getFitnessNumber(pair.rectangle, pair.position) > highestFitness) {
+                for (PositionRectangleRotationPair pair : minimumLocalSpaceWasteRectangles) {
+                    if (skylineDataStructure.getFitnessNumber(pair) > highestFitness) {
                         toBePlaced = pair;
                     }
                 }
@@ -258,30 +274,48 @@ public class SkylineSolver extends AbstractSolver {
 
             if (toBePlaced != null) {
                 /* Placement of rectangle */
-                if (toBePlaced.position.start) {
-                    toBePlaced.rectangle.x = toBePlaced.position.x;
-                    toBePlaced.rectangle.y = toBePlaced.position.y;
-                } else if (!toBePlaced.position.start) {
-                    toBePlaced.rectangle.x = toBePlaced.position.x;
-                    toBePlaced.rectangle.y = toBePlaced.position.y - toBePlaced.rectangle.height;
-                }
-                toBePlaced.rectangle.place(true);
-                sequence.remove(toBePlaced.rectangle);
-                skylineDataStructure.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
+                placeRectangle(toBePlaced, sequence, skylineDataStructure);
             } else {
                 return false;
             }
         }
         parameters.rectangles = originalSequence;
         Solution currentSolution = new Solution(parameters, this);
+        System.out.println("solution with width " + width + " maximum spread "+ maximumSpread );
         if (globalSolution == null || currentSolution.getArea() < globalSolution.getArea()) {
-            System.out.println("global Solution updated to one with area " + currentSolution.getArea());
             globalSolution = currentSolution;
         }
         return true;
     }
 
-    public boolean hasOverlap(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence) {
+    public void placeRectangle(PositionRectangleRotationPair toBePlaced, ArrayList<Rectangle> sequence, ArrayListSkyline skyline) {
+        if (toBePlaced.rotated) {
+            toBePlaced.rectangle.rotate();
+        }
+        if (toBePlaced.position.start) {
+            toBePlaced.rectangle.x = toBePlaced.position.x;
+            toBePlaced.rectangle.y = toBePlaced.position.y;
+        } else if (!toBePlaced.position.start) {
+            toBePlaced.rectangle.x = toBePlaced.position.x;
+            toBePlaced.rectangle.y = toBePlaced.position.y - toBePlaced.rectangle.height;
+        }
+
+        skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
+        skyline.mergeSegmentsNextToEachOther();
+//        for (Segment seg : skyline.skyline) {
+//            for (int j = 0; j < seg.end.y - seg.start.y; j++) {
+//                for (int i = 0; i < seg.start.x ; i++) {
+//                    System.out.print(" ");
+//                }
+//                System.out.println(seg.start.x);
+//            }
+//        }
+//        System.out.println("REEEEEEEEWIND");
+        toBePlaced.rectangle.place(true);
+        sequence.remove(toBePlaced.rectangle);
+    }
+
+    public boolean hasOverlap(Rectangle rectangle, SegPoint position, int width, ArrayList<Rectangle> originalSequence) {
         if (position.start) {
             rectangle.x = position.x;
             rectangle.y = position.y;
@@ -296,11 +330,25 @@ public class SkylineSolver extends AbstractSolver {
         } else if (rectangle.y < 0) {
             //System.out.println("reaches top");
             return true;
+        } else if (rectangle.x + rectangle.width > width) {
+            return true;
+        }
+
+        rectangle.place(true);
+        for (Rectangle rectangle1 : originalSequence) {
+            for (Rectangle rectangle2 : originalSequence) {
+                if (rectangle1.isPlaced() && rectangle2.isPlaced() && rectangle1 != rectangle2) {
+                    if (rectangle1.intersects(rectangle2)) {
+                        rectangle.place(false);
+                        return true;
+                    }
+                }
+            }
         }
 
         rectangle.place(true);
         ArrayList<Rectangle> placedRecs = new ArrayList<>();
-        for (Rectangle rec : sequence) {
+        for (Rectangle rec : originalSequence) {
             if (rec.isPlaced()) {
                 placedRecs.add(rec);
             }
