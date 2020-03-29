@@ -76,7 +76,7 @@ class ArrayListSkylineTest {
         parameters.heightVariant = Util.HeightSupport.FIXED;
         parameters.height = 40;
 
-        for (Float aFloat : new SkylineSolver.SpreadValues(rectangles, parameters)) {
+        for (Float aFloat : new SkylineSolver.SpreadValues(rectangles, parameters, 11)) {
             Assertions.assertTrue(spreadValues.contains(aFloat));
             spreadValues.remove(aFloat);
         }
