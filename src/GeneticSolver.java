@@ -42,7 +42,7 @@ public class GeneticSolver extends AbstractSolver {
         }
 
         // Create the first permutations of rectangles
-        int nPermutations = 10;
+        int nPermutations = 15;
         int[][] permutations = shuffle(a, nPermutations);
         Solution bestSolution = null;
 
@@ -101,6 +101,7 @@ public class GeneticSolver extends AbstractSolver {
             // Compare the contender to the best solution yet
             if (x < solutions.size()) {
                 if (bestSolution == null || contenderSolution.getRate() < bestSolution.getRate()) {
+                    if (Util.debug) System.out.println("new rate:" + contenderSolution.getRate());
                     bestSolution = solutions.get(0).getValue().copy();
                 }
             }
@@ -116,7 +117,34 @@ public class GeneticSolver extends AbstractSolver {
     }
 
     protected double fitnessFunction(Solution solution) {
-        return solution.getRate();
+        int areaWidth = (int) solution.getWidth();
+        // Get the rectangle that we can most easily make less wide
+        // Do this by getting largest area that can be filled by a single rectangle
+        // that is below the current rectangles
+        ArrayList<Util.Segment> segments = getSegments(solution);
+
+        // We sweep from right to left
+        segments.sort((o1, o2) -> {
+            // If same X, then from bottom to top
+            if (o1.x == o2.x) {
+                return o2.yEnd - o1.yEnd;
+            }
+            // Else sort on x
+            return o2.x - o1.x;
+        });
+
+        // Calculate the reusableTrimLoss by the maximal rectangle that can be made
+        // from the remaining space to the bottom right of the box
+        int y = segments.get(0).yEnd;
+        double reusableTrimLoss = 0;
+        for (Util.Segment seg : segments) {
+            if (seg.yEnd >= y) {
+                reusableTrimLoss = Math.max(reusableTrimLoss, (parameters.height - y) * (areaWidth - seg.x));
+                y = seg.yEnd;
+            }
+        }
+        double boxArea = (areaWidth * parameters.height);
+        return areaWidth + reusableTrimLoss / boxArea;
     }
 
     private int[][] crossover(int[][] permutations) {
