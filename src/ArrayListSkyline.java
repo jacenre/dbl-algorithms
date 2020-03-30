@@ -378,13 +378,10 @@ public class ArrayListSkyline extends AbstractSkyline {
                     onlyFits[i]++;
                 }
             }
-            if (onlyFits[i] == 1 && !doesNotMeetSpreadConstraint(potentialPlacement.rectangle, skyline.get(i).start, getMostLeftPoint())) {
-                if (potentialPlacement.rectangle.y + potentialPlacement.rectangle.height > globalHeight
-                        || potentialPlacement.rectangle.y < 0
-                        || potentialPlacement.position.x + (potentialPlacement.rotated? potentialPlacement.rectangle.height : potentialPlacement.rectangle.width) > globalWidth) {
-                    return null;
-                }
-
+            if (onlyFits[i] == 1 && !(doesNotMeetSpreadConstraint(potentialPlacement.rectangle, skyline.get(i).start, getMostLeftPoint())
+                    || potentialPlacement.rectangle.y + potentialPlacement.rectangle.height > globalHeight
+                    || potentialPlacement.rectangle.y < 0
+                    || potentialPlacement.position.x + (potentialPlacement.rotated? potentialPlacement.rectangle.height : potentialPlacement.rectangle.width) > globalWidth)) {
                 return potentialPlacement;
             }
         }
