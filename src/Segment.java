@@ -34,4 +34,9 @@ class Segment {
         }
         return super.equals(obj);
     }
+
+    @Override
+    public String toString() {
+        return "Segment[start=(" + this.start.x +","+this.start.y+"), end=("+ this.end.x +","+this.end.y+")";
+    }
 }
