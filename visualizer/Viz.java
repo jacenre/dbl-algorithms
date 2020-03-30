@@ -120,6 +120,9 @@ public class Viz extends PApplet {
 
         void setup() {
             for (Rectangle rectangle : this.solution.parameters.rectangles) {
+                if (rectangle.x < 0 || rectangle.y < 0) {
+                    overlap.add(rectangle);
+                }
                 smallest = Math.min(smallest, rectangle.width * rectangle.height);
                 largest = Math.max(largest, rectangle.width * rectangle.height);
             }

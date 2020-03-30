@@ -14,12 +14,12 @@ public class SkylineSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED, Util.HeightSupport.FREE));
     }
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
-        if (parameters.rectangles.size() > 40) return false;
+        if (parameters.rectangles.size() > 1000) return false;
         return super.canSolveParameters(parameters);
     }
 
@@ -37,14 +37,14 @@ public class SkylineSolver extends AbstractSolver {
         int MAX_ITERATIONS = 5;
 
         while (MAX_ITERATIONS > 0 && lowerBound != upperBound) {
-            System.out.println(lowerBound + " - " + upperBound + ", " + debug++);
+//            System.out.println(lowerBound + " - " + upperBound + ", " + debug++);
             int tempLowerBound = lowerBound;
             while (tempLowerBound < upperBound) {
                 // Binary search
                 int width = ((tempLowerBound + upperBound) / 2);
-                System.out.println(width);
+                System.out.println("Solving for width=" + width + ", and " + iter + " iterations");
                 if (solve(parameters, width, iter)) {
-                    System.out.println("solution found with width " + width);
+//                    System.out.println("solution found with width " + width);
                     /* record this solution */
                     upperBound = width;
                     upperBoundFound = true;
@@ -122,11 +122,13 @@ public class SkylineSolver extends AbstractSolver {
                             highestAreaUtil = areaUtil;
                         }
                     }
-                    if (solved.contains(seqx.hashCode())) {
-                        return true;
+                    if (seqx != null) {
+                        if (solved.contains(seqx.hashCode())) {
+                            return true;
+                        }
+                        tabu.put(i + 3 * parameters.rectangles.size(), seqx.hashCode());
+                        seq = seqx;
                     }
-                    tabu.put(i + 3 * parameters.rectangles.size(), seqx.hashCode());
-                    seq = seqx;
                 }
             }
         }
@@ -300,9 +302,10 @@ public class SkylineSolver extends AbstractSolver {
      * @return true or false whether the heuristic was able to pack all the rectangles given the restrictions
      */
     boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
+//        System.out.println(originalSequence + ", " + width + ", " + maximumSpread);
         Parameters animation = parameters.copy();
         parameters.rectangles = originalSequence;
-        Util.animate(animation, this);
+//        Util.animate(animation, this);
 
         // Just to be sure
         resetRecs(originalSequence);
@@ -393,7 +396,7 @@ public class SkylineSolver extends AbstractSolver {
         // it (if it is the first solution or the best up to this point)
         parameters.rectangles = Util.cloneRectangleState(originalSequence);
         Solution currentSolution = new Solution(parameters, this);
-        System.out.println("solution found in heuristic solve with " + currentSolution.getWidth());
+//        System.out.println("solution found in heuristic solve with " + currentSolution.getWidth());
         if (globalSolution == null || currentSolution.getArea() < globalSolution.getArea()) {
             globalSolution = currentSolution.copy();
         }

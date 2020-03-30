@@ -1,3 +1,5 @@
+import jdk.swing.interop.SwingInterOpUtils;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -338,11 +340,7 @@ public class ArrayListSkyline extends AbstractSkyline {
         int totalLength = 0;
         for (Segment segment : skyline) {
             totalLength += segment.getLength();
-            System.out.println(segment.start);
-            System.out.println(segment.end);
         }
-        System.out.println("");
-        System.out.println("");
         if (totalLength != globalHeight) {
 
             throw new IllegalStateException();
