@@ -1,4 +1,4 @@
-class PositionRectangleRotationPair {
+public class PositionRectangleRotationPair {
     Rectangle rectangle;
     SegPoint position;
     boolean rotated;

@@ -14,16 +14,17 @@ public class SkylineSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED, Util.HeightSupport.FREE));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
-        if (parameters.rectangles.size() > 1000) return false;
+        if (parameters.rectangles.size() > 999) return false;
         return super.canSolveParameters(parameters);
     }
 
     int debug = 0;
+    int numChecks;
 
     // Algorithm 2 in the paper
     @Override
@@ -34,15 +35,27 @@ public class SkylineSolver extends AbstractSolver {
         int iter = 1;
         boolean upperBoundFound = false;
         debug = 0;
-        int MAX_ITERATIONS = 5;
 
-        while (MAX_ITERATIONS > 0 && lowerBound != upperBound) {
+        // Following the design paradigm we time a single heuristic and use that as limit.
+        long startTime = System.nanoTime();
+        heuristicSolve(parameters.rectangles, upperBound, upperBound);
+        long endTime = System.nanoTime();
+        long duration = Math.max((endTime - startTime) / 1000000, 5); // duration of subSolver.pack or 1 if too fast
+
+        // Time allowed in milliseconds
+        final int ALLOWED_TIME = 10000; // 25 seconds which leaves 5 seconds for other stuff
+        numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
+
+        terminate:
+        while (numChecks > 0 && lowerBound != upperBound) {
 //            System.out.println(lowerBound + " - " + upperBound + ", " + debug++);
             int tempLowerBound = lowerBound;
             while (tempLowerBound < upperBound) {
                 // Binary search
                 int width = ((tempLowerBound + upperBound) / 2);
+//                System.out.println("Solving for width=" + width + ", and " + iter + " iterations");
                 if (solve(parameters, width, iter)) {
+                    if (!(numChecks > 0)) break terminate;
 //                    System.out.println("solution found with width " + width);
                     /* record this solution */
                     upperBound = width;
@@ -54,7 +67,6 @@ public class SkylineSolver extends AbstractSolver {
             if (!upperBoundFound) {
                 upperBound = (int) (upperBound * 1.1);
             }
-            MAX_ITERATIONS--;
             iter *= 2;
         }
         return globalSolution;
@@ -96,6 +108,7 @@ public class SkylineSolver extends AbstractSolver {
      * @returns a boolean signalling if a solution could be found with the given attributes
      */
     boolean solve(Parameters parameters, int W, int iter) {
+        terminate:
         for (ArrayList<Rectangle> seq : new RectangleSorter(parameters.rectangles)) {
             for (float ms : new SpreadValues(seq, parameters, W)) {
                 if (heuristicSolve(seq, W, (int) ms)) {
@@ -104,6 +117,7 @@ public class SkylineSolver extends AbstractSolver {
                 // Map the remaining tabu iterations against the set of tabus.
                 HashMap<Integer, Integer> tabu = new HashMap<>();
                 for (int i = 0; i < iter; i++) {
+                    if (!(numChecks > 0)) break terminate;
                     tabu.remove(i);
                     // Seqx is the sequence with highest area utilization.
                     ArrayList<Rectangle> seqx = null;
@@ -301,6 +315,7 @@ public class SkylineSolver extends AbstractSolver {
      * @return true or false whether the heuristic was able to pack all the rectangles given the restrictions
      */
     boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
+        numChecks--;
 //        System.out.println(originalSequence + ", " + width + ", " + maximumSpread);
         Parameters animation = parameters.copy();
         parameters.rectangles = originalSequence;
