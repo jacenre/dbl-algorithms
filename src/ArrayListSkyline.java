@@ -279,10 +279,13 @@ public class ArrayListSkyline extends AbstractSkyline {
                 skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)),
                         new SegPoint(false, new Point(position.x + rectangle.width, upToThisY))));
 
+
+
                 // delete segments that are completely overshadowed
                 for (int i = index + 1; i < skyline.size(); i++) {
                     if (skyline.get(i).end.y < upToThisY) {
                         skyline.remove(skyline.get(i));
+                        i--;
                     }
                 }
 
@@ -334,8 +337,13 @@ public class ArrayListSkyline extends AbstractSkyline {
         int totalLength = 0;
         for (Segment segment : skyline) {
             totalLength += segment.getLength();
+            System.out.println(segment.start);
+            System.out.println(segment.end);
         }
+        System.out.println("");
+        System.out.println("");
         if (totalLength != globalHeight) {
+
             throw new IllegalStateException();
         }
     }
@@ -363,7 +371,7 @@ public class ArrayListSkyline extends AbstractSkyline {
             if (onlyFits[i] == 1 && !doesNotMeetSpreadConstraint(potentialPlacement.rectangle, skyline.get(i).start, getMostLeftPoint())) {
                 if (potentialPlacement.rectangle.y + potentialPlacement.rectangle.height > globalHeight
                         || potentialPlacement.rectangle.y < 0
-                        || potentialPlacement.position.x + potentialPlacement.rectangle.width > globalWidth) {
+                        || potentialPlacement.position.x + (potentialPlacement.rotated? potentialPlacement.rectangle.height : potentialPlacement.rectangle.width) > globalWidth) {
                     return null;
                 }
 
