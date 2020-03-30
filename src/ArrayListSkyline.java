@@ -370,10 +370,10 @@ public class ArrayListSkyline extends AbstractSkyline {
             // Loop through all the rectangles that have not been placed yet
             // TODO: test of rectangle.height == skyline.get(i).getLength() beter werkt op testcases
             for (Rectangle rectangle : rectanglesLeft) {
-                if (rectangle.height <= skyline.get(i).getLength()) {
+                if (rectangle.height == skyline.get(i).getLength()) {
                     potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, false);
                     onlyFits[i]++;
-                } else if (rotationsAllowed && rectangle.width <= skyline.get(i).getLength()) {
+                } else if (rotationsAllowed && rectangle.width == skyline.get(i).getLength()) {
                     potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, true);
                     onlyFits[i]++;
                 }
