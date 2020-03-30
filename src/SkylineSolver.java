@@ -42,7 +42,6 @@ public class SkylineSolver extends AbstractSolver {
             while (tempLowerBound < upperBound) {
                 // Binary search
                 int width = ((tempLowerBound + upperBound) / 2);
-                System.out.println("Solving for width=" + width + ", and " + iter + " iterations");
                 if (solve(parameters, width, iter)) {
 //                    System.out.println("solution found with width " + width);
                     /* record this solution */
@@ -305,7 +304,7 @@ public class SkylineSolver extends AbstractSolver {
 //        System.out.println(originalSequence + ", " + width + ", " + maximumSpread);
         Parameters animation = parameters.copy();
         parameters.rectangles = originalSequence;
-//        Util.animate(animation, this);
+        //Util.animate(animation, this);
 
         // Just to be sure
         resetRecs(originalSequence);
@@ -395,6 +394,7 @@ public class SkylineSolver extends AbstractSolver {
         // If we are here, that means we have placed all the rectangles and this could be a valid solution so we store
         // it (if it is the first solution or the best up to this point)
         parameters.rectangles = Util.cloneRectangleState(originalSequence);
+
         Solution currentSolution = new Solution(parameters, this);
 //        System.out.println("solution found in heuristic solve with " + currentSolution.getWidth());
         if (globalSolution == null || currentSolution.getArea() < globalSolution.getArea()) {
@@ -419,7 +419,9 @@ public class SkylineSolver extends AbstractSolver {
 
         // Fix skyline
         skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
-        skyline.mergeSegmentsNextToEachOther();
+
+
+
 
         // Debug
 //        for (Segment seg : skyline.skyline) {
@@ -430,9 +432,15 @@ public class SkylineSolver extends AbstractSolver {
 //                System.out.println(seg.start.x);
 //            }
 //        }
-
         toBePlaced.rectangle.place(true);
         sequence.remove(toBePlaced.rectangle);
+
+        // Make the small segments merge with bigger ones
+        skyline.mergeSegmentsNextToEachOther();
+        skyline.mergeSmallSegments(sequence, parameters.rotationVariant);
+        skyline.mergeSegmentsNextToEachOther();
+        skyline.mergeSmallSegments(sequence, parameters.rotationVariant);
+        skyline.mergeSegmentsNextToEachOther();
     }
 
     public boolean hasOverlap(Rectangle rectangle, SegPoint position, int width, ArrayList<Rectangle> originalSequence) {

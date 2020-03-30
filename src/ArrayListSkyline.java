@@ -1,5 +1,3 @@
-import jdk.swing.interop.SwingInterOpUtils;
-
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -74,25 +72,14 @@ public class ArrayListSkyline extends AbstractSkyline {
         // Wasted space above
         // TODO: dit klopt nog niet helemaal
         int wastedSpaceAbove = 0;
-        while (index > 0) {
-//            index--;
-//            Segment toCheck = skyline.get(index);
-//            if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
-//                    (segmentInQuestion.start.y - toCheck.start.y) < smallestRecs[3] : (segmentInQuestion.start.y - toCheck.start.y) < smallestRecs[2])) {
-//                if (index > 0) {
-//                    Segment toCheckAsWell = skyline.get(index - 1);
-//                    if (toCheckAsWell.end.x > toCheck.start.x) {
-//                        wastedSpaceAbove += (toCheckAsWell.end.x - toCheck.start.x) * (segmentInQuestion.start.y - toCheck.start.y) ;
-//                    }
-//                } else {
-//                    wastedSpaceAbove += (segmentInQuestion.start.x - toCheck.start.x) * toCheck.getLength();
-//                }
-//            }
+
+        if (index != 0) {
             index--;
             Segment toCheck = skyline.get(index);
             if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
                     toCheck.getLength() < smallestRecs[3] : toCheck.getLength() < smallestRecs[2])) {
-                wastedSpaceAbove += (segmentInQuestion.start.x - toCheck.start.x) * toCheck.getLength();
+                int height = (index != 0 ? Math.min(skyline.get(index - 1).start.x, segmentInQuestion.start.x) : segmentInQuestion.start.x);
+                wastedSpaceAbove += (height - toCheck.start.x) * toCheck.getLength();
             }
         }
 
@@ -100,12 +87,13 @@ public class ArrayListSkyline extends AbstractSkyline {
 
         // Wasted space below
         int wastedSpaceBelow = 0;
-        while (index < skyline.size() - 1) {
+        if (index < skyline.size() - 1) {
             index++;
             Segment toCheck = skyline.get(index);
             if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
                     toCheck.getLength() < smallestRecs[3] : toCheck.getLength() < smallestRecs[2])) {
-                wastedSpaceBelow += (segmentInQuestion.start.x - toCheck.start.x) * toCheck.getLength();
+                int height = (index != skyline.size() - 1 ? Math.min(skyline.get(index + 1).start.x, segmentInQuestion.start.x) : segmentInQuestion.start.x);
+                wastedSpaceBelow += (height - toCheck.start.x) * toCheck.getLength();
             }
         }
 
@@ -334,6 +322,29 @@ public class ArrayListSkyline extends AbstractSkyline {
             }
         }
         checkSkyline(skyline);
+    }
+
+    public void mergeSmallSegments(ArrayList<Rectangle> rectangles, boolean rotationsAllowed) {
+        if (skyline.size() == 1) {
+            return;
+        }
+        int[] smallestRecs = getMinWidthHeightOtherRectangles(rectangles);
+        int smallestSide = (rotationsAllowed ? Math.min(smallestRecs[0], smallestRecs[2]) : smallestRecs[2]);
+
+        for (int i = 0; i < skyline.size(); i++) {
+            int toX;
+            if (i == 0) {
+                toX = skyline.get(1).start.x;
+            } else if (i == skyline.size() - 1) {
+                toX = skyline.get(skyline.size() - 2).start.x;
+            } else {
+                toX = Math.min(skyline.get(i -1).start.x, skyline.get(i + 1).start.x);
+            }
+            if (skyline.get(i).getLength() < smallestSide && skyline.get(i).start.x < toX) {
+                skyline.get(i).start.x = toX;
+                skyline.get(i).end.x = toX;
+            }
+        }
     }
 
     public void checkSkyline(ArrayList<Segment> skyline) {
