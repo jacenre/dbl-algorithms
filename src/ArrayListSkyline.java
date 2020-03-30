@@ -363,7 +363,7 @@ public class ArrayListSkyline extends AbstractSkyline {
             if (onlyFits[i] == 1 && !doesNotMeetSpreadConstraint(potentialPlacement.rectangle, skyline.get(i).start, getMostLeftPoint())) {
                 if (potentialPlacement.rectangle.y + potentialPlacement.rectangle.height > globalHeight
                         || potentialPlacement.rectangle.y < 0
-                        || potentialPlacement.rectangle.x + potentialPlacement.rectangle.width > globalWidth) {
+                        || potentialPlacement.position.x + potentialPlacement.rectangle.width > globalWidth) {
                     return null;
                 }
 

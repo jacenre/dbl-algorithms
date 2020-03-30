@@ -393,7 +393,7 @@ public class SkylineSolver extends AbstractSolver {
         // it (if it is the first solution or the best up to this point)
         parameters.rectangles = Util.cloneRectangleState(originalSequence);
         Solution currentSolution = new Solution(parameters, this);
-        System.out.println("solution found with " + currentSolution.getWidth());
+        System.out.println("solution found in heuristic solve with " + currentSolution.getWidth());
         if (globalSolution == null || currentSolution.getArea() < globalSolution.getArea()) {
             globalSolution = currentSolution.copy();
         }
