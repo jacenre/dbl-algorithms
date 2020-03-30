@@ -40,12 +40,10 @@ public class SkylineSolver extends AbstractSolver {
         long startTime = System.nanoTime();
         heuristicSolve(parameters.rectangles, upperBound, upperBound);
         long endTime = System.nanoTime();
-        long duration = Math.max((endTime - startTime) / 1000000, 5); // duration of subSolver.pack or 1 if too fast
-
+        long duration = Math.max((endTime - startTime) / 1000000, 1); // duration of subSolver.pack or 1 if too fast
         // Time allowed in milliseconds
-        final int ALLOWED_TIME = 10000; // 25 seconds which leaves 5 seconds for other stuff
+        final int ALLOWED_TIME = 50000; // 25 seconds which leaves 5 seconds for other stuff
         numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
-
         terminate:
         while (numChecks > 0 && lowerBound != upperBound) {
 //            System.out.println(lowerBound + " - " + upperBound + ", " + debug++);
@@ -69,6 +67,7 @@ public class SkylineSolver extends AbstractSolver {
             }
             iter *= 2;
         }
+//        System.out.println(numChecks);
         return globalSolution;
     }
 
@@ -85,7 +84,9 @@ public class SkylineSolver extends AbstractSolver {
         double LB3 = 0;
         for (Rectangle rec : parameters.rectangles) {
             totalArea += rec.getHeight() * rec.getWidth();
-            LB2 += rec.getWidth();
+            if (rec.getWidth() > parameters.height / 2f) {
+                LB2 += rec.getWidth();
+            }
             if (rec.height == parameters.height / 2) {
                 LB3 += rec.width;
             }
@@ -95,7 +96,6 @@ public class SkylineSolver extends AbstractSolver {
         if (parameters.rotationVariant) {
             return LB1;
         }
-
         return Math.max(LB1, LB2 + (int) Math.ceil(LB3 / 2));
     }
 

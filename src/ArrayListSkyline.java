@@ -373,7 +373,7 @@ public class ArrayListSkyline extends AbstractSkyline {
                 if (rectangle.height <= skyline.get(i).getLength()) {
                     potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, false);
                     onlyFits[i]++;
-                } else if (rotationsAllowed && rectangle.width <= skyline.get(i).getLength()) {
+                } else if (rotationsAllowed && rectangle.width == skyline.get(i).getLength()) {
                     potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, true);
                     onlyFits[i]++;
                 }
