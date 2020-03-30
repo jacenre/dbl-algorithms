@@ -281,7 +281,7 @@ public class ArrayListSkyline extends AbstractSkyline {
 
 
 
-//                // delete segments that are completely overshadowed
+                // delete segments that are completely overshadowed
                 while(index + 1 < skyline.size()) {
                     if (skyline.get(index + 1).end.y < upToThisY) {
                         skyline.remove(skyline.get(index + 1));
