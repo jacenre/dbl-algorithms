@@ -23,6 +23,8 @@ public class SkylineSolver extends AbstractSolver {
         return super.canSolveParameters(parameters);
     }
 
+    int debug = 0;
+
     // Algorithm 2 in the paper
     @Override
     Solution pack(Parameters parameters) {
@@ -32,9 +34,10 @@ public class SkylineSolver extends AbstractSolver {
         int iter = 1;
         boolean upperBoundFound = false;
 
-        int debug = 0;
+        debug = 0;
+        int MAX_ITERATIONS = 5;
 
-        while (/*time limit not reached and */ lowerBound != upperBound) {
+        while (MAX_ITERATIONS > 0 && lowerBound != upperBound) {
             System.out.println(lowerBound + " - " + upperBound + ", " + debug++);
             int tempLowerBound = lowerBound;
             while (tempLowerBound < upperBound) {
@@ -48,8 +51,10 @@ public class SkylineSolver extends AbstractSolver {
                     tempLowerBound = width + 1;
                 }
             }
-            if (upperBoundFound == false)
+            if (!upperBoundFound) {
                 upperBound = (int) (upperBound * 1.1);
+            }
+            MAX_ITERATIONS--;
             iter *= 2;
         }
         return globalSolution;
@@ -92,7 +97,7 @@ public class SkylineSolver extends AbstractSolver {
      */
     boolean solve(Parameters parameters, int W, int iter) {
         for (ArrayList<Rectangle> seq : new RectangleSorter(parameters.rectangles)) {
-            for (float ms : new SpreadValues(seq, parameters)) {
+            for (float ms : new SpreadValues(seq, parameters, W)) {
                 if (heuristicSolve(seq, W, (int) ms)) {
                     return true;
                 }
@@ -252,18 +257,18 @@ public class SkylineSolver extends AbstractSolver {
          *
          * @param rectangles the Rectangles for which to calculate
          */
-        SpreadValues(ArrayList<Rectangle> rectangles, Parameters parameters) {
-            // Maximum height
-            float mh = 0;
+        SpreadValues(ArrayList<Rectangle> rectangles, Parameters parameters, int W) {
+            // Maximum width
+            float mw = 0;
             for (Rectangle rectangle : rectangles) {
-                mh = (rectangle.height > mh) ? rectangle.height : mh;
+                mw = (rectangle.width > mw) ? rectangle.width : mw;
             }
 
-            // {mh, mh + (H - mh) * 1/3, mh + (H - mh) * 2/3, H}
-            spreadValues.add(mh);
-            spreadValues.add(mh + (parameters.height - mh) * (1f / 3f));
-            spreadValues.add(mh + (parameters.height - mh) * (2f / 3f));
-            spreadValues.add((float) parameters.height);
+            // {mh, mh + (W - mh) * 1/3, mh + (H - mh) * 2/3, H}
+            spreadValues.add(mw);
+            spreadValues.add(mw + (W - mw) * (1f / 3f));
+            spreadValues.add(mw + (W - mw) * (2f / 3f));
+            spreadValues.add((float) W);
         }
 
         /**
@@ -319,6 +324,7 @@ public class SkylineSolver extends AbstractSolver {
 
             // Before every placement, we want to keep track of what placement/which placements create(s) the least waste of space and
             // keep these in an array
+
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
             minimumLocalSpaceWastePlacements.clear();
 
@@ -338,6 +344,7 @@ public class SkylineSolver extends AbstractSolver {
                     for (int secondLoop = 0; secondLoop < (parameters.rotationVariant? 2 : 1); secondLoop++) {
                         if (secondLoop == 1) {
                             rectangle.rotate();
+
                         }
                         // Checks if the rectangle can even be placed
                         if (skylineDataStructure.doesNotMeetSpreadConstraint(rectangle, segPoint, mostLeft) || hasOverlap(rectangle, segPoint, width, originalSequence)) { // spread constraint
@@ -354,9 +361,9 @@ public class SkylineSolver extends AbstractSolver {
                         }
                     }
                     // We do not want to permanently rotate this rectangle because we have not placed it yet
-                    if (parameters.rotationVariant) {
-                        rectangle.rotate();
-                    }
+                    if (parameters.rotationVariant) rectangle.rotate();
+
+
                 }
             }
 
@@ -407,6 +414,10 @@ public class SkylineSolver extends AbstractSolver {
         if (!toBePlaced.position.start) {
             toBePlaced.rectangle.y -= toBePlaced.rectangle.height;
         }
+        if (toBePlaced.rectangle.y < 0){
+            System.err.println("negative y cordinates?");
+        }
+
 
         // Fix skyline
         skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
@@ -431,6 +442,7 @@ public class SkylineSolver extends AbstractSolver {
         rectangle.x = position.x;
         rectangle.y = position.y;
 
+
         if (!position.start) {
             rectangle.y -= rectangle.height;
         }
@@ -450,5 +462,4 @@ public class SkylineSolver extends AbstractSolver {
 
         return false;
     }
-
 }
