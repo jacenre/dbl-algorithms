@@ -45,6 +45,9 @@ public class SkylineSolver extends AbstractSolver {
                 if (solve(parameters, width, iter)) {
 //                    System.out.println("solution found with width " + width);
                     /* record this solution */
+                    if (globalSolution.getRate() == 1) {
+                        return globalSolution;
+                    }
                     upperBound = width;
                     upperBoundFound = true;
                 } else {
