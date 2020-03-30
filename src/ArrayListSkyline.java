@@ -7,19 +7,21 @@ public class ArrayListSkyline extends AbstractSkyline {
     public int globalHeight;
     public int globalWidth;
     public int maximumSpread;
+    public boolean rotationsAllowed;
 
-    public ArrayListSkyline(int height, int width, int maximumSpread) {
+    public ArrayListSkyline(int height, int width, int maximumSpread, boolean rotationsAllowed) {
         this.globalHeight = height;
         this.globalWidth = width;
         this.maximumSpread = maximumSpread;
+        this.rotationsAllowed = rotationsAllowed;
 
         skyline = new ArrayList<>();
         skyline.add(new Segment(new SegPoint(true, 0, 0), new SegPoint(false, 0, height)));
     }
 
     @Override
-    public boolean testSpreadConstraint(Rectangle rectangle, SegPoint position) {
-        return position.x + rectangle.width - getMostLeftPoint() > maximumSpread;
+    public boolean doesNotMeetSpreadConstraint(Rectangle rectangle, SegPoint position, int mostLeftPoint) {
+        return position.x + rectangle.width - mostLeftPoint > maximumSpread;
     }
 
     public ArrayList<Segment> deepCopySkyline(ArrayList<Segment> skyline) {
@@ -40,7 +42,7 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
     @Override
-    public int getLocalWaste(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence) {
+    public int getLocalWaste(Rectangle rectangle, SegPoint position, int[] smallestRecs) {
         ArrayList<Segment> skylineBefore = deepCopySkyline(skyline);
 
         // Compute wasted space left
@@ -51,16 +53,17 @@ public class ArrayListSkyline extends AbstractSkyline {
 
         // wasted space right
         int wastedSpaceRight = 0;
-        int[] minMax = getMinWidthHeightOtherRectangles(rectangle, sequence);
         int spaceLeftRight = globalWidth - position.x - rectangle.width;
-        if (minMax[0] > spaceLeftRight) {
+        if (rectangle.width > smallestRecs[2] && smallestRecs[2] > spaceLeftRight) {
+            wastedSpaceRight = spaceLeftRight * rectangle.height;
+        } else if (rectangle.width == smallestRecs[2] && smallestRecs[3] > spaceLeftRight) {
             wastedSpaceRight = spaceLeftRight * rectangle.height;
         }
 
         // Get segment corresponding to right side of rectangle
         Segment segmentInQuestion = null;
         for (Segment segment : skyline) {
-            if (segment.start.y == position.y || segment.end.y == position.y) {
+            if ((segment.start.y == position.y && segment.start.x == position.x + rectangle.width)|| (segment.end.y == position.y && segment.start.x == position.x + rectangle.width)) {
                 segmentInQuestion = segment;
             }
         }
@@ -70,9 +73,23 @@ public class ArrayListSkyline extends AbstractSkyline {
         // TODO: dit klopt nog niet helemaal
         int wastedSpaceAbove = 0;
         while (index > 0) {
+//            index--;
+//            Segment toCheck = skyline.get(index);
+//            if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
+//                    (segmentInQuestion.start.y - toCheck.start.y) < smallestRecs[3] : (segmentInQuestion.start.y - toCheck.start.y) < smallestRecs[2])) {
+//                if (index > 0) {
+//                    Segment toCheckAsWell = skyline.get(index - 1);
+//                    if (toCheckAsWell.end.x > toCheck.start.x) {
+//                        wastedSpaceAbove += (toCheckAsWell.end.x - toCheck.start.x) * (segmentInQuestion.start.y - toCheck.start.y) ;
+//                    }
+//                } else {
+//                    wastedSpaceAbove += (segmentInQuestion.start.x - toCheck.start.x) * toCheck.getLength();
+//                }
+//            }
             index--;
             Segment toCheck = skyline.get(index);
-            if (toCheck.start.x < segmentInQuestion.start.x && toCheck.getLength() < minMax[1]) {
+            if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
+                    toCheck.getLength() < smallestRecs[3] : toCheck.getLength() < smallestRecs[2])) {
                 wastedSpaceAbove += (segmentInQuestion.start.x - toCheck.start.x) * toCheck.getLength();
             }
         }
@@ -84,7 +101,8 @@ public class ArrayListSkyline extends AbstractSkyline {
         while (index < skyline.size() - 1) {
             index++;
             Segment toCheck = skyline.get(index);
-            if (toCheck.start.x < segmentInQuestion.start.x && toCheck.getLength() < minMax[1]) {
+            if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
+                    toCheck.getLength() < smallestRecs[3] : toCheck.getLength() < smallestRecs[2])) {
                 wastedSpaceBelow += (segmentInQuestion.start.x - toCheck.start.x) * toCheck.getLength();
             }
         }
@@ -95,20 +113,30 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
 
-    public int[] getMinWidthHeightOtherRectangles(Rectangle rectangle, ArrayList<Rectangle> sequence) {
+    public int[] getMinWidthHeightOtherRectangles(ArrayList<Rectangle> sequence) {
         int minWidth = Integer.MAX_VALUE;
+        int secWidth = Integer.MAX_VALUE;
         int minHeight = Integer.MAX_VALUE;
+        int secHeight = Integer.MAX_VALUE;
         for (Rectangle rec : sequence) {
-            if (rec != rectangle) {
-                if (rec.width < minWidth) {
-                    minWidth = rec.width;
-                }
-                if (rec.height < minHeight) {
-                    minHeight = rec.height;
-                }
+            if (rec.width < minWidth) {
+                minWidth = rec.width;
+                secWidth = minWidth;
+            } else if (rec.width < secWidth) {
+                secWidth = rec.width;
+            }
+            if (rec.height < minHeight) {
+                minHeight = rec.height;
+                secHeight = minHeight;
+            } else if (rec.height < secHeight) {
+                secHeight = rec.height;
             }
         }
-        return new int[] {minWidth, minHeight};
+//        if (rotationsAllowed) {
+//            minHeight = Math.min(minHeight, minWidth);
+//            minWidth = minHeight;
+//        }
+        return new int[] {minWidth, secWidth, minHeight, secHeight};
     }
 
     @Override
@@ -313,19 +341,27 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
     @Override
-    public PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> sequence) {
-        int[] perfectFits = new int[skyline.size()];
+    public PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> rectanglesLeft, boolean rotationsAllowed) {
+        int[] onlyFits = new int[skyline.size()];
 
+        // Loop through all the segments in the skyline and check if there is a segment for which there is only one
+        // rectangle left that can be placed
         for (int i = 0; i < skyline.size(); i++) {
-            Rectangle rectangleThatMightBeTheOnlyFittingOne = null;
-            for (Rectangle rec : sequence) {
-                if (!rec.isPlaced() && skyline.get(i).getLength() == rec.height) {
-                    perfectFits[i]++;
-                    rectangleThatMightBeTheOnlyFittingOne = rec;
+            // If there is only one rectangle that could be placed, it will be stored in this variable
+            PositionRectangleRotationPair potentialPlacement = null;
+            // Loop through all the rectangles that have not been placed yet
+            // TODO: test of rectangle.height == skyline.get(i).getLength() beter werkt op testcases
+            for (Rectangle rectangle : rectanglesLeft) {
+                if (rectangle.height <= skyline.get(i).getLength()) {
+                    potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, false);
+                    onlyFits[i]++;
+                } else if (rotationsAllowed && rectangle.width <= skyline.get(i).getLength()) {
+                    potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, true);
+                    onlyFits[i]++;
                 }
             }
-            if (perfectFits[i] == 1 && !testSpreadConstraint(rectangleThatMightBeTheOnlyFittingOne, skyline.get(i).start)) {
-                return new PositionRectangleRotationPair(rectangleThatMightBeTheOnlyFittingOne, skyline.get(i).start, false);
+            if (onlyFits[i] == 1 && !doesNotMeetSpreadConstraint(potentialPlacement.rectangle, skyline.get(i).start, getMostLeftPoint())) {
+                return potentialPlacement;
             }
         }
         return null;

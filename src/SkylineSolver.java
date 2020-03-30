@@ -1,8 +1,5 @@
-import jdk.swing.interop.SwingInterOpUtils;
-
 import java.util.ArrayList;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -47,7 +44,6 @@ public class SkylineSolver extends AbstractSolver {
                     /* record this solution */
                     upperBound = width;
                     upperBoundFound = true;
-                    System.out.println("found");
                 } else {
                     tempLowerBound = width + 1;
                 }
@@ -95,13 +91,6 @@ public class SkylineSolver extends AbstractSolver {
      * @returns a boolean signalling if a solution could be found with the given attributes
      */
     boolean solve(Parameters parameters, int W, int iter) {
-        // DEBUG
-
-//        if (heuristicSolve(parameters.rectangles, W, W)) {
-//            return true;
-//        }
-
-        // DEBUG
         for (ArrayList<Rectangle> seq : new RectangleSorter(parameters.rectangles)) {
             for (float ms : new SpreadValues(seq, parameters)) {
                 if (heuristicSolve(seq, W, (int) ms)) {
@@ -307,74 +296,100 @@ public class SkylineSolver extends AbstractSolver {
     boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
         Parameters animation = parameters.copy();
         parameters.rectangles = originalSequence;
+        Util.animate(animation, this);
 
+        // Just to be sure
         resetRecs(originalSequence);
-        // Test all the candidate positions - rectangle combos
-        ArrayListSkyline skylineDataStructure = new ArrayListSkyline(parameters.height, width, maximumSpread);
-        ArrayList<PositionRectangleRotationPair> minimumLocalSpaceWasteRectangles = new ArrayList<>();
-        ArrayList<Rectangle> sequence = skylineDataStructure.deepCopyRectangles(originalSequence);
 
-        // Place a rectangle every time till every rectangle is placed
-        while (!sequence.isEmpty()) {
-            Util.animate(animation, this);
+        // Make a skyline for this attempt to place all the rectangles
+        ArrayListSkyline skylineDataStructure = new ArrayListSkyline(parameters.height, width, maximumSpread, parameters.rotationVariant);
+        ArrayList<PositionRectangleRotationPair> minimumLocalSpaceWastePlacements = new ArrayList<>();
+
+        // Keep track of which rectangles still need to be placed
+        ArrayList<Rectangle> rectanglesNotPlacedYet = skylineDataStructure.deepCopyRectangles(originalSequence);
+
+        // Place a rectangle every loop till every rectangle is placed
+        // If it is impossible to place a rectangle, the method returns false
+        while (!rectanglesNotPlacedYet.isEmpty()) {
+            // Get most left x point of any segment
+            int mostLeft = skylineDataStructure.getMostLeftPoint();
+
+            // Get smallest and second smallest widths and smallest and second smallest heights
+            int[] smallestRecs = skylineDataStructure.getMinWidthHeightOtherRectangles(rectanglesNotPlacedYet);
+
+            // Before every placement, we want to keep track of what placement/which placements create(s) the least waste of space and
+            // keep these in an array
             int minimumLocalSpaceWaste = Integer.MAX_VALUE;
-            minimumLocalSpaceWasteRectangles.clear();
+            minimumLocalSpaceWastePlacements.clear();
+
             // Test if there is any perfect place to place the rectangle.
-            PositionRectangleRotationPair toBePlaced = skylineDataStructure.anyOnlyFit(sequence);
+            PositionRectangleRotationPair toBePlaced = skylineDataStructure.anyOnlyFit(rectanglesNotPlacedYet, parameters.rotationVariant);
 
             // If there is then place it
             if (!(toBePlaced == null)) {
-                placeRectangle(toBePlaced, sequence, skylineDataStructure);
+                placeRectangle(toBePlaced, rectanglesNotPlacedYet, skylineDataStructure);
                 continue;
             }
 
             // Check for every rectangle-position pair the local waste
             for (SegPoint segPoint : skylineDataStructure.getCandidatePoints()) {
-                for (Rectangle rectangle : sequence) {
-                    for (int i = 0; i < 2; i++) {
-                        if (i == 1) {
+                for (Rectangle rectangle : rectanglesNotPlacedYet) {
+                    // If the rotationsvariant is true, we want to test both rotations for every rectangle
+                    for (int secondLoop = 0; secondLoop < (parameters.rotationVariant? 2 : 1); secondLoop++) {
+                        if (secondLoop == 1) {
                             rectangle.rotate();
                         }
-                        // Checks if the rectangle can be placed
-                        if (skylineDataStructure.testSpreadConstraint(rectangle, segPoint) || hasOverlap(rectangle, segPoint, width, originalSequence)) { // spread constraint
+                        // Checks if the rectangle can even be placed
+                        if (skylineDataStructure.doesNotMeetSpreadConstraint(rectangle, segPoint, mostLeft) || hasOverlap(rectangle, segPoint, width, originalSequence)) { // spread constraint
                             continue;
                         }
-                        int localSpaceWaste = skylineDataStructure.getLocalWaste(rectangle, segPoint, sequence);
+                        // Produces a list of placements which all have the lowest local space waste
+                        int localSpaceWaste = skylineDataStructure.getLocalWaste(rectangle, segPoint, smallestRecs);
                         if (localSpaceWaste < minimumLocalSpaceWaste) {
-                            minimumLocalSpaceWasteRectangles.clear();
                             minimumLocalSpaceWaste = localSpaceWaste;
-                            minimumLocalSpaceWasteRectangles.add(new PositionRectangleRotationPair(rectangle, segPoint, (i == 1) ? true : false));
+                            minimumLocalSpaceWastePlacements.clear();
+                            minimumLocalSpaceWastePlacements.add(new PositionRectangleRotationPair(rectangle, segPoint, (secondLoop == 1)? true: false));
                         } else if (localSpaceWaste == minimumLocalSpaceWaste) {
-                            minimumLocalSpaceWasteRectangles.add(new PositionRectangleRotationPair(rectangle, segPoint, (i == 1) ? true : false));
+                            minimumLocalSpaceWastePlacements.add(new PositionRectangleRotationPair(rectangle, segPoint, (secondLoop == 1)? true: false));
                         }
                     }
-                    rectangle.rotate();
+                    // We do not want to permanently rotate this rectangle because we have not placed it yet
+                    if (parameters.rotationVariant) {
+                        rectangle.rotate();
+                    }
                 }
             }
 
-
-            if (minimumLocalSpaceWasteRectangles.size() == 1) { // minimum local waste
-                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
-            } else if (minimumLocalSpaceWasteRectangles.size() >= 2) { // maximum fitness number and earliest in sequence
+            // If there is only one placement that has the minimum space waste, then this placement should be done
+            if (minimumLocalSpaceWastePlacements.size() == 1) {
+                toBePlaced = minimumLocalSpaceWastePlacements.get(0);
+            } else if (minimumLocalSpaceWastePlacements.size() >= 2){
+                // If there are more placements sharing the minimum weight we place the one with the highest fitness score
+                // If there is a tie between those, we choose the first
                 int highestFitness = 0;
-                toBePlaced = minimumLocalSpaceWasteRectangles.get(0);
-                for (PositionRectangleRotationPair pair : minimumLocalSpaceWasteRectangles) {
+                toBePlaced = minimumLocalSpaceWastePlacements.get(0);
+                for (PositionRectangleRotationPair pair : minimumLocalSpaceWastePlacements) {
                     if (skylineDataStructure.getFitnessNumber(pair) > highestFitness) {
                         toBePlaced = pair;
                     }
                 }
             }
 
+            // If there is a rectangle to place we place it, otherwise we cannot place a rectangle with these parameters
+            // and we return false.
             if (toBePlaced != null) {
-                /* Placement of rectangle */
-                placeRectangle(toBePlaced, sequence, skylineDataStructure);
+                placeRectangle(toBePlaced, rectanglesNotPlacedYet, skylineDataStructure);
             } else {
                 return false;
             }
         }
-        parameters.rectangles = originalSequence;
+        for (SegPoint point : skylineDataStructure.getCandidatePoints()) {
+            System.out.println(point);
+        }
+        // If we are here, that means we have placed all the rectangles and this could be a valid solution so we store
+        // it (if it is the first solution or the best up to this point)
+        parameters.rectangles = Util.cloneRectangleState(originalSequence);
         Solution currentSolution = new Solution(parameters, this);
-        System.out.println("solution with width " + width + " maximum spread " + maximumSpread);
         if (globalSolution == null || currentSolution.getArea() < globalSolution.getArea()) {
             globalSolution = currentSolution;
         }
@@ -385,16 +400,19 @@ public class SkylineSolver extends AbstractSolver {
         if (toBePlaced.rotated) {
             toBePlaced.rectangle.rotate();
         }
-        if (toBePlaced.position.start) {
-            toBePlaced.rectangle.x = toBePlaced.position.x;
-            toBePlaced.rectangle.y = toBePlaced.position.y;
-        } else if (!toBePlaced.position.start) {
-            toBePlaced.rectangle.x = toBePlaced.position.x;
-            toBePlaced.rectangle.y = toBePlaced.position.y - toBePlaced.rectangle.height;
+
+        toBePlaced.rectangle.x = toBePlaced.position.x;
+        toBePlaced.rectangle.y = toBePlaced.position.y;
+
+        if (!toBePlaced.position.start) {
+            toBePlaced.rectangle.y -= toBePlaced.rectangle.height;
         }
 
+        // Fix skyline
         skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
         skyline.mergeSegmentsNextToEachOther();
+
+        // Debug
 //        for (Segment seg : skyline.skyline) {
 //            for (int j = 0; j < seg.end.y - seg.start.y; j++) {
 //                for (int i = 0; i < seg.start.x ; i++) {
@@ -403,59 +421,33 @@ public class SkylineSolver extends AbstractSolver {
 //                System.out.println(seg.start.x);
 //            }
 //        }
-//        System.out.println("REEEEEEEEWIND");
+
         toBePlaced.rectangle.place(true);
         sequence.remove(toBePlaced.rectangle);
     }
 
     public boolean hasOverlap(Rectangle rectangle, SegPoint position, int width, ArrayList<Rectangle> originalSequence) {
-        if (position.start) {
-            rectangle.x = position.x;
-            rectangle.y = position.y;
-        } else {
-            rectangle.x = position.x;
-            rectangle.y = position.y - rectangle.height;
+        // Place rectangle on position
+        rectangle.x = position.x;
+        rectangle.y = position.y;
+
+        if (!position.start) {
+            rectangle.y -= rectangle.height;
         }
 
-        if (rectangle.y + rectangle.height > parameters.height) {
-            //System.out.println("reaches bottom");
-            return true;
-        } else if (rectangle.y < 0) {
-            //System.out.println("reaches top");
-            return true;
-        } else if (rectangle.x + rectangle.width > width) {
+        // Check if rectangle crosses outerbox
+        if (rectangle.y + rectangle.height > parameters.height
+                || rectangle.y < 0
+                || rectangle.x + rectangle.width > width) {
             return true;
         }
 
-        rectangle.place(true);
-        for (Rectangle rectangle1 : originalSequence) {
-            for (Rectangle rectangle2 : originalSequence) {
-                if (rectangle1.isPlaced() && rectangle2.isPlaced() && rectangle1 != rectangle2) {
-                    if (rectangle1.intersects(rectangle2)) {
-                        rectangle.place(false);
-                        return true;
-                    }
-                }
+        for (Rectangle other : originalSequence) {
+            if (other.isPlaced() && other.intersects(rectangle)) {
+                return true;
             }
         }
 
-        rectangle.place(true);
-        ArrayList<Rectangle> placedRecs = new ArrayList<>();
-        for (Rectangle rec : originalSequence) {
-            if (rec.isPlaced()) {
-                placedRecs.add(rec);
-            }
-        }
-
-        Parameters parameters = new Parameters();
-        parameters.rectangles = placedRecs;
-
-        if (Util.sweepline(new Solution(parameters))) {
-            //System.out.println("sweepline detected collision");
-            rectangle.place(false);
-            return true;
-        }
-        rectangle.place(false);
         return false;
     }
 

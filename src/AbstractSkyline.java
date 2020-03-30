@@ -13,7 +13,7 @@ public abstract class AbstractSkyline {
      * @param position The position where the Rectangle could be placed
      * @returns (position.x + rectangle.width - getMostLeftPoint() > spread constraint)
      */
-    public abstract boolean testSpreadConstraint(Rectangle rectangle, SegPoint position);
+    public abstract boolean doesNotMeetSpreadConstraint(Rectangle rectangle, SegPoint position, int mostLeftPoint);
 
     /**
      * Computes how much space would be wasted if a rectangle would be placed on a certain position
@@ -23,13 +23,12 @@ public abstract class AbstractSkyline {
      *                 and minimum width of these rectangles.
      * @returns a number which tells how much local waste there would be if this rectangle were to be placed
      */
-    public abstract int getLocalWaste(Rectangle rectangle, SegPoint position, ArrayList<Rectangle> sequence);
+    public abstract int getLocalWaste(Rectangle rectangle, SegPoint position, int[] minRecs);
 
     /**
      * If two potential placements give the same minimum local waste, then this function might determine the
      * rectangle which should be placed. It find the fitness number of a rectangles, indicing how "perfect" the fit is.
-     * @param rectangle The rectangle to be placed
-     * @param position The position where the rectangle would be placed
+     * @param pair The record that holds all the information of the placement
      * @returns an integer in the set of { 0, 1, 2, 3, 4 }
      */
     public abstract int getFitnessNumber(PositionRectangleRotationPair pair);
@@ -48,7 +47,7 @@ public abstract class AbstractSkyline {
      * @param sequence The ordered set of rectangles that have not been placed yet
      * @returns a position-rectangle pair if it was found
      */
-    public abstract PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> sequence);
+    public abstract PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> sequence, boolean rotationsAllowed);
 
     /**
      * Looks at current skyline and determines the candidate points where a new rectangle could be placed, puts it in
