@@ -33,7 +33,6 @@ public class SkylineSolver extends AbstractSolver {
         int upperBound = Math.max(lowerBound + 1, (int) (lowerBound * 1.1));
         int iter = 1;
         boolean upperBoundFound = false;
-
         debug = 0;
         int MAX_ITERATIONS = 5;
 
@@ -43,7 +42,9 @@ public class SkylineSolver extends AbstractSolver {
             while (tempLowerBound < upperBound) {
                 // Binary search
                 int width = ((tempLowerBound + upperBound) / 2);
+                System.out.println(width);
                 if (solve(parameters, width, iter)) {
+                    System.out.println("solution found with width " + width);
                     /* record this solution */
                     upperBound = width;
                     upperBoundFound = true;
@@ -362,8 +363,6 @@ public class SkylineSolver extends AbstractSolver {
                     }
                     // We do not want to permanently rotate this rectangle because we have not placed it yet
                     if (parameters.rotationVariant) rectangle.rotate();
-
-
                 }
             }
 
@@ -390,15 +389,13 @@ public class SkylineSolver extends AbstractSolver {
                 return false;
             }
         }
-        for (SegPoint point : skylineDataStructure.getCandidatePoints()) {
-            System.out.println(point);
-        }
         // If we are here, that means we have placed all the rectangles and this could be a valid solution so we store
         // it (if it is the first solution or the best up to this point)
         parameters.rectangles = Util.cloneRectangleState(originalSequence);
         Solution currentSolution = new Solution(parameters, this);
+        System.out.println("solution found with " + currentSolution.getWidth());
         if (globalSolution == null || currentSolution.getArea() < globalSolution.getArea()) {
-            globalSolution = currentSolution;
+            globalSolution = currentSolution.copy();
         }
         return true;
     }
@@ -414,10 +411,8 @@ public class SkylineSolver extends AbstractSolver {
         if (!toBePlaced.position.start) {
             toBePlaced.rectangle.y -= toBePlaced.rectangle.height;
         }
-        if (toBePlaced.rectangle.y < 0){
-            System.err.println("negative y cordinates?");
-        }
 
+       // System.out.println(toBePlaced.rectangle.x + toBePlaced.rectangle.width < );
 
         // Fix skyline
         skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
