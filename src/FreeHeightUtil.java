@@ -51,7 +51,7 @@ public class FreeHeightUtil {
         Solution bestSolution = subSolver.pack(parameters.copy());
         long endTime = System.nanoTime();
 
-        long duration = Math.max((endTime - startTime) / 1000000, 15); // duration of subSolver.pack or 1 if too fast
+        long duration = Math.max((endTime - startTime) / 1000000, 5); // duration of subSolver.pack or 1 if too fast
 
         // Time allowed in milliseconds
         final int ALLOWED_TIME = 25000; // 25 seconds which leaves 5 seconds for other stuff

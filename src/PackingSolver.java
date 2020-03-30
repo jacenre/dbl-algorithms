@@ -12,8 +12,9 @@ public class PackingSolver {
         // Different solutions
         CompoundSolver compoundSolver = new CompoundSolver();
         compoundSolver.addSolver(new FirstFitSolver());
+        compoundSolver.addSolver(new SkylineSolver());
         compoundSolver.addSolver(new GeneticSolver(new TopLeftSolver(false), true));
-        compoundSolver.addSolver(new TopLeftSolver());
+//        compoundSolver.addSolver(new TopLeftSolver());
         compoundSolver.addSolver(new BottomUpSolver());
         compoundSolver.addSolver(new CompressionSolver());
         compoundSolver.addSolver(new ReverseFitSolver());
