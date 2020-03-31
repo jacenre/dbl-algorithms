@@ -85,6 +85,7 @@ public class SkylineSolver extends AbstractSolver {
         int totalArea = 0;
         int LB2 = 0;
         double LB3 = 0;
+        int LB4 = 0;
         for (Rectangle rec : parameters.rectangles) {
             totalArea += rec.getHeight() * rec.getWidth();
             if (rec.getWidth() > parameters.height / 2f) {
@@ -93,13 +94,16 @@ public class SkylineSolver extends AbstractSolver {
             if (rec.height == parameters.height / 2) {
                 LB3 += rec.width;
             }
+            if (rec.width > LB4) {
+                LB4 = rec.width;
+            }
         }
         int LB1 = (int) Math.ceil(totalArea / (double) parameters.height);
 
         if (parameters.rotationVariant) {
             return LB1;
         }
-        return Math.max(LB1, LB2 + (int) Math.ceil(LB3 / 2));
+        return Math.max(Math.max(LB1, LB4), LB2 + (int) Math.ceil(LB3 / 2));
     }
 
     /**
@@ -319,9 +323,6 @@ public class SkylineSolver extends AbstractSolver {
      */
     boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
         numChecks--;
-//        System.out.println(originalSequence + ", " + width + ", " + maximumSpread);
-        Parameters animation = parameters.copy();
-        parameters.rectangles = originalSequence;
         //Util.animate(animation, this);
 
         // Just to be sure
@@ -433,32 +434,14 @@ public class SkylineSolver extends AbstractSolver {
             toBePlaced.rectangle.y -= toBePlaced.rectangle.height;
         }
 
-       // System.out.println(toBePlaced.rectangle.x + toBePlaced.rectangle.width < );
-
         // Fix skyline
         skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
 
-
-
-
-        // Debug
-//        for (Segment seg : skyline.skyline) {
-//            for (int j = 0; j < seg.end.y - seg.start.y; j++) {
-//                for (int i = 0; i < seg.start.x ; i++) {
-//                    System.out.print(" ");
-//                }
-//                System.out.println(seg.start.x);
-//            }
-//        }
         toBePlaced.rectangle.place(true);
         sequence.remove(toBePlaced.rectangle);
 
         // Make the small segments merge with bigger ones
-        skyline.mergeSegmentsNextToEachOther();
-        skyline.mergeSmallSegments(sequence, parameters.rotationVariant);
-        skyline.mergeSegmentsNextToEachOther();
-        skyline.mergeSmallSegments(sequence, parameters.rotationVariant);
-        skyline.mergeSegmentsNextToEachOther();
+        skyline.fixSkylineAfterPlacements(sequence, parameters.rotationVariant);
     }
 
     public boolean hasOverlap(Rectangle rectangle, SegPoint position, int width, ArrayList<Rectangle> originalSequence) {
