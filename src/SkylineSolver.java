@@ -24,20 +24,29 @@ public class SkylineSolver extends AbstractSolver {
         return super.canSolveParameters(parameters);
     }
 
-    int debug = 0;
-    int numChecks;
+    private int debug = 0;
+    private int numChecks;
+
+    int getNumChecks(Parameters parameters) {
+        if (parameters.freeHeightUtil || parameters.heightVariant == Util.HeightSupport.FREE) return 1000;
+        return 4000;
+    }
 
     // Algorithm 2 in the paper
     @Override
     Solution pack(Parameters parameters) {
         this.parameters = parameters;
         int lowerBound = getLowerBound(parameters);
-        int upperBound = Math.max(lowerBound + 1, (int) (lowerBound * 1.1));
+
+        globalSolution = new FirstFitSolver().getSolution(parameters);
+        if (globalSolution.getRate() == 1.0) return globalSolution;
+
+        int upperBound = (int) globalSolution.getWidth();
+
         int iter = 1;
-        boolean upperBoundFound = false;
         debug = 0;
 
-        numChecks = 500; // amount of checks that can be done
+        numChecks = getNumChecks(parameters); // amount of checks that can be done
 
         terminate:
         while (numChecks > 0 && lowerBound != upperBound) {
@@ -55,17 +64,14 @@ public class SkylineSolver extends AbstractSolver {
                         return globalSolution;
                     }
                     upperBound = width;
-                    upperBoundFound = true;
                 } else {
                     tempLowerBound = width + 1;
                 }
             }
-            if (!upperBoundFound) {
-                upperBound = (int) (upperBound * 1.1);
-            }
             iter *= 2;
         }
 //        System.out.println(numChecks);
+        globalSolution.solvedBy = this;
         return globalSolution;
     }
 
@@ -83,8 +89,8 @@ public class SkylineSolver extends AbstractSolver {
         int LB4 = 0;
         for (Rectangle rec : parameters.rectangles) {
             totalArea += rec.getHeight() * rec.getWidth();
-            if (rec.getWidth() > parameters.height / 2f) {
-                LB2 += rec.getWidth();
+            if (rec.getHeight() > parameters.height / 2f) {
+                LB2 += rec.getHeight();
             }
             if (rec.height == parameters.height / 2) {
                 LB3 += rec.width;
@@ -98,7 +104,8 @@ public class SkylineSolver extends AbstractSolver {
         if (parameters.rotationVariant) {
             return LB1;
         }
-        return Math.max(Math.max(LB1, LB4), LB2 + (int) Math.ceil(LB3 / 2));
+        return Math.max(LB1, LB4);
+//        return Math.max(Math.max(LB1, LB4), LB2 + (int) Math.ceil(LB3 / 2));
     }
 
     /**

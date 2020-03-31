@@ -25,7 +25,7 @@ public class BottomUpSolver extends AbstractSolver {
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
-        return parameters.rectangles.size() <= 9999 || (parameters.heightVariant != Util.HeightSupport.FREE && !parameters.freeHeightUtil);
+        return parameters.rectangles.size() <= 10000 || (parameters.heightVariant != Util.HeightSupport.FREE && !parameters.freeHeightUtil);
     }
 
     Parameters parameters;
