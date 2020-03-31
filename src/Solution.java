@@ -124,6 +124,7 @@ public class Solution {
      */
     public Solution(Parameters parameters) {
         this.parameters = parameters;
+        this.setMinimumArea();
     }
 
 
@@ -136,6 +137,7 @@ public class Solution {
     public Solution(Parameters parameters, AbstractSolver solvedBy) {
         this.parameters = parameters;
         this.solvedBy = solvedBy;
+        this.setMinimumArea();
     }
 
     /**
@@ -153,6 +155,8 @@ public class Solution {
      * @return the sum of the area of all rectangles
      */
     public long getMinimumArea() {
+        if (this.minimumArea != null) return this.minimumArea;
+
         long minimumArea = 0L;
         for (Rectangle rectangle :
                 parameters.rectangles) {
@@ -160,6 +164,19 @@ public class Solution {
         }
         return minimumArea;
     }
+
+    /**
+     * Calculates and stores the minimum area.
+     * <p>
+     *     If we find that {@link #getArea()} is less than the sum of all rectangles it must mean that there is an
+     *     overlap and the solution is invalid.
+     * </p>
+     */
+    private void setMinimumArea() {
+        this.minimumArea = this.parameters.getMinimumArea();
+    }
+
+    private Long minimumArea = null;
 
     /**
      * Returns the OPT rate of the solution.

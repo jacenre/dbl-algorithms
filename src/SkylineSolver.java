@@ -19,7 +19,7 @@ public class SkylineSolver extends AbstractSolver {
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
-        if (parameters.rectangles.size() > 999) return false;
+        if (parameters.rectangles.size() > 100) return false;
         if ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)  && parameters.rectangles.size() > 50) return false;
         return super.canSolveParameters(parameters);
     }
@@ -28,8 +28,8 @@ public class SkylineSolver extends AbstractSolver {
     private int numChecks;
 
     int getNumChecks(Parameters parameters) {
-        if (parameters.freeHeightUtil || parameters.heightVariant == Util.HeightSupport.FREE) return 1000;
-        return 4000;
+        if (parameters.freeHeightUtil || parameters.heightVariant == Util.HeightSupport.FREE) return 3000;
+        return 1500;
     }
 
     // Algorithm 2 in the paper
@@ -39,7 +39,7 @@ public class SkylineSolver extends AbstractSolver {
         int lowerBound = getLowerBound(parameters);
 
         globalSolution = new FirstFitSolver().getSolution(parameters);
-        if (globalSolution.getRate() == 1.0) return globalSolution;
+        if (globalSolution.getRate() == 1.0d) return globalSolution;
 
         int upperBound = (int) globalSolution.getWidth();
 
@@ -60,7 +60,7 @@ public class SkylineSolver extends AbstractSolver {
                     if (!(numChecks > 0)) break terminate;
 //                    System.out.println("solution found with width " + width);
                     /* record this solution */
-                    if (globalSolution.getRate() == 1) {
+                    if (globalSolution.getRate() == 1.0d) {
                         return globalSolution;
                     }
                     upperBound = width;
@@ -70,7 +70,6 @@ public class SkylineSolver extends AbstractSolver {
             }
             iter *= 2;
         }
-//        System.out.println(numChecks);
         globalSolution.solvedBy = this;
         return globalSolution;
     }
@@ -104,7 +103,8 @@ public class SkylineSolver extends AbstractSolver {
         if (parameters.rotationVariant) {
             return LB1;
         }
-        return Math.max(LB1, LB4);
+        return LB1;
+//        return Math.max(LB1, LB4);
 //        return Math.max(Math.max(LB1, LB4), LB2 + (int) Math.ceil(LB3 / 2));
     }
 
@@ -379,9 +379,9 @@ public class SkylineSolver extends AbstractSolver {
                         if (localSpaceWaste < minimumLocalSpaceWaste) {
                             minimumLocalSpaceWaste = localSpaceWaste;
                             minimumLocalSpaceWastePlacements.clear();
-                            minimumLocalSpaceWastePlacements.add(new PositionRectangleRotationPair(rectangle, segPoint, (secondLoop == 1)? true: false));
+                            minimumLocalSpaceWastePlacements.add(new PositionRectangleRotationPair(rectangle, segPoint, secondLoop == 1));
                         } else if (localSpaceWaste == minimumLocalSpaceWaste) {
-                            minimumLocalSpaceWastePlacements.add(new PositionRectangleRotationPair(rectangle, segPoint, (secondLoop == 1)? true: false));
+                            minimumLocalSpaceWastePlacements.add(new PositionRectangleRotationPair(rectangle, segPoint, secondLoop == 1));
                         }
                     }
                     // We do not want to permanently rotate this rectangle because we have not placed it yet

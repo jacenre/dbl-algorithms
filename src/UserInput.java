@@ -23,7 +23,7 @@ public class UserInput {
 
         params.height = (Integer) height.get(1);
         params.rotationVariant = getRotation();
-        params.rectangles = getRectangles();
+        params.setRectangles(getRectangles());
         return params;
     }
 

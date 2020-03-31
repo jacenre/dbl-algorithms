@@ -19,6 +19,24 @@ public class Parameters {
     public Util.HeightSupport heightVariant;
 
     /**
+     * Pre calculate the minimum area to improve runtime.
+     */
+    private void calculateMinimumArea() {
+        long minimumArea = 0L;
+        for (Rectangle rectangle :
+                this.rectangles) {
+            minimumArea += (rectangle.height * rectangle.width);
+        }
+        this.minimumArea = minimumArea;
+    }
+
+    public Long getMinimumArea() {
+        return minimumArea;
+    }
+
+    private Long minimumArea;
+
+    /**
      * Boolean representing if this Parameters object was parsed by the {@link FreeHeightUtil}.
      * <p>
      *     The reason for this boolean is that when you use the compound solver in the {@code FreeHeightUtil} it will
@@ -55,6 +73,7 @@ public class Parameters {
 
     public void setRectangles(ArrayList<Rectangle> rectangles) {
         this.rectangles = rectangles;
+        calculateMinimumArea();
     }
 
     /**
@@ -75,7 +94,7 @@ public class Parameters {
         parameters.freeHeightUtil = this.freeHeightUtil;
         parameters.height = this.height;
         parameters.rotationVariant = this.rotationVariant;
-        parameters.rectangles = Util.cloneRectangleState(rectangles);
+        parameters.setRectangles(Util.cloneRectangleState(rectangles));
         return parameters;
     }
 
@@ -87,22 +106,27 @@ public class Parameters {
     @Override
     public String toString() {
         StringBuilder toString = new StringBuilder();
-        if (this.heightVariant == Util.HeightSupport.FIXED) {
-            toString.append("container height: fixed ").append(this.height);
-        } else {
-            toString.append("container height: free");
-        }
-        toString.append("\n");
-        toString.append("rotations allowed: ");
-        if (this.rotationVariant) {
-            toString.append("yes");
-        } else {
-            toString.append("no");
-        }
-        toString.append("\n");
-        toString.append("number of rectangles: ").append(this.rectangles.size()).append("\n");
-        for (Rectangle rectangle : rectangles) {
-            toString.append(rectangle.width).append(" ").append(rectangle.height).append("\n");
+//        if (this.heightVariant == Util.HeightSupport.FIXED) {
+////            toString.append("container height: fixed ").append(this.height);
+////        } else {
+////            toString.append("container height: free");
+////        }
+////        toString.append("\n");
+////        toString.append("rotations allowed: ");
+////        if (this.rotationVariant) {
+////            toString.append("yes");
+////        } else {
+////            toString.append("no");
+////        }
+////        toString.append("\n");
+////        toString.append("number of rectangles: ").append(this.rectangles.size()).append("\n");
+////        for (Rectangle rectangle : rectangles) {
+////            toString.append(rectangle.width).append(" ").append(rectangle.height).append("\n");
+////        }
+        for (int i = 0; i < rectangles.size(); i++) {
+            if (i != 0 && i % 8 == 0)
+                toString.append(rectangles.get(i).width).append(" ").append(rectangles.get(i).height).append("\n");
+            else toString.append(rectangles.get(i).width).append(" ").append(rectangles.get(i).height).append("|");
         }
         return toString.toString();
     }

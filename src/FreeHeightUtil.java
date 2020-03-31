@@ -51,14 +51,13 @@ public class FreeHeightUtil {
         Solution bestSolution = subSolver.pack(parameters.copy());
         long endTime = System.nanoTime();
 
-        long duration = Math.max((endTime - startTime) / 1000000, 5); // duration of subSolver.pack or 1 if too fast
+        long duration = Math.max((endTime - startTime) / 1000000, 1); // duration of subSolver.pack or 1 if too fast
 
         // Time allowed in milliseconds
-        final int ALLOWED_TIME = 25000; // 25 seconds which leaves 5 seconds for other stuff
-        int numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
+        final int ALLOWED_TIME = 30000; // 25 seconds which leaves 5 seconds for other stuff
+        int numChecks = (int) (ALLOWED_TIME / duration); // amount of checks that can be done
         if (Util.debug)
             System.out.println("numChecks: " + numChecks);
-
         // find best heights
         if (numChecks >= numPossibleHeights) { // if more checks can be done than the max needed
             bestSolution = tryAllHeightsFinder(parameters);
@@ -76,8 +75,9 @@ public class FreeHeightUtil {
 
     /**
      * Return best solution dependent on the height.
+     *
      * @param parameters of the problem
-     * @param numChecks number of checks to do at most
+     * @param numChecks  number of checks to do at most
      * @return best Solution found
      */
     Solution localMinimaFinder(Parameters parameters, int numChecks) {
@@ -98,28 +98,28 @@ public class FreeHeightUtil {
 
         // For the math behind this, refer to Tristan Trouwen (or maybe the report in a later stage)
         // for simplification of expression of checksPerIteration
-        double L1 = Math.log((float) stepSizePrecision/numPossibleHeights);
+        double L1 = Math.log((float) stepSizePrecision / numPossibleHeights);
 
         double numRecursions, checksPerIteration;
         // check if not legal
-        if (2*L1/numChecks < -1/Math.exp(1) || 2*L1/numChecks >= 0) {
-           // numChecks = - (int) (Math.log((float)1/numPossibleHeights)*2*Math.exp(1))+2; // amount of checks that should be needed
+        if (2 * L1 / numChecks < -1 / Math.exp(1) || 2 * L1 / numChecks >= 0) {
+            // numChecks = - (int) (Math.log((float)1/numPossibleHeights)*2*Math.exp(1))+2; // amount of checks that should be needed
             numRecursions = 1; // no recursion
-            stepSizePrecision = (float) numPossibleHeights/numChecks;
+            stepSizePrecision = (float) numPossibleHeights / numChecks;
             checksPerIteration = numChecks;
 
         } else { // legal
             // approximate number of recursions that will be made
-            numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks)));
+            numRecursions = (L1 / (MathUtil.LambertMinusOne(2 * L1 / numChecks)));
 
-            checksPerIteration = numChecks * MathUtil.LambertMinusOne(2*L1/numChecks) / L1;
+            checksPerIteration = numChecks * MathUtil.LambertMinusOne(2 * L1 / numChecks) / L1;
         }
 
         if (Util.debug) {
             System.out.println("Possible heights to try (H): " + numPossibleHeights);
             System.out.println("Approximate number of recursions (M): " + numRecursions);
             System.out.println("Checks per iteration (m): " + checksPerIteration);
-            System.out.println("M*m: " + checksPerIteration *numRecursions);
+            System.out.println("M*m: " + checksPerIteration * numRecursions);
             System.out.println("StepSize precision: " + stepSizePrecision);
         }
 
@@ -134,14 +134,11 @@ public class FreeHeightUtil {
 
         // stepSize such that #checksPerIteration are done (larger means less precise) is made smaller each iteration
         int stepSize;
-
         // record heights that were tried already
         ArrayList<Double> triedHeights = new ArrayList<>();
-
         do {
             // update stepSize
-            stepSize = Math.max((int) ((stopRange - startRange)/checksPerIteration), 1);
-
+            stepSize = Math.max((int) ((stopRange - startRange) / checksPerIteration), 1);
             if (Util.debug) System.out.println("Stepsize: " + stepSize);
 
             for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
@@ -152,6 +149,10 @@ public class FreeHeightUtil {
                 solves++;
 
                 if (newSolution == null) continue;
+
+                if (newSolution.getRate() == 1.0d) {
+                    return newSolution;
+                }
 
                 if (newSolution.isBetter(bestSolution)) {
                     // update bestSolution
@@ -172,6 +173,7 @@ public class FreeHeightUtil {
 
     /**
      * Tries to find a solution with all height parameters and returns best solution found.
+     *
      * @param parameters of the problem
      * @return best Solution found
      */
@@ -184,10 +186,13 @@ public class FreeHeightUtil {
 
         for (int newHeight = minimumHeight; newHeight <= maximumHeight; newHeight++) {
             Parameters params = parameters.copy();
-            params.height = (int) newHeight;
+            params.height = newHeight;
             Solution newSolution = subSolver.pack(params);
 
             if (newSolution == null) continue; // not a good solution, skip
+            if (newSolution.getRate() == 1.0d) {
+                return newSolution;
+            }
 
             if (newSolution.isBetter(bestSolution)) {
                 // update bestSolution
