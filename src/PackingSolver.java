@@ -8,6 +8,7 @@ public class PackingSolver {
 
         // Remember the order of the rectangles for the output
         String[] inputOrder = params.rectangles.stream().map(Rectangle::getId).toArray(String[]::new);
+        System.err.println(params.heightVariant);
 
         // Different solutions
         CompoundSolver compoundSolver = new CompoundSolver();
@@ -16,12 +17,11 @@ public class PackingSolver {
         compoundSolver.addSolver(new GeneticSolver(new TopLeftSolver(false), true));
 //        compoundSolver.addSolver(new TopLeftSolver());
         compoundSolver.addSolver(new BottomUpSolver());
-        compoundSolver.addSolver(new CompressionSolver());
+//        compoundSolver.addSolver(new CompressionSolver());
         compoundSolver.addSolver(new ReverseFitSolver());
         compoundSolver.addSolver(new SimpleTopLeftSolver());
 
         Solution solution = compoundSolver.getSolution(params);
-        System.err.println(params.heightVariant == Util.HeightSupport.FREE);
         System.err.println(solution.solvedBy.getName());
         if (Util.debug) System.err.println(solution.solvedBy);
         Output.output(solution.parameters, inputOrder);

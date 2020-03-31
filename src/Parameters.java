@@ -19,6 +19,24 @@ public class Parameters {
     public Util.HeightSupport heightVariant;
 
     /**
+     * Pre calculate the minimum area to improve runtime.
+     */
+    private void calculateMinimumArea() {
+        long minimumArea = 0L;
+        for (Rectangle rectangle :
+                this.rectangles) {
+            minimumArea += (rectangle.height * rectangle.width);
+        }
+        this.minimumArea = minimumArea;
+    }
+
+    public Long getMinimumArea() {
+        return minimumArea;
+    }
+
+    private Long minimumArea;
+
+    /**
      * Boolean representing if this Parameters object was parsed by the {@link FreeHeightUtil}.
      * <p>
      *     The reason for this boolean is that when you use the compound solver in the {@code FreeHeightUtil} it will
@@ -55,6 +73,7 @@ public class Parameters {
 
     public void setRectangles(ArrayList<Rectangle> rectangles) {
         this.rectangles = rectangles;
+        calculateMinimumArea();
     }
 
     /**
@@ -75,7 +94,7 @@ public class Parameters {
         parameters.freeHeightUtil = this.freeHeightUtil;
         parameters.height = this.height;
         parameters.rotationVariant = this.rotationVariant;
-        parameters.rectangles = Util.cloneRectangleState(rectangles);
+        parameters.setRectangles(Util.cloneRectangleState(rectangles));
         return parameters;
     }
 

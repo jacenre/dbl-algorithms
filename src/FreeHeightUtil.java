@@ -153,6 +153,8 @@ public class FreeHeightUtil {
 
                 if (newSolution == null) continue;
 
+                if (newSolution.getRate() == 1.0d) return newSolution;
+
                 if (newSolution.isBetter(bestSolution)) {
                     // update bestSolution
                     currentBestHeight = (int) newHeight;

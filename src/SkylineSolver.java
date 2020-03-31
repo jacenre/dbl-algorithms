@@ -19,7 +19,7 @@ public class SkylineSolver extends AbstractSolver {
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
-        if (parameters.rectangles.size() > 999) return false;
+        if (parameters.rectangles.size() > 100) return false;
         if ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)  && parameters.rectangles.size() > 50) return false;
         return super.canSolveParameters(parameters);
     }
@@ -29,7 +29,7 @@ public class SkylineSolver extends AbstractSolver {
 
     int getNumChecks(Parameters parameters) {
         if (parameters.freeHeightUtil || parameters.heightVariant == Util.HeightSupport.FREE) return 1000;
-        return 4000;
+        return 1500;
     }
 
     // Algorithm 2 in the paper
