@@ -30,6 +30,7 @@ public class GeneticSolver extends AbstractSolver {
     Solution pack(Parameters parameters) {
         this.parameters = parameters.copy();
 
+        // If we are not allowed to change the input order or rotate rectangles
         if (!this.allowInputSorting && !parameters.rotationVariant) {
             return this.solver.pack(this.parameters);
         }
@@ -46,20 +47,18 @@ public class GeneticSolver extends AbstractSolver {
         int[][] permutations = shuffle(a, nPermutations);
         Solution bestSolution = null;
 
-        // Run 5 generations
-        int nGenerations;
+        // Run at most 10000 generations, or take at most 1 sec
+        int nGenerations = 10000;
+        long duration;
+        long startTime = System.nanoTime();
+
         // Each crossover will generate 3 new permutations per permutation
         int nRectangles = parameters.rectangles.size();
-        if (nRectangles <= 6) {
-            nGenerations = 10;
-        } else if (nRectangles <= 15) {
-            nGenerations = 100;
-        } else if (nRectangles <= 100) {
-            nGenerations = 50;
-        } else {
-            nGenerations = 10;
-        }
         for (int i = 0; i < nGenerations; i++) {
+            // Stop if 1 second has elapsed
+            duration = (System.nanoTime() - startTime) / 1000000;
+            if (duration >= 1000) break;
+
             // Each permutation generates 2 new permutations
             permutations = crossover(permutations);
 
