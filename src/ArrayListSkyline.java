@@ -313,10 +313,6 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
     public void fixSkylineAfterPlacements(ArrayList<Rectangle> rectangles, boolean rotationsAllowed) {
-        if (skyline.size() == 1) {
-            return;
-        }
-
         boolean changes = true;
         while(changes) {
             changes = false;
@@ -329,7 +325,9 @@ public class ArrayListSkyline extends AbstractSkyline {
                 }
             }
             checkSkyline(skyline);
-
+            if (skyline.size() == 1) {
+                return;
+            }
             int[] smallestRecs = getMinWidthHeightOtherRectangles(rectangles);
             int smallestSide = (rotationsAllowed ? Math.min(smallestRecs[0], smallestRecs[2]) : smallestRecs[2]);
 
@@ -364,29 +362,39 @@ public class ArrayListSkyline extends AbstractSkyline {
     @Override
     public PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> rectanglesLeft, boolean rotationsAllowed) {
         int[] onlyFits = new int[skyline.size()];
+        PositionRectangleRotationPair potentialPlacement = null;
 
         // Loop through all the segments in the skyline and check if there is a segment for which there is only one
         // rectangle left that can be placed
         for (int i = 0; i < skyline.size(); i++) {
             // If there is only one rectangle that could be placed, it will be stored in this variable
-            PositionRectangleRotationPair potentialPlacement = null;
             // Loop through all the rectangles that have not been placed yet
             // TODO: test of rectangle.height == skyline.get(i).getLength() beter werkt op testcases
             for (Rectangle rectangle : rectanglesLeft) {
-                if (rectangle.height <= skyline.get(i).getLength()) {
+                if (rectangle.height == skyline.get(i).getLength()) {
                     potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, false);
                     onlyFits[i]++;
-                } else if (rotationsAllowed && rectangle.width <= skyline.get(i).getLength()) {
+                } else if (rotationsAllowed && rectangle.width == skyline.get(i).getLength()) {
                     potentialPlacement = new PositionRectangleRotationPair(rectangle, skyline.get(i).start, true);
                     onlyFits[i]++;
                 }
             }
-            if (onlyFits[i] == 1 && !(doesNotMeetSpreadConstraint(potentialPlacement.rectangle, skyline.get(i).start, getMostLeftPoint())
-                    || potentialPlacement.rectangle.y + potentialPlacement.rectangle.height > globalHeight
-                    || potentialPlacement.rectangle.y < 0
-                    || potentialPlacement.position.x + (potentialPlacement.rotated? potentialPlacement.rectangle.height : potentialPlacement.rectangle.width) > globalWidth)) {
-                return potentialPlacement;
+        }
+        int index = -1;
+        // We check if there is an only fit somewhere
+        for (int i = 0; i < skyline.size(); i++) {
+            if (index == -1 && onlyFits[i] == 1) {  // We found a placement that is potentially the only one that is left
+                index = i;
+            } else if (index != -1 && onlyFits[i] == 1) {  // Nevermind, there are more than one 'only fits'
+                index = -1;
+                break;
             }
+        }
+        if (index!= -1 && !(doesNotMeetSpreadConstraint(potentialPlacement.rectangle, skyline.get(index).start, getMostLeftPoint())
+                || potentialPlacement.rectangle.y + potentialPlacement.rectangle.height > globalHeight
+                || potentialPlacement.rectangle.y < 0
+                || potentialPlacement.position.x + (potentialPlacement.rotated? potentialPlacement.rectangle.height : potentialPlacement.rectangle.width) > globalWidth)) {
+            return potentialPlacement;
         }
         return null;
     }

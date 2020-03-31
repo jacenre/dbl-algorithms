@@ -319,9 +319,6 @@ public class SkylineSolver extends AbstractSolver {
      */
     boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
         numChecks--;
-//        System.out.println(originalSequence + ", " + width + ", " + maximumSpread);
-        Parameters animation = parameters.copy();
-        parameters.rectangles = originalSequence;
         //Util.animate(animation, this);
 
         // Just to be sure

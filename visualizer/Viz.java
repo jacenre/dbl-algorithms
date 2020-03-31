@@ -41,7 +41,7 @@ public class Viz extends PApplet {
 //            solvers.add(new BottomUpSolver());
 //            solvers.add(new CompoundSolver().addSolver(new FirstFitSolver()).addSolver(new SkylineSolver()));
 
-//        solvers.add(new SkylineSolver());
+        solvers.add(new SkylineSolver());
 
         range = (int) (Math.random() * 180);
 
