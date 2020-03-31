@@ -80,6 +80,7 @@ public class SkylineSolver extends AbstractSolver {
         int totalArea = 0;
         int LB2 = 0;
         double LB3 = 0;
+        int LB4 = 0;
         for (Rectangle rec : parameters.rectangles) {
             totalArea += rec.getHeight() * rec.getWidth();
             if (rec.getWidth() > parameters.height / 2f) {
@@ -88,13 +89,16 @@ public class SkylineSolver extends AbstractSolver {
             if (rec.height == parameters.height / 2) {
                 LB3 += rec.width;
             }
+            if (rec.width > LB4) {
+                LB4 = rec.width;
+            }
         }
         int LB1 = (int) Math.ceil(totalArea / (double) parameters.height);
 
         if (parameters.rotationVariant) {
             return LB1;
         }
-        return Math.max(LB1, (int) (LB2 + Math.ceil(LB3 / 2f)));
+        return Math.max(Math.max(LB1, LB4), LB2 + (int) Math.ceil(LB3 / 2));
     }
 
     /**

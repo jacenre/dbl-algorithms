@@ -57,7 +57,7 @@ public class UserInput {
 //        System.out.println("Getting " + nRectangles + " rectangles");
         ArrayList<Rectangle> rectangles = new ArrayList<>();
         for (int i = 0; i < nRectangles; i++) {
-            int[] rec = Arrays.stream(sc.nextLine().trim().split(" ")).mapToInt(Integer::parseInt).toArray();
+            int[] rec = Arrays.stream(sc.nextLine().trim().split("\\s+")).mapToInt(Integer::parseInt).toArray();
             rectangles.add(new Rectangle(rec[0], rec[1]));
         }
 

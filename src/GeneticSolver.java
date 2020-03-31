@@ -44,21 +44,22 @@ public class GeneticSolver extends AbstractSolver {
         }
 
         // Create the first permutations of rectangles
-        int nPermutations = 15;
+        int nPermutations = 10;
         int[][] permutations = shuffle(a, nPermutations);
         Solution bestSolution = null;
 
         // Run at most 10000 generations, or take at most 1 sec
         int nGenerations = 10000;
+        int i;
         long duration;
         long startTime = System.nanoTime();
 
         // Each crossover will generate 3 new permutations per permutation
         int nRectangles = parameters.rectangles.size();
-        for (int i = 0; i < nGenerations; i++) {
-            // Stop if 1 second has elapsed
+        for (i = 1; i <= nGenerations; i++) {
+            // Stop if 3 seconds has elapsed
             duration = (System.nanoTime() - startTime) / 1000000;
-            if (duration >= 1000) break;
+            if (duration >= 3000) break;
 
             // Each permutation generates 2 new permutations
             permutations = crossover(permutations);
@@ -101,8 +102,9 @@ public class GeneticSolver extends AbstractSolver {
             // Compare the contender to the best solution yet
             if (x < solutions.size()) {
                 if (bestSolution == null || contenderSolution.getRate() < bestSolution.getRate()) {
-                    if (Util.debug) System.out.println("new rate:" + contenderSolution.getRate());
+                    if (Util.debug) System.out.println("new rate "+i+" after "+(double)duration / 1000+"s:" + contenderSolution.getRate());
                     bestSolution = solutions.get(0).getValue().copy();
+                    if (bestSolution.getRate() == 1) break;
                 }
             }
 
@@ -113,6 +115,7 @@ public class GeneticSolver extends AbstractSolver {
             }
         }
 
+        if (Util.debug) System.out.println("generations: " + i);
         return bestSolution != null ? new Solution(bestSolution.parameters, this) : this.solver.pack(this.parameters);
     }
 
