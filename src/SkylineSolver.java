@@ -433,32 +433,14 @@ public class SkylineSolver extends AbstractSolver {
             toBePlaced.rectangle.y -= toBePlaced.rectangle.height;
         }
 
-       // System.out.println(toBePlaced.rectangle.x + toBePlaced.rectangle.width < );
-
         // Fix skyline
         skyline.adjustSkyline(toBePlaced.rectangle, toBePlaced.position);
 
-
-
-
-        // Debug
-//        for (Segment seg : skyline.skyline) {
-//            for (int j = 0; j < seg.end.y - seg.start.y; j++) {
-//                for (int i = 0; i < seg.start.x ; i++) {
-//                    System.out.print(" ");
-//                }
-//                System.out.println(seg.start.x);
-//            }
-//        }
         toBePlaced.rectangle.place(true);
         sequence.remove(toBePlaced.rectangle);
 
         // Make the small segments merge with bigger ones
-        skyline.mergeSegmentsNextToEachOther();
-        skyline.mergeSmallSegments(sequence, parameters.rotationVariant);
-        skyline.mergeSegmentsNextToEachOther();
-        skyline.mergeSmallSegments(sequence, parameters.rotationVariant);
-        skyline.mergeSegmentsNextToEachOther();
+        skyline.fixSkylineAfterPlacements(sequence, parameters.rotationVariant);
     }
 
     public boolean hasOverlap(Rectangle rectangle, SegPoint position, int width, ArrayList<Rectangle> originalSequence) {

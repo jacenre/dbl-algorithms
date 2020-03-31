@@ -312,37 +312,41 @@ public class ArrayListSkyline extends AbstractSkyline {
         }
     }
 
-    public void mergeSegmentsNextToEachOther() {
-        for (int i = 0; i < skyline.size() - 1; i++) {
-            if (skyline.get(i).end.x == skyline.get(i + 1).start.x) {
-                SegPoint newStart = skyline.get(i).start;
-                SegPoint newEnd = skyline.get(i + 1).end;
-                skyline.remove(i); skyline.remove(i);
-                skyline.add(i , new Segment(newStart, newEnd));
-            }
-        }
-        checkSkyline(skyline);
-    }
-
-    public void mergeSmallSegments(ArrayList<Rectangle> rectangles, boolean rotationsAllowed) {
+    public void fixSkylineAfterPlacements(ArrayList<Rectangle> rectangles, boolean rotationsAllowed) {
         if (skyline.size() == 1) {
             return;
         }
-        int[] smallestRecs = getMinWidthHeightOtherRectangles(rectangles);
-        int smallestSide = (rotationsAllowed ? Math.min(smallestRecs[0], smallestRecs[2]) : smallestRecs[2]);
 
-        for (int i = 0; i < skyline.size(); i++) {
-            int toX;
-            if (i == 0) {
-                toX = skyline.get(1).start.x;
-            } else if (i == skyline.size() - 1) {
-                toX = skyline.get(skyline.size() - 2).start.x;
-            } else {
-                toX = Math.min(skyline.get(i -1).start.x, skyline.get(i + 1).start.x);
+        boolean changes = true;
+        while(changes) {
+            changes = false;
+            for (int i = 0; i < skyline.size() - 1; i++) {
+                if (skyline.get(i).end.x == skyline.get(i + 1).start.x) {
+                    SegPoint newStart = skyline.get(i).start;
+                    SegPoint newEnd = skyline.get(i + 1).end;
+                    skyline.remove(i); skyline.remove(i);
+                    skyline.add(i , new Segment(newStart, newEnd));
+                }
             }
-            if (skyline.get(i).getLength() < smallestSide && skyline.get(i).start.x < toX) {
-                skyline.get(i).start.x = toX;
-                skyline.get(i).end.x = toX;
+            checkSkyline(skyline);
+
+            int[] smallestRecs = getMinWidthHeightOtherRectangles(rectangles);
+            int smallestSide = (rotationsAllowed ? Math.min(smallestRecs[0], smallestRecs[2]) : smallestRecs[2]);
+
+            for (int i = 0; i < skyline.size(); i++) {
+                int toX;
+                if (i == 0) {
+                    toX = skyline.get(1).start.x;
+                } else if (i == skyline.size() - 1) {
+                    toX = skyline.get(skyline.size() - 2).start.x;
+                } else {
+                    toX = Math.min(skyline.get(i - 1).start.x, skyline.get(i + 1).start.x);
+                }
+                if (skyline.get(i).getLength() < smallestSide && skyline.get(i).start.x < toX) {
+                    skyline.get(i).start.x = toX;
+                    skyline.get(i).end.x = toX;
+                    changes = true;
+                }
             }
         }
     }
