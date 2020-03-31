@@ -313,8 +313,8 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
     public void fixSkylineAfterPlacements(ArrayList<Rectangle> rectangles, boolean rotationsAllowed) {
-        boolean changes = true;
-        while(changes) {
+        boolean changes;
+        do {
             changes = false;
             for (int i = 0; i < skyline.size() - 1; i++) {
                 if (skyline.get(i).end.x == skyline.get(i + 1).start.x) {
@@ -346,7 +346,7 @@ public class ArrayListSkyline extends AbstractSkyline {
                     changes = true;
                 }
             }
-        }
+        } while (changes);
     }
 
     public void checkSkyline(ArrayList<Segment> skyline) {
