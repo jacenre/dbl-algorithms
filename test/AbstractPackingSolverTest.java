@@ -30,7 +30,8 @@ abstract class AbstractPackingSolverTest {
     Stream<DynamicTest> dynamicSolverTests() throws IOException {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        String path = "./test/input/Non-perfect fit/Bortfeldt, 2006";
+//        String path = "./test/input/Non-perfect fit/Bortfeldt, 2006";
+        String path = "./test/input/Perfect fit/Pinto, 2005";
 
         ArrayList<Double> average = new ArrayList<>();
         File folder = new File(path);
