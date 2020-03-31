@@ -100,18 +100,20 @@ public class FreeHeightUtil {
         // for simplification of expression of checksPerIteration
         double L1 = Math.log((float) stepSizePrecision/numPossibleHeights);
 
-        // check if legal
+        double numRecursions, checksPerIteration;
+        // check if not legal
         if (2*L1/numChecks < -1/Math.exp(1) || 2*L1/numChecks >= 0) {
            // numChecks = - (int) (Math.log((float)1/numPossibleHeights)*2*Math.exp(1))+2; // amount of checks that should be needed
-            stepSizePrecision = numPossibleHeights*Math.exp(-numChecks/(2*Math.exp(1)))+1;
+            numRecursions = 1; // no recursion
+            stepSizePrecision = (float) numPossibleHeights/numChecks;
+            checksPerIteration = numChecks;
 
-            L1 = Math.log((float) stepSizePrecision/numPossibleHeights); // recompute with legal term
+        } else { // legal
+            // approximate number of recursions that will be made
+            numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks)));
+
+            checksPerIteration = numChecks * MathUtil.LambertMinusOne(2*L1/numChecks) / L1;
         }
-
-        // approximate number of recursions that will be made
-        final double numRecursions = (L1/(MathUtil.LambertMinusOne(2*L1/numChecks)));
-
-        final double checksPerIteration = numChecks * MathUtil.LambertMinusOne(2*L1/numChecks) / L1;
 
         if (Util.debug) {
             System.out.println("Possible heights to try (H): " + numPossibleHeights);
@@ -162,7 +164,7 @@ public class FreeHeightUtil {
             // update ranges around the best found value
             startRange = (int) Math.max(minimumHeight, currentBestHeight - stepSize);
             stopRange = (int) Math.min(maximumHeight, currentBestHeight + stepSize);
-        } while (stepSize > stepSizePrecision);
+        } while (stepSize > stepSizePrecision && numRecursions > 1);
 
         if (Util.debug) System.out.println("Solves: " + solves);
         return bestSolution;
