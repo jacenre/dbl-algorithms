@@ -14,12 +14,13 @@ public class SkylineSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED, Util.HeightSupport.FREE));
     }
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         if (parameters.rectangles.size() > 999) return false;
+        if ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)  && parameters.rectangles.size() > 50) return false;
         return super.canSolveParameters(parameters);
     }
 
@@ -36,14 +37,8 @@ public class SkylineSolver extends AbstractSolver {
         boolean upperBoundFound = false;
         debug = 0;
 
-        // Following the design paradigm we time a single heuristic and use that as limit.
-        long startTime = System.nanoTime();
-        heuristicSolve(parameters.rectangles, upperBound, upperBound);
-        long endTime = System.nanoTime();
-        long duration = Math.max((endTime - startTime) / 1000000, 1); // duration of subSolver.pack or 1 if too fast
-        // Time allowed in milliseconds
-        final int ALLOWED_TIME = 50000; // 25 seconds which leaves 5 seconds for other stuff
-        numChecks = (int) (ALLOWED_TIME/duration); // amount of checks that can be done
+        numChecks = 500; // amount of checks that can be done
+
         terminate:
         while (numChecks > 0 && lowerBound != upperBound) {
 //            System.out.println(lowerBound + " - " + upperBound + ", " + debug++);
@@ -99,7 +94,7 @@ public class SkylineSolver extends AbstractSolver {
         if (parameters.rotationVariant) {
             return LB1;
         }
-        return Math.max(LB1, LB2 + (int) Math.ceil(LB3 / 2));
+        return Math.max(LB1, (int) (LB2 + Math.ceil(LB3 / 2f)));
     }
 
     /**

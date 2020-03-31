@@ -11,13 +11,14 @@ public class GeneticSolver extends AbstractSolver {
 
     @Override
     Set<Util.HeightSupport> getHeightSupport() {
-        return new HashSet<>(Collections.singletonList(Util.HeightSupport.FIXED));
+        return new HashSet<>(Arrays.asList(Util.HeightSupport.FIXED));
     }
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
         if (!superResult) return false;
+        if ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil) && parameters.rectangles.size() > 50) return false;
         return parameters.rectangles.size() <= 500;
     }
 
