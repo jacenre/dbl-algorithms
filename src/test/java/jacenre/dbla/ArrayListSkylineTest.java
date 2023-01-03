@@ -1,6 +1,7 @@
 package jacenre.dbla;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,12 +38,12 @@ class ArrayListSkylineTest {
         rectangles.add(new Rectangle(2, 5));
         HashSet<Integer> tabu = new HashSet<>();
         tabu.add(rectangles.hashCode());
-        ArrayList<Rectangle> wrong = Util.cloneRectangleState(rectangles);
+        List<Rectangle> wrong = Util.cloneRectangleState(rectangles);
         Rectangle temp = wrong.get(0).copy();
         wrong.set(0, wrong.get(1).copy());
         wrong.set(1, temp);
         tabu.add(wrong.hashCode());
-        for (ArrayList<Rectangle> list : new SkylineSolver.TabuSearchGenerator(tabu, 10, rectangles)) {
+        for (List<Rectangle> list : new SkylineSolver.TabuSearchGenerator(tabu, 10, rectangles)) {
             Assertions.assertNotEquals(list.hashCode(), rectangles.hashCode());
             Assertions.assertFalse(tabu.contains(list.hashCode()));
         }
@@ -54,7 +55,7 @@ class ArrayListSkylineTest {
         rectangles.add(new Rectangle(10, 10));
         rectangles.add(new Rectangle(1, 1));
 
-        ArrayList<Rectangle> deepcopy = Util.cloneRectangleState(rectangles);
+        List<Rectangle> deepcopy = Util.cloneRectangleState(rectangles);
         Assertions.assertEquals(rectangles.hashCode(), deepcopy.hashCode());
 
         rectangles.get(0).place(true);

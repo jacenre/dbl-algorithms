@@ -1,10 +1,11 @@
 package jacenre.dbla;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ArrayListSkyline extends AbstractSkyline {
 
-    public ArrayList<Segment> skyline;
+    public List<Segment> skyline;
     public int globalHeight;
     public int globalWidth;
     public int maximumSpread;
@@ -25,22 +26,22 @@ public class ArrayListSkyline extends AbstractSkyline {
         return position.x + rectangle.width - mostLeftPoint > maximumSpread;
     }
 
-    public ArrayList<Segment> deepCopySkyline(ArrayList<Segment> skyline) {
-        ArrayList<Segment> result = new ArrayList<>();
+    public List<Segment> deepCopySkyline(List<Segment> skyline) {
+        List<Segment> result = new ArrayList<>();
         result.addAll(skyline);
         return result;
     }
 
 
-    public ArrayList<Rectangle> deepCopyRectangles(ArrayList<Rectangle> sequence) {
-        ArrayList<Rectangle> result = new ArrayList<>();
+    public List<Rectangle> deepCopyRectangles(List<Rectangle> sequence) {
+        List<Rectangle> result = new ArrayList<>();
         result.addAll(sequence);
         return result;
     }
 
     @Override
     public int getLocalWaste(Rectangle rectangle, SegPoint position, int[] smallestRecs) {
-        ArrayList<Segment> skylineBefore = deepCopySkyline(skyline);
+        List<Segment> skylineBefore = deepCopySkyline(skyline);
 
         // Compute wasted space left
         int areaBefore = getAreaOfSkyline(skyline);
@@ -100,7 +101,7 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
 
-    public int[] getMinWidthHeightOtherRectangles(ArrayList<Rectangle> sequence) {
+    public int[] getMinWidthHeightOtherRectangles(List<Rectangle> sequence) {
         int minWidth = Integer.MAX_VALUE;
         int secWidth = Integer.MAX_VALUE;
         int minHeight = Integer.MAX_VALUE;
@@ -308,7 +309,7 @@ public class ArrayListSkyline extends AbstractSkyline {
 		}
     }
 
-    public void fixSkylineAfterPlacements(ArrayList<Rectangle> rectangles, boolean rotationsAllowed) {
+    public void fixSkylineAfterPlacements(List<Rectangle> rectangles, boolean rotationsAllowed) {
         boolean changes;
         do {
             changes = false;
@@ -345,7 +346,7 @@ public class ArrayListSkyline extends AbstractSkyline {
         } while (changes);
     }
 
-    public void checkSkyline(ArrayList<Segment> skyline) {
+    public void checkSkyline(List<Segment> skyline) {
         int totalLength = 0;
         for (Segment segment : skyline) {
             totalLength += segment.getLength();
@@ -356,7 +357,7 @@ public class ArrayListSkyline extends AbstractSkyline {
     }
 
     @Override
-    public PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> rectanglesLeft, boolean rotationsAllowed) {
+    public PositionRectangleRotationPair anyOnlyFit(List<Rectangle> rectanglesLeft, boolean rotationsAllowed) {
         int[] onlyFits = new int[skyline.size()];
         PositionRectangleRotationPair potentialPlacement = null;
 
@@ -395,7 +396,7 @@ public class ArrayListSkyline extends AbstractSkyline {
         return null;
     }
 
-    int getAreaOfSkyline(ArrayList<Segment> skyline) {
+    int getAreaOfSkyline(List<Segment> skyline) {
         int total = 0;
         for (Segment segment : skyline) {
             total += segment.getLength() * segment.start.x;

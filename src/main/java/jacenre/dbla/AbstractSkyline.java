@@ -1,5 +1,6 @@
 package jacenre.dbla;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The idea of this ADT is that it maintains the skyline, but does not concern itself with placing the actual
@@ -48,7 +49,7 @@ public abstract class AbstractSkyline {
      * @param sequence The ordered set of rectangles that have not been placed yet
      * @returns a position-rectangle pair if it was found
      */
-    public abstract PositionRectangleRotationPair anyOnlyFit(ArrayList<Rectangle> sequence, boolean rotationsAllowed);
+    public abstract PositionRectangleRotationPair anyOnlyFit(List<Rectangle> sequence, boolean rotationsAllowed);
 
     /**
      * Looks at current skyline and determines the candidate points where a new rectangle could be placed, puts it in

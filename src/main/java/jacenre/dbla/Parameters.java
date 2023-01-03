@@ -1,5 +1,6 @@
 package jacenre.dbla;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data Type to store all the parameters of the problem.
@@ -68,11 +69,11 @@ public class Parameters {
      */
     public boolean rotationVariant;
 
-    public ArrayList<Rectangle> getRectangles() {
+    public List<Rectangle> getRectangles() {
         return rectangles;
     }
 
-    public void setRectangles(ArrayList<Rectangle> rectangles) {
+    public void setRectangles(List<Rectangle> rectangles) {
         this.rectangles = rectangles;
         calculateMinimumArea();
     }
@@ -82,7 +83,7 @@ public class Parameters {
      *
      * @see Rectangle
      */
-    public ArrayList<Rectangle> rectangles;
+    public List<Rectangle> rectangles;
 
     /**
      * Returns a deep copy of this parameter object.

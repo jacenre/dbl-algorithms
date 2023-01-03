@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -132,7 +133,7 @@ public class SkylineSolver extends AbstractSolver {
      */
     boolean solve(Parameters parameters, int W, int iter) {
         terminate:
-        for (ArrayList<Rectangle> seq : new RectangleSorter(parameters.rectangles)) {
+        for (List<Rectangle> seq : new RectangleSorter(parameters.rectangles)) {
             for (float ms : new SpreadValues(seq, parameters, W)) {
                 if (heuristicSolve(seq, W, (int) ms)) {
                     return true;
@@ -145,11 +146,11 @@ public class SkylineSolver extends AbstractSolver {
 					}
                     tabu.remove(i);
                     // Seqx is the sequence with highest area utilization.
-                    ArrayList<Rectangle> seqx = null;
+                    List<Rectangle> seqx = null;
                     int highestAreaUtil = 0;
 
                     Collection<Integer> solved = new HashSet<>();
-                    for (ArrayList<Rectangle> rectangles : new TabuSearchGenerator(tabu.values(), 10, seq)) {
+                    for (List<Rectangle> rectangles : new TabuSearchGenerator(tabu.values(), 10, seq)) {
                         if (heuristicSolve(rectangles, W, (int) ms)) {
                             solved.add(rectangles.hashCode());
                         }
@@ -177,9 +178,9 @@ public class SkylineSolver extends AbstractSolver {
     /**
      * Returns an iterator over an amount of sequences using Tabu.
      */
-    static class TabuSearchGenerator implements Iterable<ArrayList<Rectangle>> {
+    static class TabuSearchGenerator implements Iterable<List<Rectangle>> {
 
-        ArrayList<ArrayList<Rectangle>> sequences;
+        List<List<Rectangle>> sequences;
 
         int MAX_ATTEMPTS = 100;
         Random random = new Random(100L);
@@ -191,11 +192,11 @@ public class SkylineSolver extends AbstractSolver {
          * @param n          amount of sequences to generate
          * @param rectangles the Rectangles list for which to generate
          */
-        TabuSearchGenerator(Collection<Integer> tabu, int n, ArrayList<Rectangle> rectangles) {
+        TabuSearchGenerator(Collection<Integer> tabu, int n, List<Rectangle> rectangles) {
             sequences = new ArrayList<>();
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < MAX_ATTEMPTS; j++) {
-                    ArrayList<Rectangle> copy = Util.cloneRectangleState(rectangles);
+                    List<Rectangle> copy = Util.cloneRectangleState(rectangles);
                     int a = random.nextInt(copy.size() - 1);
                     int b = random.nextInt(copy.size() - 1);
 
@@ -221,7 +222,7 @@ public class SkylineSolver extends AbstractSolver {
          * @return an Iterator.
          */
         @Override
-        public Iterator<ArrayList<Rectangle>> iterator() {
+        public Iterator<List<Rectangle>> iterator() {
             return sequences.iterator();
         }
     }
@@ -229,48 +230,48 @@ public class SkylineSolver extends AbstractSolver {
     /**
      * Iterable that returns deep copies of the given rectangle ArrayList following the sorting rules.
      */
-    static class RectangleSorter implements Iterable<ArrayList<Rectangle>> {
+    static class RectangleSorter implements Iterable<List<Rectangle>> {
 
         /**
          * ArrayList containing all the different sorted ArrayList.
          */
-        ArrayList<ArrayList<Rectangle>> sortedRectangles;
+        List<List<Rectangle>> sortedRectangles;
 
         /**
          * Initialize and sort the Rectangle ArrayLists.
          *
          * @param rectangles the Rectangles to sort
          */
-        RectangleSorter(ArrayList<Rectangle> rectangles) {
+        RectangleSorter(List<Rectangle> rectangles) {
             sortedRectangles = new ArrayList<>();
 
             // Area in decreasing order.
-            ArrayList<Rectangle> decreasingArea = Util.cloneRectangleState(rectangles);
+            List<Rectangle> decreasingArea = Util.cloneRectangleState(rectangles);
             decreasingArea.sort(Comparator.comparingInt((Rectangle rect) -> rect.width * rect.height).reversed());
             sortedRectangles.add(decreasingArea);
 
             // Width in decreasing order.
-            ArrayList<Rectangle> decreasingWidth = Util.cloneRectangleState(rectangles);
+            List<Rectangle> decreasingWidth = Util.cloneRectangleState(rectangles);
             decreasingWidth.sort(Comparator.comparingInt((Rectangle rect) -> rect.width).reversed());
             sortedRectangles.add(decreasingWidth);
 
             // Height in decreasing order.
-            ArrayList<Rectangle> decreasingHeight = Util.cloneRectangleState(rectangles);
+            List<Rectangle> decreasingHeight = Util.cloneRectangleState(rectangles);
             decreasingHeight.sort(Comparator.comparingInt((Rectangle rect) -> rect.height).reversed());
             sortedRectangles.add(decreasingHeight);
 
             // Perimeter in decreasing order.
-            ArrayList<Rectangle> decreasingPerimeter = Util.cloneRectangleState(rectangles);
+            List<Rectangle> decreasingPerimeter = Util.cloneRectangleState(rectangles);
             decreasingPerimeter.sort(Comparator.comparingInt((Rectangle rect) -> 2 * rect.height + 2 * rect.width).reversed());
             sortedRectangles.add(decreasingPerimeter);
 
             // Max of width en height in decreasing order.
-            ArrayList<Rectangle> decreasingMaxSizes = Util.cloneRectangleState(rectangles);
+            List<Rectangle> decreasingMaxSizes = Util.cloneRectangleState(rectangles);
             decreasingMaxSizes.sort(Comparator.comparingInt((Rectangle rect) -> Math.max(rect.width, rect.height)).reversed());
             sortedRectangles.add(decreasingMaxSizes);
 
             // Diagonal in decreasing order.
-            ArrayList<Rectangle> decreasingDiagonal = Util.cloneRectangleState(rectangles);
+            List<Rectangle> decreasingDiagonal = Util.cloneRectangleState(rectangles);
             decreasingDiagonal.sort(Comparator.comparingInt((Rectangle rect) -> ((int) Math.sqrt(rect.width ^ 2 + rect.height ^ 2) + rect.width + rect.height)).reversed());
             sortedRectangles.add(decreasingDiagonal);
         }
@@ -281,7 +282,7 @@ public class SkylineSolver extends AbstractSolver {
          * @return an Iterator.
          */
         @Override
-        public Iterator<ArrayList<Rectangle>> iterator() {
+        public Iterator<List<Rectangle>> iterator() {
             return sortedRectangles.iterator();
         }
     }
@@ -298,7 +299,7 @@ public class SkylineSolver extends AbstractSolver {
          *
          * @param rectangles the Rectangles for which to calculate
          */
-        SpreadValues(ArrayList<Rectangle> rectangles, Parameters parameters, int W) {
+        SpreadValues(List<Rectangle> rectangles, Parameters parameters, int W) {
             // Maximum width
             float mw = 0;
             for (Rectangle rectangle : rectangles) {
@@ -323,7 +324,7 @@ public class SkylineSolver extends AbstractSolver {
         }
     }
 
-    public void resetRecs(ArrayList<Rectangle> sequence) {
+    public void resetRecs(List<Rectangle> sequence) {
         for (Rectangle rec : sequence) {
             rec.place(false);
         }
@@ -339,7 +340,7 @@ public class SkylineSolver extends AbstractSolver {
      * @param maximumSpread    The given maximumSpread to which to adhere
      * @return true or false whether the heuristic was able to pack all the rectangles given the restrictions
      */
-    boolean heuristicSolve(ArrayList<Rectangle> originalSequence, int width, int maximumSpread) {
+    boolean heuristicSolve(List<Rectangle> originalSequence, int width, int maximumSpread) {
         numChecks--;
         //Util.animate(animation, this);
 
@@ -348,10 +349,10 @@ public class SkylineSolver extends AbstractSolver {
 
         // Make a skyline for this attempt to place all the rectangles
         ArrayListSkyline skylineDataStructure = new ArrayListSkyline(parameters.height, width, maximumSpread, parameters.rotationVariant);
-        ArrayList<PositionRectangleRotationPair> minimumLocalSpaceWastePlacements = new ArrayList<>();
+        List<PositionRectangleRotationPair> minimumLocalSpaceWastePlacements = new ArrayList<>();
 
         // Keep track of which rectangles still need to be placed
-        ArrayList<Rectangle> rectanglesNotPlacedYet = skylineDataStructure.deepCopyRectangles(originalSequence);
+        List<Rectangle> rectanglesNotPlacedYet = skylineDataStructure.deepCopyRectangles(originalSequence);
 
         // Place a rectangle every loop till every rectangle is placed
         // If it is impossible to place a rectangle, the method returns false
@@ -442,7 +443,7 @@ public class SkylineSolver extends AbstractSolver {
         return true;
     }
 
-    public void placeRectangle(PositionRectangleRotationPair toBePlaced, ArrayList<Rectangle> sequence, ArrayListSkyline skyline) {
+    public void placeRectangle(PositionRectangleRotationPair toBePlaced, List<Rectangle> sequence, ArrayListSkyline skyline) {
         if (toBePlaced.rotated) {
             toBePlaced.rectangle.rotate();
         }
@@ -464,7 +465,7 @@ public class SkylineSolver extends AbstractSolver {
         skyline.fixSkylineAfterPlacements(sequence, parameters.rotationVariant);
     }
 
-    public boolean hasOverlap(Rectangle rectangle, SegPoint position, int width, ArrayList<Rectangle> originalSequence) {
+    public boolean hasOverlap(Rectangle rectangle, SegPoint position, int width, List<Rectangle> originalSequence) {
         // Place rectangle on position
         rectangle.x = position.x;
         rectangle.y = position.y;

@@ -26,8 +26,8 @@ public class Util {
      * @param rects Input array to copy
      * @return A deep copy ArrayList.
      */
-    public static ArrayList<Rectangle> cloneRectangleState(ArrayList<Rectangle> rects) {
-        ArrayList<Rectangle> rectangles = new ArrayList<>();
+    public static List<Rectangle> cloneRectangleState(List<Rectangle> rects) {
+        List<Rectangle> rectangles = new ArrayList<>();
         for (Rectangle rect :
                 rects) {
             rectangles.add(rect.copy());
@@ -39,7 +39,7 @@ public class Util {
      * Returns the maximum height of the set w.r.t the y coordinates.
      * @return maximum height
      */
-    public static int maxHeight(ArrayList<Rectangle> rectangles) {
+    public static int maxHeight(List<Rectangle> rectangles) {
         int max = 0;
         for (Rectangle rectangle : rectangles) {
             max = rectangle.y + rectangle.height > max ? rectangle.y + rectangle.height : max;
@@ -291,7 +291,7 @@ public class Util {
      * @return a boolean that is true if there is overlap
      */
     @Deprecated
-    public static boolean hasOverlapping(ArrayList<Rectangle> rectangles) {
+    public static boolean hasOverlapping(List<Rectangle> rectangles) {
         for (Rectangle rectangle1 :
                 rectangles) {
             for (Rectangle rectangle2 :
