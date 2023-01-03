@@ -22,6 +22,7 @@ import jacenre.dbla.Solution;
 import jacenre.dbla.TopLeftSolver;
 import jacenre.dbla.UserInput;
 import jacenre.dbla.Util;
+import net.jafama.FastMath;
 import processing.core.PApplet;
 
 @SuppressWarnings("Duplicates")
@@ -226,8 +227,8 @@ public class Viz extends PApplet {
                     stroke(0,100,100);
                     fill(0, 0, 0);
                 } else {
-                    hue = map((float)Math.log(rectangle.width * rectangle.height),
-                            (float)Math.log(activeView.smallest), (float)Math.log(activeView.largest), range, range + 180);
+                    hue = map((float)FastMath.log(rectangle.width * rectangle.height),
+                            (float)FastMath.log(activeView.smallest), (float)FastMath.log(activeView.largest), range, range + 180);
                     fill(hue, 100, 100);
                     stroke(0,0,0);
                 }

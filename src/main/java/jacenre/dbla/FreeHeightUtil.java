@@ -1,6 +1,8 @@
 package jacenre.dbla;
 import java.util.ArrayList;
 
+import net.jafama.FastMath;
+
 /**
  * Util that allows any {@code Util.HeightSupport.FIXED} to be turned into a {@code Util.HeightSupport.FREE} solver
  * using local minima finder.
@@ -100,12 +102,12 @@ public class FreeHeightUtil {
 
         // For the math behind this, refer to Tristan Trouwen (or maybe the report in a later stage)
         // for simplification of expression of checksPerIteration
-        double L1 = Math.log((float) stepSizePrecision / numPossibleHeights);
+        double L1 = FastMath.log((float) stepSizePrecision / numPossibleHeights);
 
         double numRecursions, checksPerIteration;
         // check if not legal
-        if (2 * L1 / numChecks < -1 / Math.exp(1) || 2 * L1 / numChecks >= 0) {
-            // numChecks = - (int) (Math.log((float)1/numPossibleHeights)*2*Math.exp(1))+2; // amount of checks that should be needed
+        if (2 * L1 / numChecks < -1 / FastMath.exp(1) || 2 * L1 / numChecks >= 0) {
+            // numChecks = - (int) (FastMath.log((float)1/numPossibleHeights)*2*FastMath.exp(1))+2; // amount of checks that should be needed
             numRecursions = 1; // no recursion
             stepSizePrecision = (float) numPossibleHeights / numChecks;
             checksPerIteration = numChecks;
