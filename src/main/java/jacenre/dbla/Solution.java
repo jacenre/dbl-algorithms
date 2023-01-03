@@ -1,4 +1,5 @@
 package jacenre.dbla;
+
 /**
  * Solution object encapsulating the results of solving a {@link Parameters} object.
  * <p>

@@ -16,6 +16,7 @@ import jacenre.dbla.BottomUpSolver;
 import jacenre.dbla.CompoundSolver;
 import jacenre.dbla.CompressionSolver;
 import jacenre.dbla.FirstFitSolver;
+import jacenre.dbla.GeneticSolver;
 import jacenre.dbla.Parameters;
 import jacenre.dbla.Rectangle;
 import jacenre.dbla.ReverseFitSolver;
@@ -55,8 +56,8 @@ public class Viz extends PApplet {
 	@Override
 	public void settings() {
 		SplittableRandom r = new SplittableRandom();
-		List<Rectangle> rects = Stream.generate(() -> new Rectangle(r.nextInt(15, 150), r.nextInt(15, 150))).limit(2000).toList();
-		Parameters params = new Parameters(4000, HeightSupport.FIXED, true, rects);
+		List<Rectangle> rects = Stream.generate(() -> new Rectangle(r.nextInt(15, 300), r.nextInt(15, 300))).limit(500).toList();
+		Parameters params = new Parameters(3000, HeightSupport.FIXED, true, rects);
 
 		List<AbstractSolver> solvers = new ArrayList<>();
 		solvers.add(new FirstFitSolver());
@@ -65,6 +66,7 @@ public class Viz extends PApplet {
 		solvers.add(new ReverseFitSolver());
 		solvers.add(new SimpleTopLeftSolver());
 		solvers.add(new BottomUpSolver());
+		solvers.add(new GeneticSolver(new TopLeftSolver(), true));
 //        solvers.add(new CompoundSolver().addSolver(new FirstFitSolver()).addSolver(new SkylineSolver()));
 //        solvers.add(new SkylineSolver());
 
@@ -82,7 +84,7 @@ public class Viz extends PApplet {
 //				}
 			}
 		});
-		
+
 //        if (params.copy().heightVariant.equals(Util.HeightSupport.FREE)) {
 //            new SwingWrapper<>(chart).displayChart();
 //        }
@@ -183,45 +185,45 @@ public class Viz extends PApplet {
 	 * Object responsible for drawing parameters as rectangles
 	 */
 	class Viewport {
-	
+
 		// Max size of either the width or height.
 		int maxSize = 800;
-	
+
 		int x = 100;
-	
+
 		public void setX(int x) {
 			this.x = x;
 			this.boundingBox.x = x;
 		}
-	
+
 		int y = 100;
-	
+
 		public void setY(int y) {
 			this.y = y;
 			this.boundingBox.y = y;
 		}
-	
+
 		int solutionWidth;
 		int solutionHeight;
-	
+
 		Rectangle boundingBox;
-	
+
 		// Scale factor
 		int drawWidth;
 		int drawHeight;
-	
+
 		Solution solution;
-	
+
 		void reset() {
 			this.maxSize = 800;
 			this.x = 100;
 			this.y = 100;
 			setScale();
 		}
-	
+
 		// Arraylist filled with all the ID's of overlapping rectangles.
 		ArrayList<Rectangle> overlap = new ArrayList<>();
-	
+
 		void setup() {
 			for (Rectangle rectangle : this.solution.parameters.rectangles) {
 				if (rectangle.x < 0 || rectangle.y < 0) {
@@ -242,11 +244,11 @@ public class Viz extends PApplet {
 			}
 			setScale();
 		}
-	
+
 		private void updateSizes() {
 			this.solutionHeight = (int) this.solution.getHeight();
 			this.solutionWidth = (int) this.solution.getWidth();
-	
+
 			if (this.solutionWidth > this.solutionHeight) {
 				drawWidth = maxSize;
 				drawHeight = solutionHeight * maxSize / this.solutionWidth;
@@ -255,47 +257,47 @@ public class Viz extends PApplet {
 				drawHeight = maxSize;
 			}
 		}
-	
+
 		void setScale() {
 			updateSizes();
 			// translate rectangle position
 			this.x = (DEFAULT_WIDTH - drawWidth) / 2;
 			this.y = (DEFAULT_HEIGHT - drawHeight) / 2;
-	
+
 			boundingBox = new Rectangle(this.x, this.y, drawWidth, drawHeight);
 		}
-	
+
 		void setScale(double factor) {
 			// update sizes
 			updateSizes();
-	
+
 			double scaleChange = 1 - factor;
-	
+
 			double dx = (mouseX - this.x) * scaleChange;
 			double dy = (mouseY - this.y) * scaleChange;
-	
+
 			// translate rectangle position
 			this.x = this.x + (int) dx;
 			this.y = this.y + (int) dy;
-	
+
 			boundingBox = new Rectangle(this.x, this.y, drawWidth, drawHeight);
-	
+
 		}
-	
+
 		int smallest = Integer.MAX_VALUE;
 		int largest = 0;
-	
+
 		Viewport(Parameters parameters) {
 			// Wrap the parameters in a solution object.
 			this.solution = new Solution(parameters);
 			setup();
 		}
-	
+
 		Viewport(Solution solution) {
 			this.solution = solution;
 			setup();
 		}
-	
+
 		void draw() {
 			fill(0, 0, 100, 100);
 			for (Rectangle rectangle : solution.parameters.rectangles) {
@@ -320,7 +322,7 @@ public class Viz extends PApplet {
 			fill(0, 0, 0, 0);
 			rect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
 		}
-	
+
 	}
 
 }

@@ -1,4 +1,5 @@
 package jacenre.dbla;
+
 public class PackingSolver {
     /**
      * @throws IllegalArgumentException if number of rectangles is not positive

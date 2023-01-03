@@ -34,7 +34,9 @@ public class Animator extends PApplet {
     static boolean USER_INPUT;
 
     public static void main(String[] args) {
-        PApplet.main("Animator");
+		System.setProperty("sun.java2d.uiScale", "1.0");
+		System.setProperty("prism.allowhidpi", "false");
+        PApplet.main(Animator.class);
     }
 
     @Override

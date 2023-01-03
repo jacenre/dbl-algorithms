@@ -3,6 +3,7 @@ package visualizer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -33,7 +34,7 @@ public class ChartMaker {
 
         //String path = "./test/input/Non-perfect fit/Bortfeldt, 2006";
         //String path = "./test/input/ChartSelection";
-        String path = "./test/input/selection";
+        String path = Paths.get("src","test","resources", "input/selection").toString();
 
         File folder = new File(path);
         File[] files = folder.listFiles();
