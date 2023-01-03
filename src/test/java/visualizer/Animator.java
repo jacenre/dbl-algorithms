@@ -37,12 +37,14 @@ public class Animator extends PApplet {
         PApplet.main("Animator");
     }
 
-    public void settings() {
+    @Override
+	public void settings() {
         animator = this;
         size(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
-    public void setup() {
+    @Override
+	public void setup() {
         frameRate(100);
         colorMode(HSB, 360, 100, 100);
     }
@@ -106,9 +108,9 @@ public class Animator extends PApplet {
 
             if (this.solutionWidth > this.solutionHeight) {
                 drawWidth = maxSize;
-                drawHeight = (solutionHeight * maxSize) / this.solutionWidth;
+                drawHeight = solutionHeight * maxSize / this.solutionWidth;
             } else {
-                drawWidth = (solutionWidth * maxSize) / solutionHeight;
+                drawWidth = solutionWidth * maxSize / solutionHeight;
                 drawHeight = maxSize;
             }
 
@@ -153,12 +155,14 @@ public class Animator extends PApplet {
     int oldX;
     int oldY;
 
-    public void mousePressed() {
+    @Override
+	public void mousePressed() {
         oldX = mouseX;
         oldY = mouseY;
     }
 
-    public void keyPressed() {
+    @Override
+	public void keyPressed() {
         if (keyCode == RIGHT) {
             currentViewIndex = (currentViewIndex + 1 + viewports.size()) % viewports.size();
             currentView().reset();
@@ -179,7 +183,8 @@ public class Animator extends PApplet {
         return stepping ? viewports.get(currentViewIndex) : activeView;
     }
 
-    public void draw() {
+    @Override
+	public void draw() {
         try {
             if (Animator.getInstance() != null) {
                 Viewport view = currentView();

@@ -57,7 +57,7 @@ abstract class AbstractPackingSolverTest {
 
         for (File file : files) {
 
-            Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+            Parameters params = new UserInput(new FileInputStream(file)).getUserInput();
 
             AbstractSolver solver = this.getSolver();
             if (!solver.canSolveParameters(params)) {
@@ -95,7 +95,7 @@ abstract class AbstractPackingSolverTest {
 
             // Add a test for each input
             for (File file : files) {
-                Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+                Parameters params = new UserInput(new FileInputStream(file)).getUserInput();
 
                 AbstractSolver solver = this.getSolver();
                 if (!solver.canSolveParameters(params)) {
@@ -117,9 +117,9 @@ abstract class AbstractPackingSolverTest {
     @Disabled("Benchmark disabled.")
     public void benchmark() throws FileNotFoundException {
         // Use the hardest file as benchmark
-    	
+
         File file = Paths.get("src","test","resources", "momotor/benchmark_r1000-h1000-ry.in").toFile();
-        Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+        Parameters params = new UserInput(new FileInputStream(file)).getUserInput();
 
         long count = 0;
 

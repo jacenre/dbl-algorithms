@@ -73,7 +73,9 @@ public class Solution {
 
         for (Rectangle rectangle :
                 this.parameters.rectangles) {
-            if (rectangle.y + rectangle.height > maxHeight) maxHeight = rectangle.y + rectangle.height;
+            if (rectangle.y + rectangle.height > maxHeight) {
+				maxHeight = rectangle.y + rectangle.height;
+			}
         }
 
         return maxHeight;
@@ -90,13 +92,17 @@ public class Solution {
      * @return the height of the {@code Solution}
      */
     public long getHeight(boolean ignoreHeightVariant) {
-        if (!ignoreHeightVariant) return (long) getHeight();
+        if (!ignoreHeightVariant) {
+			return getHeight();
+		}
 
         long maxHeight = 0;
 
         for (Rectangle rectangle :
                 this.parameters.rectangles) {
-            if (rectangle.y + rectangle.height > maxHeight) maxHeight = rectangle.y + rectangle.height;
+            if (rectangle.y + rectangle.height > maxHeight) {
+				maxHeight = rectangle.y + rectangle.height;
+			}
         }
 
         return maxHeight;
@@ -112,7 +118,9 @@ public class Solution {
 
         for (Rectangle rectangle :
                 this.parameters.rectangles) {
-            if (rectangle.x + rectangle.width > maxWidth) maxWidth = rectangle.x + rectangle.width;
+            if (rectangle.x + rectangle.width > maxWidth) {
+				maxWidth = rectangle.x + rectangle.width;
+			}
         }
 
         return maxWidth;
@@ -156,12 +164,14 @@ public class Solution {
      * @return the sum of the area of all rectangles
      */
     public long getMinimumArea() {
-        if (this.minimumArea != null) return this.minimumArea;
+        if (this.minimumArea != null) {
+			return this.minimumArea;
+		}
 
         long minimumArea = 0L;
         for (Rectangle rectangle :
                 parameters.rectangles) {
-            minimumArea += (rectangle.height * rectangle.width);
+            minimumArea += rectangle.height * rectangle.width;
         }
         return minimumArea;
     }
@@ -241,7 +251,10 @@ public class Solution {
     public boolean isBetter(Solution solution2) {
         boolean ignoreHeightVariant = this.parameters.heightVariant == Util.HeightSupport.FREE;
         // Check if null (edge cases)
-        if (solution2 == null) return true;
-        else return this.getArea(ignoreHeightVariant) < solution2.getArea(ignoreHeightVariant);
+        if (solution2 == null) {
+			return true;
+		} else {
+			return this.getArea(ignoreHeightVariant) < solution2.getArea(ignoreHeightVariant);
+		}
     }
 }

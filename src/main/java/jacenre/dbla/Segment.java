@@ -30,8 +30,8 @@ class Segment {
             return this.start == ((Segment) obj).start && this.end == ((Segment) obj).end;
         } else if (obj instanceof Rectangle) {
             // For rectangles we check if the
-            return (this.start.equals(new Point(((Rectangle) obj).x, ((Rectangle) obj).y))
-                    || this.end.equals(new Point(((Rectangle) obj).x,((Rectangle) obj).x + ((Rectangle) obj).height)));
+            return this.start.equals(new Point(((Rectangle) obj).x, ((Rectangle) obj).y))
+                    || this.end.equals(new Point(((Rectangle) obj).x,((Rectangle) obj).x + ((Rectangle) obj).height));
         }
         return super.equals(obj);
     }

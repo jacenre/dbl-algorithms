@@ -42,7 +42,7 @@ public class Util {
     public static int maxHeight(ArrayList<Rectangle> rectangles) {
         int max = 0;
         for (Rectangle rectangle : rectangles) {
-            max = (rectangle.y + rectangle.height > max) ? rectangle.y + rectangle.height : max;
+            max = rectangle.y + rectangle.height > max ? rectangle.y + rectangle.height : max;
         }
         return max;
     }
@@ -115,8 +115,12 @@ public class Util {
         segments.sort((o1, o2) -> {
             if (o1.x == o2.x) {
                 // END has higher priority then START
-                if (o1.type == Type.END) return -1;
-                if (o2.type == Type.END) return 1;
+                if (o1.type == Type.END) {
+					return -1;
+				}
+                if (o2.type == Type.END) {
+					return 1;
+				}
             }
             // Else sort on x
             return o1.x - o2.x;
@@ -131,9 +135,11 @@ public class Util {
                 for (Segment segment1 :
                         active) {
                     // If the interval is already in the tree there is overlap.
-                    if (segment1.equals(segment)) return true;
-                    if ((segment.yStart > segment1.yStart && segment.yStart < segment1.yEnd)
-                            || (segment.yEnd > segment1.yStart && segment.yEnd < segment1.yEnd)) {
+                    if (segment1.equals(segment)) {
+						return true;
+					}
+                    if (segment.yStart > segment1.yStart && segment.yStart < segment1.yEnd
+                            || segment.yEnd > segment1.yStart && segment.yEnd < segment1.yEnd) {
                         // Overlap
                         return true;
                     }
@@ -176,9 +182,11 @@ public class Util {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj.getClass() != this.getClass()) return false;
+            if (obj.getClass() != this.getClass()) {
+				return false;
+			}
             Segment seg = (Segment) obj;
-            return (seg.yStart == this.yStart && seg.yEnd == this.yEnd);
+            return seg.yStart == this.yStart && seg.yEnd == this.yEnd;
         }
     }
 
@@ -205,7 +213,9 @@ public class Util {
         }
 
         if (sweepline(solution)) {
-            if (debug) System.err.println("There are overlapping rectangles");
+            if (debug) {
+				System.err.println("There are overlapping rectangles");
+			}
             return false;
         }
 
@@ -213,12 +223,16 @@ public class Util {
                 solution.parameters.rectangles) {
             // Rotation without rotation variant.
             if (rectangle.isRotated() && !solution.parameters.rotationVariant) {
-                if (debug) System.err.println("Illegal rotation found");
+                if (debug) {
+					System.err.println("Illegal rotation found");
+				}
                 return false;
             }
 
             if (rectangle.x < 0 || rectangle.y < 0) {
-                if (debug) System.err.println("Negative coordinates found");
+                if (debug) {
+					System.err.println("Negative coordinates found");
+				}
                 return false;
             }
         }
@@ -226,16 +240,20 @@ public class Util {
         if (solution.parameters.heightVariant == Util.HeightSupport.FIXED) {
             for (Rectangle rectangle : solution.parameters.rectangles) {
                 if (rectangle.y + rectangle.height > solution.parameters.height) {
-                    if (debug) System.err.println("The height limit is not maintained, " +
-                            (rectangle.y + rectangle.height) + " went over the maximum height of " +
-                            solution.parameters.height);
+                    if (debug) {
+						System.err.println("The height limit is not maintained, " +
+						        (rectangle.y + rectangle.height) + " went over the maximum height of " +
+						        solution.parameters.height);
+					}
                     return false;
                 }
             }
         }
 
         if (rate < 1) {
-            if (debug) System.err.println("Impossible result.");
+            if (debug) {
+				System.err.println("Impossible result.");
+			}
             return false;
         }
 
@@ -334,7 +352,9 @@ public class Util {
         Rectangle path = new Rectangle(rect.x, 0, rect.width, rect.y);
         rect.y = 0;
         for (Rectangle rectangle : rectangles) {
-            if (rectangle.getId().equals(rect.getId())) break;
+            if (rectangle.getId().equals(rect.getId())) {
+				break;
+			}
             if (path.intersects(rectangle)) {
                 rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
             }
@@ -349,7 +369,9 @@ public class Util {
         Rectangle path = new Rectangle(0, rect.y, rect.x, rect.height);
         rect.x = 0;
         for (Rectangle rectangle : rectangles) {
-            if (rectangle.getId().equals(rect.getId())) break;
+            if (rectangle.getId().equals(rect.getId())) {
+				break;
+			}
             if (path.intersects(rectangle)) {
                 rect.x = Math.max(rect.x, rectangle.x + rectangle.width);
             }

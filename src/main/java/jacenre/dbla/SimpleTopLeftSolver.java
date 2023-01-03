@@ -27,9 +27,10 @@ public class SimpleTopLeftSolver extends AbstractSolver {
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
-        if (!superResult) return false;
-        if (parameters.rectangles.size() > 500 && (
-                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
+        if (!superResult || (parameters.rectangles.size() > 500 && (
+                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil))) {
+			return false;
+		}
         return parameters.rectangles.size() <= 1000;
     }
 
@@ -54,7 +55,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
 
         // Sort the array from large to small
         if (allowInputSorting) {
-            parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
+            parameters.rectangles.sort((o1, o2) -> o2.height - o1.height);
         }
 
         // Get 50 solutions based on rotating differently
@@ -73,7 +74,7 @@ public class SimpleTopLeftSolver extends AbstractSolver {
                 Rectangle rect = parameters.rectangles.get(i);
                 rect.place(true);
                 Util.animate();
-                if (parameters.rotationVariant && (new Random()).nextBoolean() && rect.width < parameters.height) {
+                if (parameters.rotationVariant && new Random().nextBoolean() && rect.width < parameters.height) {
                     rect.rotate();
                 }
                 rect.x = binWidth;
@@ -123,11 +124,15 @@ public class SimpleTopLeftSolver extends AbstractSolver {
 
     /** Check if the rectangle can move to its left */
     protected boolean canMoveLeft(Rectangle rect, List<Rectangle> rectangles) {
-        if (rect.x <= 0) return false;
+        if (rect.x <= 0) {
+			return false;
+		}
         rect.x--;
         // Check intersection with all placed rectangles
         for (Rectangle rectangle : rectangles) {
-            if (rect.getId().equals(rectangle.getId())) break;
+            if (rect.getId().equals(rectangle.getId())) {
+				break;
+			}
             if (rect.intersects(rectangle)) {
                 rect.x++;
                 return false;
@@ -139,11 +144,15 @@ public class SimpleTopLeftSolver extends AbstractSolver {
 
     /** Check if the rectangle can move up */
     protected boolean canMoveUp(Rectangle rect, List<Rectangle> rectangles) {
-        if (rect.y <= 0) return false;
+        if (rect.y <= 0) {
+			return false;
+		}
         rect.y--;
         // Check intersection with all placed rectangles
         for (Rectangle rectangle : rectangles) {
-            if (rect.getId().equals(rectangle.getId())) break;
+            if (rect.getId().equals(rectangle.getId())) {
+				break;
+			}
             if (rect.intersects(rectangle)) {
                 rect.y++;
                 return false;

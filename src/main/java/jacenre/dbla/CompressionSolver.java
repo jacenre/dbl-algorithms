@@ -15,7 +15,9 @@ public class CompressionSolver extends AbstractSolver {
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
-        if (!superResult) return false;
+        if (!superResult) {
+			return false;
+		}
         return parameters.rectangles.size() <= 2000;
     }
 

@@ -23,7 +23,9 @@ public class PackingSolver {
 
         Solution solution = compoundSolver.getSolution(params);
         System.err.println(solution.getArea());
-        if (Util.debug) System.err.println(solution.solvedBy);
+        if (Util.debug) {
+			System.err.println(solution.solvedBy);
+		}
         Output.output(solution.parameters, inputOrder);
     }
 
@@ -39,7 +41,7 @@ public class PackingSolver {
             for (String rectID : inputOrder) {
                 Rectangle rect = params.rectangles.stream()
                         .filter(rectangle -> rectID.equals(rectangle.getId())).findAny().orElse(null);
-                assert (rect != null);
+                assert rect != null;
                 if (!rect.isRotated()) {
                     System.out.print(rect.width + " ");
                     System.out.println(rect.height);
@@ -52,7 +54,7 @@ public class PackingSolver {
             for (String rectID : inputOrder) {
                 Rectangle rect = params.rectangles.stream()
                         .filter(rectangle -> rectID.equals(rectangle.getId())).findAny().orElse(null);
-                assert (rect != null);
+                assert rect != null;
                 if (params.rotationVariant) {
                     System.out.print(rect.isRotated() ? "yes " : "no ");
                 }

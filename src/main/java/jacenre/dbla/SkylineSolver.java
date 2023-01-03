@@ -26,8 +26,9 @@ public class SkylineSolver extends AbstractSolver {
 
     @Override
     public boolean canSolveParameters(Parameters parameters) {
-        if (parameters.rectangles.size() > 100) return false;
-        if ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)  && parameters.rectangles.size() > 50) return false;
+        if ((parameters.rectangles.size() > 100) || ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)  && parameters.rectangles.size() > 50)) {
+			return false;
+		}
         return super.canSolveParameters(parameters);
     }
 
@@ -35,7 +36,9 @@ public class SkylineSolver extends AbstractSolver {
     private int numChecks;
 
     int getNumChecks(Parameters parameters) {
-        if (parameters.freeHeightUtil || parameters.heightVariant == Util.HeightSupport.FREE) return 3000;
+        if (parameters.freeHeightUtil || parameters.heightVariant == Util.HeightSupport.FREE) {
+			return 3000;
+		}
         return 1500;
     }
 
@@ -46,7 +49,9 @@ public class SkylineSolver extends AbstractSolver {
         int lowerBound = getLowerBound(parameters);
 
         globalSolution = new FirstFitSolver().getSolution(parameters);
-        if (globalSolution.getRate() == 1.0d) return globalSolution;
+        if (globalSolution.getRate() == 1.0d) {
+			return globalSolution;
+		}
 
         int upperBound = (int) globalSolution.getWidth();
 
@@ -61,10 +66,12 @@ public class SkylineSolver extends AbstractSolver {
             int tempLowerBound = lowerBound;
             while (tempLowerBound < upperBound) {
                 // Binary search
-                int width = ((tempLowerBound + upperBound) / 2);
+                int width = (tempLowerBound + upperBound) / 2;
 //                System.out.println("Solving for width=" + width + ", and " + iter + " iterations");
                 if (solve(parameters, width, iter)) {
-                    if (!(numChecks > 0)) break terminate;
+                    if (!(numChecks > 0)) {
+						break terminate;
+					}
 //                    System.out.println("solution found with width " + width);
                     /* record this solution */
                     if (globalSolution.getRate() == 1.0d) {
@@ -133,7 +140,9 @@ public class SkylineSolver extends AbstractSolver {
                 // Map the remaining tabu iterations against the set of tabus.
                 HashMap<Integer, Integer> tabu = new HashMap<>();
                 for (int i = 0; i < iter; i++) {
-                    if (!(numChecks > 0)) break terminate;
+                    if (!(numChecks > 0)) {
+						break terminate;
+					}
                     tabu.remove(i);
                     // Seqx is the sequence with highest area utilization.
                     ArrayList<Rectangle> seqx = null;
@@ -190,7 +199,9 @@ public class SkylineSolver extends AbstractSolver {
                     int a = random.nextInt(copy.size() - 1);
                     int b = random.nextInt(copy.size() - 1);
 
-                    if (a == b) b++;
+                    if (a == b) {
+						b++;
+					}
 
                     Rectangle temp = copy.get(a).copy();
                     copy.set(a, copy.get(b).copy());
@@ -260,9 +271,7 @@ public class SkylineSolver extends AbstractSolver {
 
             // Diagonal in decreasing order.
             ArrayList<Rectangle> decreasingDiagonal = Util.cloneRectangleState(rectangles);
-            decreasingDiagonal.sort(Comparator.comparingInt((Rectangle rect) -> {
-                return (int) Math.sqrt(rect.width ^ 2 + rect.height ^ 2) + rect.width + rect.height;
-            }).reversed());
+            decreasingDiagonal.sort(Comparator.comparingInt((Rectangle rect) -> ((int) Math.sqrt(rect.width ^ 2 + rect.height ^ 2) + rect.width + rect.height)).reversed());
             sortedRectangles.add(decreasingDiagonal);
         }
 
@@ -293,7 +302,7 @@ public class SkylineSolver extends AbstractSolver {
             // Maximum width
             float mw = 0;
             for (Rectangle rectangle : rectangles) {
-                mw = (rectangle.width > mw) ? rectangle.width : mw;
+                mw = rectangle.width > mw ? rectangle.width : mw;
             }
 
             // {mh, mh + (W - mh) * 1/3, mh + (H - mh) * 2/3, H}
@@ -392,7 +401,9 @@ public class SkylineSolver extends AbstractSolver {
                         }
                     }
                     // We do not want to permanently rotate this rectangle because we have not placed it yet
-                    if (parameters.rotationVariant) rectangle.rotate();
+                    if (parameters.rotationVariant) {
+						rectangle.rotate();
+					}
                 }
             }
 

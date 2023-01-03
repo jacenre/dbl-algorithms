@@ -60,13 +60,17 @@ public class CompoundSolver extends AbstractSolver {
                 Solution solution = solver.pack(initialParameters.copy());
 
                 // If we didn't find a solution.
-                if (solution == null) continue;
+                if (solution == null) {
+					continue;
+				}
 
                 double rate = solution.getRate();
 
                 // Overflow
                 if (rate < 0) {
-                    if (Util.debug) System.err.println("Negative rate");
+                    if (Util.debug) {
+						System.err.println("Negative rate");
+					}
                     continue;
                 } else if (rate == 1.0d) {
                     return solution;
@@ -77,12 +81,14 @@ public class CompoundSolver extends AbstractSolver {
                     if (rate >= 1) {
                         bestSolution = solution.copy();
                     }
-                    if (Util.debug) System.err.println(solver.getClass().getSimpleName() + " is improved with " + solution.getArea());
+                    if (Util.debug) {
+						System.err.println(solver.getClass().getSimpleName() + " is improved with " + solution.getArea());
+					}
                 } else if (solution.isBetter(bestSolution)) {
                     bestSolution = solution.copy();
-                } else {
-                    if (Util.debug) System.err.println(solver.getClass().getSimpleName() + " is not better with " + solution.getArea());
-                }
+                } else if (Util.debug) {
+					System.err.println(solver.getClass().getSimpleName() + " is not better with " + solution.getArea());
+				}
             } catch (Exception e) {
                 e.printStackTrace();
             }

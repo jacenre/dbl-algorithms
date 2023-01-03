@@ -12,8 +12,9 @@ public class MathUtil {
      * @throws IllegalArgumentException if {@code input} not in domain [-1/e, 0).
      */
     public static double LambertMinusOne(double input) throws IllegalArgumentException {
-        if (input < -1/Math.exp(1) || input >= 0) // input not in [-1/e, 0)
-            throw new IllegalArgumentException("Only defined on [-1/e, 0)");
+        if (input < -1/Math.exp(1) || input >= 0) { // input not in [-1/e, 0)
+			throw new IllegalArgumentException("Only defined on [-1/e, 0)");
+		}
 
         final double sigma = -1-Math.log(-input); // for simplification of final expression
 
@@ -23,7 +24,7 @@ public class MathUtil {
         final double M3 = -0.0201;
 
         // final expression (expression A5, appendix)
-        return -1-sigma - (2/M1)*(1-(1/(1+(M1*Math.sqrt(sigma/2))/(1+M2*sigma*Math.exp(M3*Math.sqrt(sigma))))));
+        return -1-sigma - 2/M1*(1-1/(1+M1*Math.sqrt(sigma/2)/(1+M2*sigma*Math.exp(M3*Math.sqrt(sigma)))));
     }
 
     /**
@@ -34,8 +35,9 @@ public class MathUtil {
      * @throws IllegalArgumentException if {@code input} not in domain [-1/e, infinity).
      */
     public static double LambertZero(double input) throws IllegalArgumentException {
-        if (input < -1 / Math.exp(1)) // input not in [-1/e, infinity)
-            throw new IllegalArgumentException("Only defined on [-1/e, infinity)");
+        if (input < -1 / Math.exp(1)) { // input not in [-1/e, infinity)
+			throw new IllegalArgumentException("Only defined on [-1/e, infinity)");
+		}
 
         final double y = Math.sqrt(2*Math.exp(1)*input+2); // to simplify expression
 
@@ -48,6 +50,6 @@ public class MathUtil {
 
         // final expression (expression 40, section 4)
         return (2*Math.log(1+B*y) -Math.log(1+C*Math.log(1+D*y)) + E)
-                / (1+ (1/(2 *Math.log(1+B*y)+2*A)));
+                / (1+ 1/(2 *Math.log(1+B*y)+2*A));
     }
 }

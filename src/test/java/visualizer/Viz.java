@@ -45,7 +45,8 @@ public class Viz extends PApplet {
         PApplet.main(Viz.class, args);
     }
 
-    public void settings() {
+    @Override
+	public void settings() {
         UserInput ui = new UserInput(System.in);
         Parameters params = ui.getUserInput();
 //        params = new Parameters();
@@ -70,7 +71,9 @@ public class Viz extends PApplet {
                 solvers) {
             if (solver.canSolveParameters(params)) {
                 Solution solution = solver.getSolution(params.copy());
-                if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE))ChartMaker.addSeries(chart, solver, solution);
+                if (solution.parameters.heightVariant.equals(Util.HeightSupport.FREE)) {
+					ChartMaker.addSeries(chart, solver, solution);
+				}
                 viewports.add(new Viewport(solution));
             }
         }
@@ -87,7 +90,8 @@ public class Viz extends PApplet {
 
 
 
-    public void setup() {
+    @Override
+	public void setup() {
         colorMode(HSB, 360, 100, 100);
     }
 
@@ -165,9 +169,9 @@ public class Viz extends PApplet {
 
             if (this.solutionWidth > this.solutionHeight) {
                 drawWidth = maxSize;
-                drawHeight = (solutionHeight * maxSize) / this.solutionWidth;
+                drawHeight = solutionHeight * maxSize / this.solutionWidth;
             } else {
-                drawWidth = (solutionWidth * maxSize) / solutionHeight;
+                drawWidth = solutionWidth * maxSize / solutionHeight;
                 drawHeight = maxSize;
             }
         }
@@ -185,7 +189,7 @@ public class Viz extends PApplet {
             // update sizes
             updateSizes();
 
-            double scaleChange = (1-factor);
+            double scaleChange = 1-factor;
 
             double dx = (mouseX - this.x) * scaleChange;
             double dy = (mouseY - this.y) * scaleChange;
@@ -244,16 +248,19 @@ public class Viz extends PApplet {
     private int oldY;
     private boolean moving = false;
 
-    public void mousePressed() {
+    @Override
+	public void mousePressed() {
         oldX = mouseX;
         oldY = mouseY;
     }
 
-    public void mouseReleased() {
+    @Override
+	public void mouseReleased() {
         moving = false;
     }
 
-    public void keyPressed() {
+    @Override
+	public void keyPressed() {
         if (keyCode == RIGHT) {
             if (active < viewports.size() - 1) {
                 active++;
@@ -284,7 +291,8 @@ public class Viz extends PApplet {
         activeView.setScale(factor);
     }
 
-    public void mouseDragged() {
+    @Override
+	public void mouseDragged() {
         // If you click on the strip, move it
         if (activeView.boundingBox.contains(new Point(mouseX, mouseY)) || moving) {
             moving = true;
@@ -295,7 +303,8 @@ public class Viz extends PApplet {
         oldY = mouseY;
     }
 
-    public void draw() {
+    @Override
+	public void draw() {
         background(0, 0, 100);
         if (activeView != null) {
             // If the view has overlap turn the text red.

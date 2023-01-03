@@ -106,6 +106,6 @@ public class Rectangle extends java.awt.Rectangle {
      */
     @Override
     public boolean equals(Object o) {
-        return (o instanceof Rectangle && ((Rectangle) o).getId().equals(getId()));
+        return o instanceof Rectangle && ((Rectangle) o).getId().equals(getId());
     }
 }

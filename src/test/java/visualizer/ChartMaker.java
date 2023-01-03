@@ -63,13 +63,13 @@ public class ChartMaker {
             double[] timeData = new double[files.length];
             for (File file : files) {
                 // yData last entry
-                Parameters params = (new UserInput(new FileInputStream(file))).getUserInput();
+                Parameters params = new UserInput(new FileInputStream(file)).getUserInput();
                 if (solver.canSolveParameters(params)) {
                     double startTime = System.nanoTime();
                     Solution solution = solver.getSolution(params.copy());
                     double endTime = System.nanoTime();
                     double duration = (endTime - startTime) / 1000000;
-                    areaData[i] = (double) solution.getArea();
+                    areaData[i] = solution.getArea();
                     timeData[i] = duration;
                 } else {
                     areaData[i] = 0;
@@ -81,8 +81,8 @@ public class ChartMaker {
             timeChart.addSeries(solver.getName(), xData, timeData);
             areaChart.addSeries(solver.getName(), xData, areaData);
         }
-        new SwingWrapper<XYChart>(timeChart).displayChart();
-        new SwingWrapper<XYChart>(areaChart).displayChart();
+        new SwingWrapper<>(timeChart).displayChart();
+        new SwingWrapper<>(areaChart).displayChart();
     }
 
     static public void addSeries(XYChart chart, AbstractSolver solver, Solution solution) {
@@ -107,7 +107,7 @@ public class ChartMaker {
 
     public static void main(String[] args) {
         try {
-            (new ChartMaker()).areaAndTimeCharts();
+            new ChartMaker().areaAndTimeCharts();
         } catch (Exception e) {
             System.out.println(e);
         }

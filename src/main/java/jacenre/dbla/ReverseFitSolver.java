@@ -19,9 +19,10 @@ public class ReverseFitSolver extends AbstractSolver {
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
-        if (!superResult) return false;
-        if (parameters.rectangles.size() > 2000 && (
-                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil)) return false;
+        if (!superResult || (parameters.rectangles.size() > 2000 && (
+                parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil))) {
+			return false;
+		}
         return parameters.rectangles.size() <= 10000;
     }
 
@@ -32,7 +33,8 @@ public class ReverseFitSolver extends AbstractSolver {
      * @throws IllegalArgumentException if {@code !parameters.heightVariant.equals("fixed") || parameters.height <= 0 }
      * @return Solution object
      */
-    Solution pack(Parameters parameters) throws IllegalArgumentException {
+    @Override
+	Solution pack(Parameters parameters) throws IllegalArgumentException {
         Util.animate(parameters, this);
 
         // STEP 1 #####
@@ -59,7 +61,7 @@ public class ReverseFitSolver extends AbstractSolver {
 
         // STEP 2 #####
         // Sort the remaining rectangles based on width
-        remainingRectangles.sort((o1, o2) -> (o2.width) - (o1.width));
+        remainingRectangles.sort((o1, o2) -> o2.width - o1.width);
         int w_max = remainingRectangles.get(0).width; // Widest of the remaining rectangles (h_{max} in article)
         //Pack the rectangles from up to down along x_0
         int y_0 = 0;
@@ -92,7 +94,9 @@ public class ReverseFitSolver extends AbstractSolver {
         for (Rectangle rectangle : remainingRectangles) {
             Util.animate();
             if (y_0_reverse < parameters.height / 2)
-                break;  // If the reverse row is this far up, stop
+			 {
+				break;  // If the reverse row is this far up, stop
+			}
             if (rectangle.height + y_0 < parameters.height) {    // Smaller rectangles might still fit in the first row
                 rectangle.setLocation(x_0, y_0);
                 y_0 += rectangle.height;
@@ -169,7 +173,7 @@ public class ReverseFitSolver extends AbstractSolver {
         // From here just modified first fit
         firstFit(remainingRectangles, nextLevel, parameters, firstRow);
 
-        assert (remainingRectangles.size() == 0);
+        assert remainingRectangles.size() == 0;
         int finalWidth = findNewLevel(firstRow);
         Util.animate();
         return new Solution(parameters, this);

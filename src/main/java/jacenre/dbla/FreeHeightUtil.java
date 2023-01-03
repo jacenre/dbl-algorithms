@@ -57,8 +57,9 @@ public class FreeHeightUtil {
         // Time allowed in milliseconds
         final int ALLOWED_TIME = 30000; // 25 seconds which leaves 5 seconds for other stuff
         int numChecks = (int) (ALLOWED_TIME / duration); // amount of checks that can be done
-        if (Util.debug)
-            System.out.println("numChecks: " + numChecks);
+        if (Util.debug) {
+			System.out.println("numChecks: " + numChecks);
+		}
         // find best heights
         if (numChecks >= numPossibleHeights) { // if more checks can be done than the max needed
             bestSolution = tryAllHeightsFinder(parameters);
@@ -111,7 +112,7 @@ public class FreeHeightUtil {
 
         } else { // legal
             // approximate number of recursions that will be made
-            numRecursions = (L1 / (MathUtil.LambertMinusOne(2 * L1 / numChecks)));
+            numRecursions = L1 / MathUtil.LambertMinusOne(2 * L1 / numChecks);
 
             checksPerIteration = numChecks * MathUtil.LambertMinusOne(2 * L1 / numChecks) / L1;
         }
@@ -140,16 +141,23 @@ public class FreeHeightUtil {
         do {
             // update stepSize
             stepSize = Math.max((int) ((stopRange - startRange) / checksPerIteration), 1);
-            if (Util.debug) System.out.println("Stepsize: " + stepSize);
+            if (Util.debug) {
+				System.out.println("Stepsize: " + stepSize);
+			}
 
             for (double newHeight = startRange + stepSize; newHeight <= stopRange - stepSize; newHeight += stepSize) {
-                if (triedHeights.contains(newHeight)) continue; // skip if already tried
+                if (triedHeights.contains(newHeight))
+				 {
+					continue; // skip if already tried
+				}
                 Parameters params = parameters.copy();
                 params.height = (int) newHeight;
                 Solution newSolution = subSolver.pack(params);
                 solves++;
 
-                if (newSolution == null) continue;
+                if (newSolution == null) {
+					continue;
+				}
 
                 if (newSolution.getRate() == 1.0d) {
                     return newSolution;
@@ -168,7 +176,9 @@ public class FreeHeightUtil {
             stopRange = (int) Math.min(maximumHeight, currentBestHeight + stepSize);
         } while (stepSize > stepSizePrecision && numRecursions > 1);
 
-        if (Util.debug) System.out.println("Solves: " + solves);
+        if (Util.debug) {
+			System.out.println("Solves: " + solves);
+		}
         return bestSolution;
     }
 
@@ -190,7 +200,10 @@ public class FreeHeightUtil {
             params.height = newHeight;
             Solution newSolution = subSolver.pack(params);
 
-            if (newSolution == null) continue; // not a good solution, skip
+            if (newSolution == null)
+			 {
+				continue; // not a good solution, skip
+			}
             if (newSolution.getRate() == 1.0d) {
                 return newSolution;
             }

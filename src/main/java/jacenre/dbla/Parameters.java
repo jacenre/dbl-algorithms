@@ -26,7 +26,7 @@ public class Parameters {
         long minimumArea = 0L;
         for (Rectangle rectangle :
                 this.rectangles) {
-            minimumArea += (rectangle.height * rectangle.width);
+            minimumArea += rectangle.height * rectangle.width;
         }
         this.minimumArea = minimumArea;
     }
@@ -125,9 +125,11 @@ public class Parameters {
 ////            toString.append(rectangle.width).append(" ").append(rectangle.height).append("\n");
 ////        }
         for (int i = 0; i < rectangles.size(); i++) {
-            if (i != 0 && i % 8 == 0)
-                toString.append(rectangles.get(i).width).append(" ").append(rectangles.get(i).height).append("\n");
-            else toString.append(rectangles.get(i).width).append(" ").append(rectangles.get(i).height).append("|");
+            if (i != 0 && i % 8 == 0) {
+				toString.append(rectangles.get(i).width).append(" ").append(rectangles.get(i).height).append("\n");
+			} else {
+				toString.append(rectangles.get(i).width).append(" ").append(rectangles.get(i).height).append("|");
+			}
         }
         return toString.toString();
     }

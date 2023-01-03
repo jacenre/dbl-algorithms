@@ -25,8 +25,9 @@ public class GeneticSolver extends AbstractSolver {
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
-        if (!superResult) return false;
-        if ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil) && parameters.rectangles.size() > 50) return false;
+        if (!superResult || ((parameters.heightVariant == Util.HeightSupport.FREE || parameters.freeHeightUtil) && parameters.rectangles.size() > 50)) {
+			return false;
+		}
         return parameters.rectangles.size() <= 500;
     }
 
@@ -67,7 +68,9 @@ public class GeneticSolver extends AbstractSolver {
         for (i = 1; i <= nGenerations; i++) {
             // Stop if 3 seconds has elapsed
             duration = (System.nanoTime() - startTime) / 1000000;
-            if (duration >= 3000) break;
+            if (duration >= 3000) {
+				break;
+			}
 
             // Each permutation generates 2 new permutations
             permutations = crossover(permutations);
@@ -110,9 +113,13 @@ public class GeneticSolver extends AbstractSolver {
             // Compare the contender to the best solution yet
             if (x < solutions.size()) {
                 if (bestSolution == null || contenderSolution.getRate() < bestSolution.getRate()) {
-                    if (Util.debug) System.out.println("new rate "+i+" after "+(double)duration / 1000+"s:" + contenderSolution.getRate());
+                    if (Util.debug) {
+						System.out.println("new rate "+i+" after "+(double)duration / 1000+"s:" + contenderSolution.getRate());
+					}
                     bestSolution = solutions.get(0).getValue().copy();
-                    if (bestSolution.getRate() == 1) break;
+                    if (bestSolution.getRate() == 1) {
+						break;
+					}
                 }
             }
 
@@ -123,7 +130,9 @@ public class GeneticSolver extends AbstractSolver {
             }
         }
 
-        if (Util.debug) System.out.println("generations: " + i);
+        if (Util.debug) {
+			System.out.println("generations: " + i);
+		}
         return bestSolution != null ? new Solution(bestSolution.parameters, this) : this.solver.pack(this.parameters);
     }
 
@@ -154,7 +163,7 @@ public class GeneticSolver extends AbstractSolver {
                 y = seg.yEnd;
             }
         }
-        double boxArea = (areaWidth * parameters.height);
+        double boxArea = areaWidth * parameters.height;
         return areaWidth + reusableTrimLoss / boxArea;
     }
 
@@ -235,6 +244,6 @@ public class GeneticSolver extends AbstractSolver {
 
     private int getRandomNumberInRange(int min, int max) {
         Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
+        return r.nextInt(max - min + 1) + min;
     }
 }

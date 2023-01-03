@@ -24,7 +24,9 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
-        if (!superResult) return false;
+        if (!superResult) {
+			return false;
+		}
         return parameters.rectangles.size() <= 500;
     }
 
@@ -50,7 +52,9 @@ public class TopLeftSolver extends SimpleTopLeftSolver {
         } else {
             rect.y = Math.max(0, rect.y - rect.height);
             for (Rectangle rectangle : rectangles) {
-                if (rectangle.getId().equals(rect.getId())) break;
+                if (rectangle.getId().equals(rect.getId())) {
+					break;
+				}
                 if (rectangle.isPlaced() && rect.intersects(rectangle)) {
                     rect.y = Math.max(rect.y, rectangle.y + rectangle.height);
                 }

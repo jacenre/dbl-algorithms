@@ -25,8 +25,10 @@ public class BottomUpSolver extends AbstractSolver {
     @Override
     public boolean canSolveParameters(Parameters parameters) {
         boolean superResult = super.canSolveParameters(parameters);
-        if (!superResult) return false;
-        return parameters.rectangles.size() <= 9999 || (parameters.heightVariant != Util.HeightSupport.FREE && !parameters.freeHeightUtil);
+        if (!superResult) {
+			return false;
+		}
+        return parameters.rectangles.size() <= 9999 || parameters.heightVariant != Util.HeightSupport.FREE && !parameters.freeHeightUtil;
     }
 
     Parameters parameters;
@@ -46,8 +48,8 @@ public class BottomUpSolver extends AbstractSolver {
         }
 
         // Sort on width, with height as the tie-breaker
-        parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
-        parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
+        parameters.rectangles.sort((o1, o2) -> o2.height - o1.height);
+        parameters.rectangles.sort((o1, o2) -> o2.width - o1.width);
 
         //up until this point, the code was identical to the first fit solver, here it diverges
 
@@ -61,7 +63,9 @@ public class BottomUpSolver extends AbstractSolver {
             //if this was the last rectangle, rotate it to minimize width
             if(toPlace.isEmpty()) {
                 if(first.width > first.height && first.width <= parameters.height) {
-                    if (parameters.rotationVariant) first.rotate();
+                    if (parameters.rotationVariant) {
+						first.rotate();
+					}
                 }
             }
 
@@ -112,12 +116,12 @@ public class BottomUpSolver extends AbstractSolver {
 
         //now we need an list of all rectangles to go sorted on area
         ArrayList<Rectangle> areaSorted = new ArrayList<>(toPlace);
-        areaSorted.sort((o1, o2) -> (o2.height * o2.width) - (o1.height * o1.width));
+        areaSorted.sort((o1, o2) -> o2.height * o2.width - o1.height * o1.width);
 
         //keep finding the row with the most remaining width
         //place the largest area rectangle that fits
         while (box.rows.size() >= 1) { //the border row is not considered a row
-            box.rows.sort((o1, o2) -> (o2.widthLeft) - (o1.widthLeft));
+            box.rows.sort((o1, o2) -> o2.widthLeft - o1.widthLeft);
             Row row = box.rows.get(0);
             toRemove = new ArrayList<>();
             boolean placedAny = false;
@@ -129,7 +133,9 @@ public class BottomUpSolver extends AbstractSolver {
                     toRemove.add(rectangle);
                     break;
                 } else if (box.rotation && rectangle.height <= row.widthLeft && rectangle.width <= row.height) {
-                    if (parameters.rotationVariant) rectangle.rotate();
+                    if (parameters.rotationVariant) {
+						rectangle.rotate();
+					}
                     box.place(rectangle, row);
                     placedAny = true;
                     toRemove.add(rectangle);
@@ -279,7 +285,7 @@ public class BottomUpSolver extends AbstractSolver {
      * All rectangles in a row are also in the box the row belongs to.
      * A row has a reference to the box it belongs to.
      */
-    private class Row {
+    private static class Row {
         int xPos;
         int yPos;
         int widthLeft;

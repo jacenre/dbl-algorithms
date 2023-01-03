@@ -33,7 +33,7 @@ public abstract class AbstractSolver {
      * Gets all the supported height variants.
      * <p>
      * By default both {@code FREE} and {@code FIXED} are enabled.
-     * 
+     *
      * @return a {@code Set} containing all the supported height variants.
      * @see Util.HeightSupport
      * </p>
@@ -58,7 +58,9 @@ public abstract class AbstractSolver {
      */
     public boolean canSolveParameters(Parameters parameters) {
         // Default check
-        if (parameters.freeHeightUtil && !this.getHeightSupport().contains(Util.HeightSupport.FREE)) return false;
+        if (parameters.freeHeightUtil && !this.getHeightSupport().contains(Util.HeightSupport.FREE)) {
+			return false;
+		}
         return this.getHeightSupport().contains(parameters.heightVariant);
     }
 

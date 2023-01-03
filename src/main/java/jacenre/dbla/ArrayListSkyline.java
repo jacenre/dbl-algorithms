@@ -27,18 +27,14 @@ public class ArrayListSkyline extends AbstractSkyline {
 
     public ArrayList<Segment> deepCopySkyline(ArrayList<Segment> skyline) {
         ArrayList<Segment> result = new ArrayList<>();
-        for (Segment segment : skyline) {
-            result.add(segment);
-        }
+        result.addAll(skyline);
         return result;
     }
 
 
     public ArrayList<Rectangle> deepCopyRectangles(ArrayList<Rectangle> sequence) {
         ArrayList<Rectangle> result = new ArrayList<>();
-        for (Rectangle rec : sequence) {
-            result.add(rec);
-        }
+        result.addAll(sequence);
         return result;
     }
 
@@ -64,7 +60,7 @@ public class ArrayListSkyline extends AbstractSkyline {
         // Get segment corresponding to right side of rectangle
         Segment segmentInQuestion = null;
         for (Segment segment : skyline) {
-            if ((segment.start.y == position.y && segment.start.x == position.x + rectangle.width)|| (segment.end.y == position.y && segment.start.x == position.x + rectangle.width)) {
+            if (segment.start.y == position.y && segment.start.x == position.x + rectangle.width|| segment.end.y == position.y && segment.start.x == position.x + rectangle.width) {
                 segmentInQuestion = segment;
             }
         }
@@ -79,7 +75,7 @@ public class ArrayListSkyline extends AbstractSkyline {
             Segment toCheck = skyline.get(index);
             if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
                     toCheck.getLength() < smallestRecs[3] : toCheck.getLength() < smallestRecs[2])) {
-                int height = (index != 0 ? Math.min(skyline.get(index - 1).start.x, segmentInQuestion.start.x) : segmentInQuestion.start.x);
+                int height = index != 0 ? Math.min(skyline.get(index - 1).start.x, segmentInQuestion.start.x) : segmentInQuestion.start.x;
                 wastedSpaceAbove += (height - toCheck.start.x) * toCheck.getLength();
             }
         }
@@ -93,7 +89,7 @@ public class ArrayListSkyline extends AbstractSkyline {
             Segment toCheck = skyline.get(index);
             if (toCheck.start.x < segmentInQuestion.start.x && (rectangle.height == smallestRecs[2] ?
                     toCheck.getLength() < smallestRecs[3] : toCheck.getLength() < smallestRecs[2])) {
-                int height = (index != skyline.size() - 1 ? Math.min(skyline.get(index + 1).start.x, segmentInQuestion.start.x) : segmentInQuestion.start.x);
+                int height = index != skyline.size() - 1 ? Math.min(skyline.get(index + 1).start.x, segmentInQuestion.start.x) : segmentInQuestion.start.x;
                 wastedSpaceBelow += (height - toCheck.start.x) * toCheck.getLength();
             }
         }
@@ -158,16 +154,16 @@ public class ArrayListSkyline extends AbstractSkyline {
         }
 
         // Same as above
-        if (index > 0 && (skyline.get(index - 1).start.x - segmentInQuestion.start.x) == pair.rectangle.width) {
+        if (index > 0 && skyline.get(index - 1).start.x - segmentInQuestion.start.x == pair.rectangle.width) {
             fitnessNumber++;
-        } else if (index == 0 && (globalWidth - segmentInQuestion.start.x) == pair.rectangle.width) {
+        } else if (index == 0 && globalWidth - segmentInQuestion.start.x == pair.rectangle.width) {
             fitnessNumber++;
         }
 
         //Same as below
-        if (index < skyline.size() - 1 && (skyline.get(index + 1).start.x - segmentInQuestion.start.x) == pair.rectangle.width) {
+        if (index < skyline.size() - 1 && skyline.get(index + 1).start.x - segmentInQuestion.start.x == pair.rectangle.width) {
             fitnessNumber++;
-        } else if (index == skyline.size() - 1 && (globalWidth - segmentInQuestion.start.x) == pair.rectangle.width) {
+        } else if (index == skyline.size() - 1 && globalWidth - segmentInQuestion.start.x == pair.rectangle.width) {
             fitnessNumber++;
         }
 
@@ -224,7 +220,8 @@ public class ArrayListSkyline extends AbstractSkyline {
         return mostLeftPoint;
     }
 
-    public void adjustSkyline(Rectangle rectangle, SegPoint position) {
+    @Override
+	public void adjustSkyline(Rectangle rectangle, SegPoint position) {
         // Note that a rectangle is always placed with the origin matching a skyline point.
         Segment segmentOnWhichIsToBePlaced = null;
         int index = 0;
@@ -263,54 +260,52 @@ public class ArrayListSkyline extends AbstractSkyline {
                 skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y - rectangle.height)), new SegPoint(false,
                         new Point(position.x + rectangle.width, position.y))));
             }
-        } else { // Case 3 : rectangle to be placed is longer than the segment on which it is placed
-            if (position.start) {
-                skyline.remove(segmentOnWhichIsToBePlaced);
-                int upToThisY = position.y + rectangle.height;
-                skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)),
-                        new SegPoint(false, new Point(position.x + rectangle.width, upToThisY))));
+        } else if (position.start) {
+		    skyline.remove(segmentOnWhichIsToBePlaced);
+		    int upToThisY = position.y + rectangle.height;
+		    skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, position.y)),
+		            new SegPoint(false, new Point(position.x + rectangle.width, upToThisY))));
 
 
 
-                // delete segments that are completely overshadowed
-                while(index + 1 < skyline.size()) {
-                    if (skyline.get(index + 1).end.y < upToThisY) {
-                        skyline.remove(skyline.get(index + 1));
-                    } else {
-                        break;
-                    }
-                }
+		    // delete segments that are completely overshadowed
+		    while(index + 1 < skyline.size()) {
+		        if (skyline.get(index + 1).end.y < upToThisY) {
+		            skyline.remove(skyline.get(index + 1));
+		        } else {
+		            break;
+		        }
+		    }
 
-                // From here we only need to cut a segment in half or delete it
-                Segment segmentToCut = skyline.get(index + 1);
-                SegPoint upToSegPoint = segmentToCut.end;
-                skyline.remove(segmentToCut);
-                if (upToSegPoint.y > upToThisY) {
-                    skyline.add(index + 1, new Segment(new SegPoint(true, new Point(upToSegPoint.x, position.y + rectangle.height)), upToSegPoint));
-                }
-            } else if (!position.start) {
-                skyline.remove(segmentOnWhichIsToBePlaced);
-                int upToThisY = position.y - rectangle.height;
-                skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, upToThisY)),
-                        new SegPoint(false, new Point(position.x + rectangle.width, position.y))));
+		    // From here we only need to cut a segment in half or delete it
+		    Segment segmentToCut = skyline.get(index + 1);
+		    SegPoint upToSegPoint = segmentToCut.end;
+		    skyline.remove(segmentToCut);
+		    if (upToSegPoint.y > upToThisY) {
+		        skyline.add(index + 1, new Segment(new SegPoint(true, new Point(upToSegPoint.x, position.y + rectangle.height)), upToSegPoint));
+		    }
+		} else if (!position.start) {
+		    skyline.remove(segmentOnWhichIsToBePlaced);
+		    int upToThisY = position.y - rectangle.height;
+		    skyline.add(index, new Segment(new SegPoint(true, new Point(position.x + rectangle.width, upToThisY)),
+		            new SegPoint(false, new Point(position.x + rectangle.width, position.y))));
 
-                // delete segments that are completely overshadowed
-                for (int i = index - 1; i > - 1; i--) {
-                    if (skyline.get(i).start.y > upToThisY) {
-                        skyline.remove(skyline.get(i));
-                        index--;
-                    }
-                }
+		    // delete segments that are completely overshadowed
+		    for (int i = index - 1; i > - 1; i--) {
+		        if (skyline.get(i).start.y > upToThisY) {
+		            skyline.remove(skyline.get(i));
+		            index--;
+		        }
+		    }
 
-                // From here we only need to cut a segment in half or delete it
-                Segment segmentToCut = skyline.get(index - 1);
-                SegPoint upToSegPoint = segmentToCut.start;
-                skyline.remove(segmentToCut);
-                if (upToSegPoint.y < upToThisY) {
-                    skyline.add(index - 1, new Segment(upToSegPoint, new SegPoint(false, new Point(upToSegPoint.x, position.y - rectangle.height))));
-                }
-            }
-        }
+		    // From here we only need to cut a segment in half or delete it
+		    Segment segmentToCut = skyline.get(index - 1);
+		    SegPoint upToSegPoint = segmentToCut.start;
+		    skyline.remove(segmentToCut);
+		    if (upToSegPoint.y < upToThisY) {
+		        skyline.add(index - 1, new Segment(upToSegPoint, new SegPoint(false, new Point(upToSegPoint.x, position.y - rectangle.height))));
+		    }
+		}
     }
 
     public void fixSkylineAfterPlacements(ArrayList<Rectangle> rectangles, boolean rotationsAllowed) {
@@ -330,7 +325,7 @@ public class ArrayListSkyline extends AbstractSkyline {
                 return;
             }
             int[] smallestRecs = getMinWidthHeightOtherRectangles(rectangles);
-            int smallestSide = (rotationsAllowed ? Math.min(smallestRecs[0], smallestRecs[2]) : smallestRecs[2]);
+            int smallestSide = rotationsAllowed ? Math.min(smallestRecs[0], smallestRecs[2]) : smallestRecs[2];
 
             for (int i = 0; i < skyline.size(); i++) {
                 int toX;

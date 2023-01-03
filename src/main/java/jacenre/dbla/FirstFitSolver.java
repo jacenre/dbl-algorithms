@@ -36,8 +36,8 @@ public class FirstFitSolver extends AbstractSolver {
         }
 
         // Sort the array from large to small
-        parameters.rectangles.sort((o1, o2) -> (o2.height) - (o1.height));
-        parameters.rectangles.sort((o1, o2) -> (o2.width) - (o1.width));
+        parameters.rectangles.sort((o1, o2) -> o2.height - o1.height);
+        parameters.rectangles.sort((o1, o2) -> o2.width - o1.width);
 
         ArrayList<Box> boxes = new ArrayList<>();
 
@@ -52,28 +52,28 @@ public class FirstFitSolver extends AbstractSolver {
                 newBox.add(rectangle);
 
                 boxes.add(newBox);
-            } else {
-                // If the rectangle doesn't fit we create a new box.
-                if (!fitRectangle(boxes, rectangle, parameters.height)) {
+            } else // If the rectangle doesn't fit we create a new box.
+			if (!fitRectangle(boxes, rectangle, parameters.height)) {
 
-                    long maxX = 0;
-                    for (Box box : boxes) {
-                        if (box.y == 0) {
-                            maxX = Math.max(box.x + box.width, maxX);
-                        }
-                    }
+			    long maxX = 0;
+			    for (Box box : boxes) {
+			        if (box.y == 0) {
+			            maxX = Math.max(box.x + box.width, maxX);
+			        }
+			    }
 
-                    rectangle.x = (int) maxX;
-                    rectangle.y = 0;
+			    rectangle.x = (int) maxX;
+			    rectangle.y = 0;
 
-                    Box newBox = new Box(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-                    newBox.add(rectangle);
+			    Box newBox = new Box(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+			    newBox.add(rectangle);
 
-                    boxes.add(newBox);
-                }
-            }
+			    boxes.add(newBox);
+			}
             rectangle.place(true);
-            if (animate) Util.animate(parameters, this);
+            if (animate) {
+				Util.animate(parameters, this);
+			}
         }
 
         return new Solution(parameters, this);
@@ -110,7 +110,7 @@ public class FirstFitSolver extends AbstractSolver {
     }
 
     // Boxes in which we store rectangles
-    private class Box {
+    private static class Box {
 
         // All the Rectangles in this box.
         ArrayList<Rectangle> rectangles = new ArrayList<>();
@@ -134,8 +134,8 @@ public class FirstFitSolver extends AbstractSolver {
         // Add a new rectangle to this box.
         public void add(Rectangle rect) {
             rectangles.add(rect);
-            this.height = (rect.y + rect.height > this.y + this.height) ? rect.y + rect.height - this.y : this.height;
-            this.width = (rect.x + rect.width > this.x + this.width) ? rect.x + rect.width - this.x : this.width;
+            this.height = rect.y + rect.height > this.y + this.height ? rect.y + rect.height - this.y : this.height;
+            this.width = rect.x + rect.width > this.x + this.width ? rect.x + rect.width - this.x : this.width;
         }
 
     }
