@@ -1,5 +1,9 @@
 package jacenre.dbla;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Solver algorithm adapted from the BL-algorithm, where the height has to be fixed.

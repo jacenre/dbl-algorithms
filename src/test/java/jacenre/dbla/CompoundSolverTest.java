@@ -1,14 +1,6 @@
 package jacenre.dbla;
 import org.junit.jupiter.api.DisplayName;
 
-import jacenre.dbla.AbstractSolver;
-import jacenre.dbla.BottomUpSolver;
-import jacenre.dbla.CompoundSolver;
-import jacenre.dbla.FirstFitSolver;
-import jacenre.dbla.GeneticSolver;
-import jacenre.dbla.SkylineSolver;
-import jacenre.dbla.TopLeftSolver;
-
 /**
  * Testing class using {@link CompoundSolver}
  */

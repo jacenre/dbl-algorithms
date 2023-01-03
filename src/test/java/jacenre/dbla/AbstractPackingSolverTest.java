@@ -1,12 +1,6 @@
 package jacenre.dbla;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
-
-import jacenre.dbla.AbstractSolver;
-import jacenre.dbla.Parameters;
-import jacenre.dbla.UserInput;
-import jacenre.dbla.Util;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,8 +12,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /**
  * Main class for the test cases
@@ -114,7 +114,7 @@ abstract class AbstractPackingSolverTest {
 
     @DisplayName("Benchmark")
     @Test
-    @Disabled
+    @Disabled("Benchmark disabled.")
     public void benchmark() throws FileNotFoundException {
         // Use the hardest file as benchmark
     	

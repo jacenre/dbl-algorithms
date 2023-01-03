@@ -1,9 +1,6 @@
 package jacenre.dbla;
 import org.junit.jupiter.api.DisplayName;
 
-import jacenre.dbla.AbstractSolver;
-import jacenre.dbla.FirstFitSolver;
-
 /**
  * Testing class using {@link FirstFitSolver}
  */

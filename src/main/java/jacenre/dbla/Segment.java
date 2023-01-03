@@ -1,5 +1,5 @@
 package jacenre.dbla;
-import java.awt.*;
+import java.awt.Point;
 
 /**
  * Util class representing a line segment.

@@ -1,5 +1,11 @@
 package visualizer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
 import org.knowm.xchart.XYChartBuilder;
@@ -14,12 +20,6 @@ import jacenre.dbla.Parameters;
 import jacenre.dbla.Solution;
 import jacenre.dbla.TopLeftSolver;
 import jacenre.dbla.UserInput;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ChartMaker {
     public void areaAndTimeCharts() throws IOException {

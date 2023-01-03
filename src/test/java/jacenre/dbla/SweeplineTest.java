@@ -1,14 +1,10 @@
 package jacenre.dbla;
-import org.junit.jupiter.api.Test;
-
-import jacenre.dbla.Parameters;
-import jacenre.dbla.Rectangle;
-import jacenre.dbla.Solution;
-import jacenre.dbla.Util;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class SweeplineTest {
 

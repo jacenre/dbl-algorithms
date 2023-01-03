@@ -1,13 +1,12 @@
 package visualizer;
 
-import processing.core.PApplet;
-
 import java.util.ArrayList;
 
 import jacenre.dbla.AbstractSolver;
 import jacenre.dbla.Parameters;
 import jacenre.dbla.Rectangle;
 import jacenre.dbla.Solution;
+import processing.core.PApplet;
 
 /**
  * Animator using the P3 library

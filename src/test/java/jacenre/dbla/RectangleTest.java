@@ -3,8 +3,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import jacenre.dbla.Rectangle;
-
 class RectangleTest {
     Rectangle rect;
     @BeforeEach

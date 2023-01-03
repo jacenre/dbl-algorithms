@@ -1,5 +1,5 @@
 package jacenre.dbla;
-import java.awt.*;
+import java.awt.Point;
 
 /**
  * A class which is necessary to keep track of the relative position of the points to the segment of which they are part

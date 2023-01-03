@@ -1,7 +1,14 @@
 package visualizer;
 
-import org.knowm.xchart.*;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.style.Styler;
+
 import jacenre.dbla.AbstractSolver;
 import jacenre.dbla.BottomUpSolver;
 import jacenre.dbla.CompoundSolver;
@@ -16,9 +23,6 @@ import jacenre.dbla.TopLeftSolver;
 import jacenre.dbla.UserInput;
 import jacenre.dbla.Util;
 import processing.core.PApplet;
-
-import java.awt.*;
-import java.util.ArrayList;
 
 @SuppressWarnings("Duplicates")
 public class Viz extends PApplet {

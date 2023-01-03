@@ -1,18 +1,10 @@
 package jacenre.dbla;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import jacenre.dbla.ArrayListSkyline;
-import jacenre.dbla.Parameters;
-import jacenre.dbla.PositionRectangleRotationPair;
-import jacenre.dbla.Rectangle;
-import jacenre.dbla.SegPoint;
-import jacenre.dbla.SkylineSolver;
-import jacenre.dbla.Util;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 
 class ArrayListSkylineTest {
 	
