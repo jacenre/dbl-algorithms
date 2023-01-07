@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.knowm.xchart.SwingWrapper;
@@ -56,7 +57,8 @@ public class Viz extends PApplet {
 	@Override
 	public void settings() {
 		SplittableRandom r = new SplittableRandom();
-		List<Rectangle> rects = Stream.generate(() -> new Rectangle(r.nextInt(15, 300), r.nextInt(15, 300))).limit(500).toList();
+		List<Rectangle> rects = Stream.generate(() -> new Rectangle(r.nextInt(15, 300), r.nextInt(15, 300))).limit(500)
+				.collect(Collectors.toList());
 		Parameters params = new Parameters(3000, HeightSupport.FIXED, true, rects);
 
 		List<AbstractSolver> solvers = new ArrayList<>();
