@@ -1,6 +1,9 @@
 # IDE
 .idea/*
 out/
+.classpath
+/.settings/
+.project
 
 lib/
 
@@ -35,3 +38,5 @@ input.txt
 
 # config iml
 *.iml
+/bin/
+/target/

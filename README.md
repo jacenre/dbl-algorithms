@@ -2,11 +2,6 @@
 
 A group project for the DBL Algorithms course at Eindhoven University of Technology.
 
-## Requirements
-- Java SDK 8
-- org.knowm.xchart:xchart:3.6.1
-- JUnit 5.6 for testing
-
 ## Terminology
 | Term  |  Description |
 |---|---|
